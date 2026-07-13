@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamVault - TV Argentina</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { display: ['Space Grotesk','sans-serif'], body: ['DM Sans','sans-serif'] },
+                    colors: {
+                        bg:'#0a0a0f', surface:'#111118', card:'#181822', 'card-h':'#20202e',
+                        bdr:'#2a2a3a', txt:'#eaeaf0', muted:'#7a7a95',
+                        accent:'#e8a020', 'accent-h':'#f0b840',
+                        ok:'#22c55e', err:'#ef4444', warn:'#f59e0b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root{--accent:#e8a020;--bg:#0a0a0f}
+        *{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#2a2a3a transparent}
+        ::-webkit-scrollbar{width:6px;height:6px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);overflow-x:hidden;margin:0}
+        .bg-glow{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 400px at 20% 10%,rgba(232,160,32,0.06),transparent),radial-gradient(ellipse 500px 500px at 80% 80%,rgba(220,80,50,0.04),transparent),radial-gradient(ellipse 400px 300px at 50% 50%,rgba(100,80,200,0.03),transparent);animation:glowShift 20s ease-in-out infinite alternate}
+        @keyframes glowShift{0%{opacity:1;transform:scale(1)}100%{opacity:.7;transform:scale(1.1)}}
+        @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
+        .live-dot{animation:livePulse 1.5s ease-in-out infinite}
+        .player-enter{animation:slideDown .4s cubic-bezier(.16,1,.3,1)}
+        @keyframes slideDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+        .card-fade{animation:cardIn .35s ease-out both}
+        @keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        .cat-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+        .cat-scroll>*{scroll-snap-align:start}
+        .toast-in{animation:toastIn .35s ease-out}
+        .toast-out{animation:toastOut .3s ease-in forwards}
+        @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes toastOut{to{opacity:0;transform:translateX(40px)}}
+        .load-bar{transition:width .4s ease}
+        .video-wrap video{width:100%;display:block;background:#000;border-radius:8px}
+        .vol-slider{-webkit-appearance:none;appearance:none;height:4px;background:#2a2a3a;border-radius:2px;outline:none}
+        .vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--accent);border-radius:50%;cursor:pointer}
+        .modal-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+        .modal-overlay.active{opacity:1;pointer-events:auto}
+        .modal-box{background:#181822;border:1px solid #2a2a3a;border-radius:16px;padding:28px;max-width:560px;width:92%;max-height:85vh;overflow-y:auto;transform:scale(.95);transition:transform .25s}
+        .modal-overlay.active .modal-box{transform:scale(1)}
+        .np-bar{backdrop-filter:blur(16px);background:rgba(17,17,24,.92);border-top:1px solid #2a2a3a}
+        .lock-screen{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .5s,transform .5s}
+        .lock-screen.out{opacity:0;transform:scale(1.05);pointer-events:none}
+        .lock-icon{animation:lockBounce 2s ease-in-out infinite}
+        @keyframes lockBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        .pin-dot{width:12px;height:12px;border-radius:50%;border:2px solid #2a2a3a;transition:all .2s}
+        .pin-dot.filled{background:var(--accent);border-color:var(--accent)}
+        .pin-dot.error{background:#ef4444;border-color:#ef4444;animation:shake .4s}
+        @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+        .key-btn{width:72px;height:72px;border-radius:50%;background:#181822;border:1px solid #2a2a3a;color:#eaeaf0;font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;user-select:none;-webkit-tap-highlight-color:transparent}
+        .key-btn:hover{background:#20202e;border-color:#e8a020;color:#e8a020}
+        .key-btn:active{transform:scale(.92);background:#e8a020;color:#0a0a0f}
+        .key-btn.wide{width:160px;border-radius:36px;font-size:14px}
+        .web-result{transition:all .15s}
+        .web-result:hover{background:#20202e;border-color:rgba(232,160,32,.3)}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .spinner{animation:spin 1s linear infinite}
+        .drop-zone{border:2px dashed #2a2a3a;border-radius:12px;transition:all .25s;cursor:pointer}
+        .drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(232,160,32,.05)}
+        .drop-zone.drag-over{transform:scale(1.01)}
+        .tab-btn{transition:all .2s}
+        .tab-btn.active{color:var(--accent);border-color:var(--accent)}
+        .history-item{transition:all .15s}
+        .history-item:hover{background:#20202e}
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+        @media(max-width:380px){.key-btn{width:62px;height:62px;font-size:20px}.key-btn.wide{width:136px}}
+    </style>
+</head>
+<body class="text-txt min-h-screen relative">
+
+<div class="bg-glow"></div>
+<div id="toasts" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm"></div>
+
+<!-- ==================== CLAVE ==================== -->
+<div id="lock-screen" class="lock-screen">
+    <div class="bg-glow"></div>
+    <div class="relative z-10 text-center px-6 w-full max-w-sm">
+        <div class="lock-icon text-5xl text-accent mb-6"><i class="fa-solid fa-lock"></i></div>
+        <h1 id="lock-title" class="font-display text-2xl font-bold mb-1">StreamVault</h1>
+        <p id="lock-subtitle" class="text-muted text-sm mb-8">Ingresá tu clave para continuar</p>
+        <div id="pin-dots" class="flex justify-center gap-3 mb-8"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
+        <div class="flex flex-col items-center gap-3" id="keypad">
+            <div class="flex gap-3"><button class="key-btn" data-key="1">1</button><button class="key-btn" data-key="2">2</button><button class="key-btn" data-key="3">3</button></div>
+            <div class="flex gap-3"><button class="key-btn" data-key="4">4</button><button class="key-btn" data-key="5">5</button><button class="key-btn" data-key="6">6</button></div>
+            <div class="flex gap-3"><button class="key-btn" data-key="7">7</button><button class="key-btn" data-key="8">8</button><button class="key-btn" data-key="9">9</button></div>
+            <div class="flex gap-3"><button class="key-btn wide" data-key="clear" style="visibility:hidden"></button><button class="key-btn" data-key="0">0</button><button class="key-btn" data-key="del"><i class="fa-solid fa-delete-left text-lg"></i></button></div>
+        </div>
+        <p id="lock-error" class="text-err text-xs mt-5 opacity-0 transition-opacity">Clave incorrecta</p>
+    </div>
+</div>
+
+<!-- ==================== CARGA ==================== -->
+<div id="loading-screen" class="fixed inset-0 z-40 bg-bg flex flex-col items-center justify-center gap-6" style="display:none">
+    <div class="text-center"><h1 class="font-display text-5xl font-bold text-accent tracking-tight">StreamVault</h1><p class="text-muted mt-2 text-sm">Cargando canales de Argentina y Latinoamerica...</p></div>
+    <div class="w-64 h-1.5 bg-surface rounded-full overflow-hidden"><div id="load-bar" class="load-bar h-full bg-accent rounded-full" style="width:0%"></div></div>
+    <p id="load-status" class="text-muted text-xs">Conectando...</p>
+</div>
+
+<!-- ==================== HEADER ==================== -->
+<header id="main-header" class="relative z-10 border-b border-bdr bg-surface/80 backdrop-blur-md sticky top-0" style="display:none">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+        <div class="flex items-center gap-2 shrink-0">
+            <div class="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center"><i class="fa-solid fa-tower-broadcast text-accent text-sm"></i></div>
+            <span class="font-display font-bold text-lg text-txt hidden sm:block">StreamVault</span>
+        </div>
+        <div class="flex-1 max-w-md relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm"></i>
+            <input id="search-input" type="text" placeholder="Buscar canales..." class="w-full bg-card border border-bdr rounded-lg pl-9 pr-4 py-2 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition">
+        </div>
+        <div class="flex items-center gap-1.5">
+            <button id="btn-web" title="Buscar en la web" class="w-9 h-9 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center text-accent hover:bg-accent/25 transition text-sm"><i class="fa-solid fa-globe"></i></button>
+            <button id="btn-favs" title="Favoritos" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-accent hover:border-accent/40 transition text-sm"><i class="fa-solid fa-heart"></i></button>
+            <button id="btn-logout" title="Cerrar sesion" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-err hover:border-err/40 transition text-sm"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </div>
+    <div class="cat-scroll flex gap-2 px-4 pb-3 max-w-7xl mx-auto">
+        <button data-cat="all" class="cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent">Todos</button>
+        <button data-cat="argentina" class="cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-location-dot mr-1"></i>Argentina</button>
+        <button data-cat="deportes" class="cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-futbol mr-1"></i>Deportes</button>
+        <button data-cat="peliculas" class="cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-film mr-1"></i>Peliculas</button>
+        <button data-cat="noticias" class="cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-newspaper mr-1"></i>Noticias</button>
+        <button data-cat="series" class="cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-tv mr-1"></i>Series</button>
+        <button data-cat="musica" class="cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-music mr-1"></i>Musica</button>
+        <button data-cat="infantil" class="cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-child mr-1"></i>Infantil</button>
+        <button data-cat="documentales" class="cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-book-open mr-1"></i>Documentales</button>
+        <button data-cat="otros" class="cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-ellipsis mr-1"></i>Mas</button>
+    </div>
+</header>
+
+<!-- ==================== REPRODUCTOR ==================== -->
+<section id="player-section" class="relative z-10 hidden max-w-7xl mx-auto px-4 mt-4">
+    <div class="player-enter bg-surface border border-bdr rounded-xl overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-bdr">
+            <div class="flex items-center gap-3 min-w-0">
+                <span class="live-dot w-2.5 h-2.5 rounded-full bg-err shrink-0"></span>
+                <span id="player-name" class="font-display font-semibold text-sm truncate">-</span>
+                <span id="player-group" class="text-xs text-muted bg-card px-2 py-0.5 rounded-full shrink-0">-</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <span id="player-fallback" class="text-xs text-warn hidden"><i class="fa-solid fa-rotate mr-1"></i>Enlace alternativo...</span>
+                <button id="player-close" class="w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+        <div class="video-wrap relative bg-black">
+            <video id="video-player" controls playsinline></video>
+            <div id="video-overlay" class="absolute inset-0 bg-black/60 flex items-center justify-center hidden">
+                <div class="text-center"><i class="fa-solid fa-satellite-dish text-4xl text-accent mb-3 block animate-pulse"></i><p class="text-sm text-muted" id="overlay-msg">Cargando stream...</p></div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 px-4 py-2.5">
+            <button id="btn-play" class="text-accent hover:text-accent-h transition"><i class="fa-solid fa-play"></i></button>
+            <div class="flex items-center gap-2 flex-1 max-w-xs"><i class="fa-solid fa-volume-high text-muted text-xs"></i><input id="vol-slider" type="range" min="0" max="100" value="80" class="vol-slider flex-1"></div>
+            <button id="btn-pip" class="text-muted hover:text-accent transition text-sm" title="PiP"><i class="fa-solid fa-clone"></i></button>
+            <button id="btn-fs" class="text-muted hover:text-accent transition text-sm" title="Full"><i class="fa-solid fa-expand"></i></button>
+            <button id="btn-fav-channel" class="text-muted hover:text-accent transition text-sm"><i class="fa-regular fa-heart"></i></button>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== CONTENIDO ==================== -->
+<main id="main-content" class="relative z-10 max-w-7xl mx-auto px-4 py-6" style="display:none">
+
+    <!-- BANNER: Cargar listas -->
+    <div id="load-banner" class="bg-gradient-to-r from-accent/10 via-card to-card border border-accent/20 rounded-xl p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-folder-plus text-accent text-xl"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+            <h3 class="font-display font-bold text-sm">Cargar tus listas M3U / M3U8</h3>
+            <p class="text-muted text-xs mt-0.5">Agrega canales desde una URL, un archivo local, o busca en la web</p>
+        </div>
+        <div class="flex gap-2 shrink-0">
+            <button id="banner-url" class="px-4 py-2 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-link mr-1.5"></i>URL</button>
+            <button id="banner-file" class="px-4 py-2 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-file-arrow-up mr-1.5"></i>Archivo</button>
+            <button id="banner-web" class="px-4 py-2 rounded-lg bg-accent text-bg text-xs font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-globe mr-1.5"></i>Buscar web</button>
+        </div>
+    </div>
+
+    <!-- Historial de listas cargadas -->
+    <div id="history-section" class="mb-6 hidden">
+        <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-medium text-muted"><i class="fa-solid fa-clock-rotate-left mr-1.5"></i>Listas cargadas</h3>
+            <button id="btn-clear-history" class="text-[10px] text-muted/50 hover:text-err transition">Limpiar</button>
+        </div>
+        <div id="history-list" class="flex gap-2 overflow-x-auto cat-scroll pb-1"></div>
+    </div>
+
+    <div id="list-info" class="flex items-center justify-between mb-4">
+        <div><h2 id="grid-title" class="font-display text-xl font-bold">Todos los canales</h2><p id="grid-count" class="text-xs text-muted mt-0.5">0 canales</p></div>
+        <div class="text-xs text-muted"><i class="fa-solid fa-clock mr-1"></i><span id="last-update">-</span></div>
+    </div>
+    <div id="channel-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"></div>
+    <div id="load-more-wrap" class="text-center mt-6 hidden"><button id="btn-load-more" class="px-6 py-2.5 rounded-lg bg-card border border-bdr text-sm text-muted hover:text-accent hover:border-accent/40 transition">Cargar mas</button></div>
+    <div id="empty-state" class="hidden text-center py-20"><i class="fa-solid fa-satellite-dish text-5xl text-bdr mb-4 block"></i><p class="text-muted text-sm">No se encontraron canales</p></div>
+</main>
+
+<!-- ==================== NOW PLAYING ==================== -->
+<div id="np-bar" class="np-bar fixed bottom-0 left-0 right-0 z-30 hidden px-4 py-3">
+    <div class="max-w-7xl mx-auto flex items-center gap-4">
+        <div class="flex items-center gap-3 flex-1 min-w-0"><span class="live-dot w-2 h-2 rounded-full bg-err shrink-0"></span><span id="np-name" class="text-sm font-medium truncate">-</span><span id="np-group" class="text-xs text-muted hidden sm:inline">-</span></div>
+        <div class="flex items-center gap-2">
+            <button id="np-play" class="w-9 h-9 rounded-full bg-accent/20 text-accent flex items-center justify-center hover:bg-accent/30 transition"><i class="fa-solid fa-pause text-sm"></i></button>
+            <button id="np-close" class="w-9 h-9 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL: CARGAR LISTA (URL + ARCHIVO) ==================== -->
+<div id="modal-load" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-box">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-display font-bold text-lg">Cargar lista M3U / M3U8</h3>
+            <button class="modal-cancel w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-1 mb-5 bg-bg rounded-lg p-1">
+            <button data-tab="url" class="tab-btn active flex-1 py-2 rounded-md text-xs font-medium border border-transparent text-center transition"><i class="fa-solid fa-link mr-1.5"></i>Desde URL</button>
+            <button data-tab="file" class="tab-btn flex-1 py-2 rounded-md text-xs font-medium border border-transparent text-muted text-center transition"><i class="fa-solid fa-file-arrow-up mr-1.5"></i>Archivo local</button>
+        </div>
+
+        <!-- Tab: URL -->
+        <div id="tab-url" class="tab-content">
+            <label class="text-xs text-muted mb-1.5 block">URL de la lista M3U o M3U8</label>
+            <input id="input-list-url" type="url" placeholder="https://ejemplo.com/lista.m3u" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-2">
+            <label class="text-xs text-muted mb-1.5 block">Nombre (opcional)</label>
+            <input id="input-list-name" type="text" placeholder="Mi lista de deportes" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4">
+            <div class="flex justify-end"><button id="btn-load-url" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-download mr-1.5"></i>Cargar lista</button></div>
+        </div>
+
+        <!-- Tab: Archivo -->
+        <div id="tab-file" class="tab-content hidden">
+            <div id="drop-zone" class="drop-zone p-8 text-center mb-4">
+                <input type="file" id="file-input" accept=".m3u,.m3u8,.txt" class="hidden">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-muted/40 mb-3 block"></i>
+                <p class="text-sm text-muted mb-1">Arrastrá tu archivo aca</p>
+                <p class="text-xs text-muted/50 mb-4">o hacé clic para seleccionar</p>
+                <span class="inline-block px-4 py-2 rounded-lg bg-card border border-bdr text-xs text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-folder-open mr-1.5"></i>Seleccionar archivo</span>
+                <p class="text-[10px] text-muted/40 mt-3">Soporta .m3u, .m3u8 y .txt</p>
+            </div>
+            <div id="file-info" class="hidden bg-bg border border-bdr rounded-lg p-3 mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines text-accent text-sm"></i></div>
+                    <div class="flex-1 min-w-0">
+                        <p id="file-name" class="text-sm font-medium truncate">-</p>
+                        <p id="file-size" class="text-[10px] text-muted">-</p>
+                    </div>
+                    <button id="file-remove" class="w-7 h-7 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition text-xs"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <label id="file-name-label" class="text-xs text-muted mb-1.5 block hidden">Nombre para la lista (opcional)</label>
+            <input id="input-file-name" type="text" placeholder="Nombre de la lista" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4 hidden">
+            <div class="flex justify-end"><button id="btn-load-file" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition disabled:opacity-40 disabled:cursor-not-allowed" disabled><i class="fa-solid fa-plus mr-1.5"></i>Agregar canales</button></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL: URL DIRECTA ==================== -->
+<div id="modal-url" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-box">
+        <h3 class="font-display font-bold text-lg mb-1">Reproducir URL directa</h3>
+        <p class="text-muted text-xs mb-4">Pega un enlace M3U8 para reproducirlo al instante</p>
+        <input id="input-url" type="url" placeholder="https://ejemplo.com/stream.m3u8" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-3">
+        <input id="input-url-name" type="text" placeholder="Nombre del canal (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4">
+        <div class="flex gap-3 justify-end">
+            <button class="modal-cancel px-4 py-2 rounded-lg text-sm text-muted hover:text-txt transition">Cancelar</button>
+            <button id="btn-play-url" class="px-5 py-2 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition">Reproducir</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL: BUSCAR WEB ==================== -->
+<div id="modal-web" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-box">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-display font-bold text-lg">Buscar listas en la web</h3>
+            <button class="modal-cancel w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p class="text-muted text-xs mb-3">Busca repositorios en GitHub con listas M3U de Argentina en espanol</p>
+        <div class="flex gap-2 mb-4">
+            <input id="web-search-input" type="text" placeholder="iptv argentina 2025" value="iptv argentina m3u" class="flex-1 bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition">
+            <button id="btn-web-search" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition shrink-0"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="flex flex-wrap gap-1.5 mb-4">
+            <button class="web-quick text-[11px] px-3 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-q="iptv argentina m3u">Argentina</button>
+            <button class="web-quick text-[11px] px-3 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-q="iptv latinoamerica espanol m3u">Latinoamerica</button>
+            <button class="web-quick text-[11px] px-3 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-q="iptv deportes argentina m3u8">Deportes AR</button>
+            <button class="web-quick text-[11px] px-3 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-q="lista iptv espanol actualizada 2025">2025</button>
+            <button class="web-quick text-[11px] px-3 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-q="free iptv m3u south america">South America</button>
+        </div>
+        <div id="web-results" class="space-y-2 max-h-64 overflow-y-auto"></div>
+    </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer id="main-footer" class="relative z-10 border-t border-bdr mt-12 pb-20" style="display:none">
+    <div class="max-w-7xl mx-auto px-4 py-6 text-center">
+        <p class="text-muted text-xs">StreamVault &mdash; TV Argentina e IPTV en Espanol</p>
+        <p class="text-muted/50 text-xs mt-1">Fuentes: iptv-org &middot; GitHub &middot; Archivos locales &middot; Fallback automatico</p>
+    </div>
+</footer>
+
+<script>
+/* ===========================================================
+   CLAVE
+   =========================================================== */
+async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+const PIN={input:'',mode:'login',locked:true,attempts:0};
+function initLock(){
+    const s=localStorage.getItem('sv_pin_hash'),t=document.getElementById('lock-title'),sb=document.getElementById('lock-subtitle');
+    if(s){PIN.mode='login';t.textContent='StreamVault';sb.textContent='Ingresá tu clave para continuar'}
+    else{PIN.mode='setup';t.textContent='Crear clave';sb.textContent='Elegí un PIN de 4 digitos';document.querySelector('.lock-icon').innerHTML='<i class="fa-solid fa-lock-open"></i>'}
+    document.querySelectorAll('#keypad .key-btn').forEach(b=>b.addEventListener('click',()=>handleKey(b.dataset.key)));
+    document.addEventListener('keydown',e=>{if(!PIN.locked)return;if(e.key>='0'&&e.key<='9')handleKey(e.key);else if(e.key==='Backspace')handleKey('del')})
+}
+async function handleKey(k){if(!PIN.locked)return;document.getElementById('lock-error').style.opacity='0';if(k==='del'){PIN.input=PIN.input.slice(0,-1);updateDots();return}if(/^\d$/.test(k)&&PIN.input.length<4){PIN.input+=k;updateDots();if(PIN.input.length===4)setTimeout(()=>submitPin(),200)}}
+function updateDots(){document.querySelectorAll('#pin-dots .pin-dot').forEach((d,i)=>{d.className='pin-dot'+(i<PIN.input.length?' filled':'')})}
+async function submitPin(){const h=await sha256(PIN.input),er=document.getElementById('lock-error'),ds=document.querySelectorAll('#pin-dots .pin-dot');if(PIN.mode==='setup'){localStorage.setItem('sv_pin_hash',h);unlock()}else{if(h===localStorage.getItem('sv_pin_hash')){PIN.attempts=0;unlock()}else{PIN.attempts++;ds.forEach(d=>{d.className='pin-dot error'});er.textContent=PIN.attempts>=3?'Demasiados intentos.':'Clave incorrecta';er.style.opacity='1';setTimeout(()=>{PIN.input='';updateDots()},600)}}}
+function unlock(){PIN.locked=false;document.getElementById('lock-screen').classList.add('out');setTimeout(()=>{document.getElementById('lock-screen').style.display='none';showApp()},500)}
+function lockApp(){if(player){player.destroy();player=null}PIN.locked=true;PIN.input='';PIN.attempts=0;updateDots();document.getElementById('lock-error').style.opacity='0';document.getElementById('lock-screen').style.display='flex';setTimeout(()=>document.getElementById('lock-screen').classList.remove('out'),50);if(localStorage.getItem('sv_pin_hash')){PIN.mode='login';document.getElementById('lock-title').textContent='StreamVault';document.getElementById('lock-subtitle').textContent='Ingresá tu clave';document.querySelector('.lock-icon').innerHTML='<i class="fa-solid fa-lock"></i>'}['main-header','main-content','main-footer'].forEach(i=>document.getElementById(i).style.display='none');document.getElementById('player-section').classList.add('hidden');document.getElementById('np-bar').classList.add('hidden')}
+function showApp(){['main-header','main-content','main-footer'].forEach(i=>document.getElementById(i).style.display='');initApp()}
+
+/* ===========================================================
+   ESTADO
+   =========================================================== */
+const DEFAULT_LISTS=[
+    {id:'ar',name:'Argentina',url:'https://iptv-org.github.io/iptv/countries/ar.m3u'},
+    {id:'south-america',name:'Sudamerica',url:'https://iptv-org.github.io/iptv/regions/south-america.m3u'},
+    {id:'latam',name:'Latinoamerica',url:'https://iptv-org.github.io/iptv/regions/latin-america.m3u'},
+    {id:'spa',name:'Espanol',url:'https://iptv-org.github.io/iptv/languages/spa.m3u'},
+    {id:'sports',name:'Deportes',url:'https://iptv-org.github.io/iptv/categories/sports.m3u'},
+    {id:'movies',name:'Peliculas',url:'https://iptv-org.github.io/iptv/categories/movies.m3u'},
+    {id:'news',name:'Noticias',url:'https://iptv-org.github.io/iptv/categories/news.m3u'},
+    {id:'entertainment',name:'Entretenimiento',url:'https://iptv-org.github.io/iptv/categories/entertainment.m3u'},
+    {id:'music',name:'Musica',url:'https://iptv-org.github.io/iptv/categories/music.m3u'},
+    {id:'kids',name:'Infantil',url:'https://iptv-org.github.io/iptv/categories/kids.m3u'},
+    {id:'docs',name:'Documentales',url:'https://iptv-org.github.io/iptv/categories/documentary.m3u'},
+];
+const AR_KW=['argentina','america tv','telefe','canal 13','elnueve','canal 9','canal 7','publica','tyc sports','fox sports argentina','espn argentina','depotv','flow','telecentro','cronica','canal 26','a24','ln+','cablenoticias','cn23','misiones','formosa','cordoba','rosario','mendoza','tucuman','salta','entre rios','santa fe','bravo tv','magazine','net tv','panamericana','america2'];
+const CAT_KW={deportes:['deporte','sports','futbol','football','soccer','nba','nfl','mlb','f1','formula','golf','tenis','boxeo','wwe','ufc','motor','racing','bein','espn','fox sport','tyc sport','directv sport'],peliculas:['pelicula','movie','film','cinema','cine','amc','star cinema','golden','paramount'],series:['serie','series','show','sitcom','comedia','drama'],noticias:['noticia','news','24h','24 hor','cnne','telefe','milenio','adn40','ejecutiv','cronica','canal 26','a24','ln+','cable','cn23'],musica:['musica','music','mtv','vh1','hit','radio','concert','banda','rock','pop','jazz'],infantil:['infantil','kids','children','nickelodeon','cartoon','disney channel','anime','boomerang','baby','nick','pj mask','paw patrol'],documentales:['documental','documentary','discovery','nat geo','national geographic','history','historia','animal','natura'],entretenimiento:['entretenimiento','entertainment','reality','variedad','show','programa','concurso','televisa','univision','magazine']};
+const S={allCh:[],filtCh:[],curCat:'all',query:'',favsOnly:false,favs:JSON.parse(localStorage.getItem('sv_favs')||'[]'),disp:0,perP:48,curCh:null,inited:false};
+let loadedFileText=null,loadedFileName='';
+
+/* ===========================================================
+   UTILIDADES
+   =========================================================== */
+function toast(m,t='info'){const c=document.getElementById('toasts'),cs={info:'border-accent bg-accent/10 text-accent',ok:'border-ok bg-ok/10 text-ok',err:'border-err bg-err/10 text-err',warn:'border-warn bg-warn/10 text-warn'},is={info:'fa-circle-info',ok:'fa-circle-check',err:'fa-circle-xmark',warn:'fa-triangle-exclamation'},e=document.createElement('div');e.className=`toast-in flex items-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-medium ${cs[t]||cs.info}`;e.innerHTML=`<i class="fa-solid ${is[t]||is.info}"></i><span>${m}</span>`;c.appendChild(e);setTimeout(()=>{e.classList.replace('toast-in','toast-out');setTimeout(()=>e.remove(),300)},3500)}
+function openM(id){document.getElementById(id).classList.add('active')}
+function closeM(id){document.getElementById(id).classList.remove('active')}
+function norm(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
+function fmtSize(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
+
+/* ===========================================================
+   HISTORIAL DE LISTAS
+   =========================================================== */
+function getHistory(){return JSON.parse(localStorage.getItem('sv_list_history')||'[]')}
+function addHistory(name,url,count){const h=getHistory();h.unshift({name,url,count,date:Date.now()});if(h.length>20)h.length=20;localStorage.setItem('sv_list_history',JSON.stringify(h));renderHistory()}
+function renderHistory(){const h=getHistory(),sec=document.getElementById('history-section'),list=document.getElementById('history-list');if(!h.length){sec.classList.add('hidden');return}sec.classList.remove('hidden');list.innerHTML='';h.forEach(item=>{const el=document.createElement('button');el.className='history-item shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-bdr text-left';el.innerHTML=`<div class="w-7 h-7 rounded-md bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-list text-accent text-[10px]"></i></div><div class="min-w-0"><p class="text-[11px] font-medium truncate max-w-[120px]">${item.name}</p><p class="text-[9px] text-muted/50">${item.count} canales</p></div>`;el.addEventListener('click',()=>{loadCustomList(item.url,item.name)});list.appendChild(el)})}
+
+/* ===========================================================
+   PARSER
+   =========================================================== */
+function parseM3U(text,sid){const lines=text.split('\n'),ch=[];let c=null;for(const r of lines){const l=r.trim();if(!l)continue;if(l.startsWith('#EXTINF:')){c={};const lm=l.match(/tvg-logo="([^"]*)"/),gm=l.match(/group-title="([^"]*)"/),ci=l.lastIndexOf(',');c.logo=lm?lm[1]:'';c.group=gm?gm[1]:'Otros';c.name=ci>=0?l.substring(ci+1).trim():'Sin nombre';if(!c.name)c.name='Sin nombre'}else if(!l.startsWith('#')&&c){if(l.startsWith('http')||l.startsWith('rtmp')||l.startsWith('rtsp')){c.url=l;c.sourceId=sid;ch.push(c)}c=null}}return ch}
+function isArg(n,g){const t=norm(n+' '+g);return AR_KW.some(k=>t.includes(norm(k)))}
+function classify(n,g){const t=norm(n+' '+g);for(const[c,ks]of Object.entries(CAT_KW))for(const k of ks)if(t.includes(norm(k)))return c;return'otros'}
+function merge(lists){const m=new Map();for(const l of lists)for(const c of l){const k=norm(c.name);if(m.has(k)){const e=m.get(k);if(!e.urls.includes(c.url))e.urls.push(c.url);if(!e.logo&&c.logo)e.logo=c.logo;if(c.sourceId==='ar'&&!e.isArg)e.isArg=isArg(c.name,c.group)}else m.set(k,{name:c.name,logo:c.logo,group:c.group,category:classify(c.name,c.group),urls:[c.url],sourceId:c.sourceId,isArg:c.sourceId==='ar'||isArg(c.name,c.group)})}return Array.from(m.values())}
+
+/* ===========================================================
+   CARGA
+   =========================================================== */
+async function loadAllLists(force=false){const ck='sv_cc',ct='sv_ct';if(!force){const c=sessionStorage.getItem(ck),ca=parseInt(sessionStorage.getItem(ct)||'0');if(c&&Date.now()-ca<30*60*1000){S.allCh=JSON.parse(c);return S.allCh}}const bar=document.getElementById('load-bar'),st=document.getElementById('load-status'),tot=DEFAULT_LISTS.length;let d=0;const res=await Promise.allSettled(DEFAULT_LISTS.map(async l=>{try{const r=await fetch(l.url);if(!r.ok)throw new Error(r.status);const t=await r.text(),p=parseM3U(t,l.id);d++;bar.style.width=`${(d/tot)*100}%`;st.textContent=`${l.name}: ${p.length} canales`;return p}catch(e){d++;bar.style.width=`${(d/tot)*100}%`;st.textContent=`${l.name}: sin respuesta`;return[]}}));const al=[];for(const r of res)if(r.status==='fulfilled'&&r.value.length)al.push(r.value);S.allCh=merge(al);sessionStorage.setItem(ck,JSON.stringify(S.allCh));sessionStorage.setItem(ct,Date.now().toString());return S.allCh}
+
+async function loadCustomList(url,listName){toast('Cargando lista...','info');try{const r=await fetch(url);if(!r.ok)throw new Error(r.status);const t=await r.text(),p=parseM3U(t,'custom');if(!p.length)throw new Error('Lista vacia o formato invalido');doMerge(p,listName||url.split('/').pop()||'Lista externa');addHistory(listName||url.split('/').pop()||'Lista',url,p.length);toast(`+${p.length} canales de ${listName||'lista externa'}`,'ok')}catch(e){toast('Error: '+e.message,'err')}}
+
+function loadFromFileText(text,fileName){const p=parseM3U(text,'file');if(!p.length){toast('El archivo no contiene canales validos','warn');return}doMerge(p,fileName);addHistory(fileName,'archivo-local',p.length);toast(`+${p.length} canales de ${fileName}`,'ok')}
+
+function doMerge(parsed,listName){const fm=new Map();for(const c of S.allCh)fm.set(norm(c.name),{...c});let added=0;for(const c of parsed){const k=norm(c.name);if(fm.has(k)){const e=fm.get(k);if(!e.urls.includes(c.url)){e.urls.push(c.url);added++}}else{fm.set(k,{name:c.name,logo:c.logo,group:c.group,category:classify(c.name,c.group),urls:[c.url],sourceId:'custom',isArg:isArg(c.name,c.group)});added++}}S.allCh=Array.from(fm.values());applyFilters()}
+
+/* ===========================================================
+   BUSCADOR WEB
+   =========================================================== */
+async function searchWeb(q){const c=document.getElementById('web-results');c.innerHTML='<div class="text-center py-8"><i class="fa-solid fa-spinner spinner text-2xl text-accent"></i><p class="text-muted text-xs mt-3">Buscando en GitHub...</p></div>';try{const r=await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&sort=updated&per_page=15`);if(!r.ok)throw new Error('API error');const d=await r.json();if(!d.items||!d.items.length){c.innerHTML='<p class="text-muted text-xs text-center py-6">Sin resultados. Probá otros terminos.</p>';return}c.innerHTML='';for(const repo of d.items){const el=document.createElement('div');el.className='web-result bg-card border border-bdr rounded-lg p-3 cursor-pointer';const desc=(repo.description||'').substring(0,100);const stars=repo.stargazers_count;const up=new Date(repo.updated_at).toLocaleDateString('es');el.innerHTML=`<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-brands fa-github text-accent text-sm"></i></div><div class="min-w-0 flex-1"><p class="text-sm font-medium truncate">${repo.full_name}</p><p class="text-xs text-muted mt-0.5 line-clamp-2">${desc||'Sin descripcion'}</p><div class="flex items-center gap-3 mt-1.5 text-[10px] text-muted/60"><span><i class="fa-solid fa-star mr-1"></i>${stars}</span><span><i class="fa-solid fa-clock mr-1"></i>${up}</span></div></div><button class="load-repo-btn shrink-0 px-3 py-1.5 rounded-lg bg-accent/15 text-accent text-xs font-medium hover:bg-accent/25 transition" data-owner="${repo.owner.login}" data-repo="${repo.name}">Cargar</button></div>`;c.appendChild(el)}c.querySelectorAll('.load-repo-btn').forEach(b=>{b.addEventListener('click',async e=>{e.stopPropagation();b.innerHTML='<i class="fa-solid fa-spinner spinner"></i>';b.disabled=true;await loadRepoM3U(b.dataset.owner,b.dataset.repo,b)})})}catch(e){c.innerHTML=`<p class="text-err text-xs text-center py-6">${e.message}</p>`}}
+
+async function loadRepoM3U(owner,repo,btn){try{const r=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/`);if(!r.ok)throw new Error('No se pudo leer');const files=await r.json();let m3u=files.filter(f=>f.name.endsWith('.m3u')||f.name.endsWith('.m3u8')||f.name.endsWith('.M3U')).sort((a,b)=>{const p=n=>{const l=n.toLowerCase();if(l.includes('playlist'))return 3;if(l.includes('lista')||l.includes('channels'))return 2;return 1};return p(b.name)-p(a.name)});if(!m3u.length){for(const d of files.filter(f=>f.type==='dir').slice(0,3)){try{const sr=await fetch(d.url),sf=await sr.json(),f=sf.filter(f=>f.name.endsWith('.m3u')||f.name.endsWith('.m3u8'));if(f.length){m3u.push(...f);break}}catch(e){}}}if(!m3u.length){toast('Sin archivos M3U en este repo','warn');btn.innerHTML='Cargar';btn.disabled=false;return}toast(`Cargando ${m3u[0].name}...`,'info');const mr=await fetch(m3u[0].download_url);if(!mr.ok)throw new Error('Error al descargar');const t=await mr.text(),p=parseM3U(t,'web-'+repo);if(!p.length)throw new Error('Sin canales validos');const name=m3u[0].name;doMerge(p,name);addHistory(name,`https://github.com/${owner}/${repo}`,p.length);toast(`+${p.length} de ${name}`,'ok');btn.innerHTML='<i class="fa-solid fa-check"></i>';btn.classList.replace('text-accent','text-ok')}catch(e){toast('Error: '+e.message,'err');btn.innerHTML='Cargar';btn.disabled=false}}
+
+/* ===========================================================
+   REPRODUCTOR
+   =========================================================== */
+class SP{constructor(v){this.v=v;this.h=null;this.c=null;this.i=0;this.d=false}play(c){this.destroy();this.d=false;this.c=c;this.i=0;this._t()}playUrl(u,n){this.destroy();this.d=false;this.c={name:n||'Stream',group:'Manual',urls:[u],logo:''};this.i=0;this._t()}_t(){if(this.d)return;if(this.i>=this.c.urls.length){this._e('Todos los enlaces fallaron.');document.getElementById('player-fallback').classList.add('hidden');return}const u=this.c.urls[this.i],fb=document.getElementById('player-fallback');if(this.i>0){fb.classList.remove('hidden');fb.innerHTML=`<i class="fa-solid fa-rotate mr-1"></i>Enlace ${this.i+1}/${this.c.urls.length}...`}if(Hls.isSupported()){this.h=new Hls({maxBufferLength:30,maxMaxBufferLength:60,startLevel:-1,fragLoadingTimeOut:15000,manifestLoadingTimeOut:15000,levelLoadingTimeOut:15000});this.h.loadSource(u);this.h.attachMedia(this.v);this.h.on(Hls.Events.MANIFEST_PARSED,()=>{if(!this.d){this.v.play().catch(()=>{});fb.classList.add('hidden');document.getElementById('video-overlay').classList.add('hidden')}});this.h.on(Hls.Events.ERROR,(_,d)=>{if(this.d)return;if(d.fatal){this.i++;if(this.h)this.h.destroy();this.h=null;setTimeout(()=>this._t(),800)}})}else if(this.v.canPlayType('application/vnd.apple.mpegurl')){this.v.src=u;this.v.addEventListener('loadeddata',()=>{if(!this.d){this.v.play().catch(()=>{});fb.classList.add('hidden');document.getElementById('video-overlay').classList.add('hidden')}},{once:true});this.v.addEventListener('error',()=>{if(!this.d){this.i++;setTimeout(()=>this._t(),800)}},{once:true})}else{this._e('Navegador sin soporte HLS')}}_e(m){document.getElementById('video-overlay').classList.remove('hidden');document.getElementById('overlay-msg').textContent=m;toast(m,'err')}destroy(){this.d=true;if(this.h){this.h.destroy();this.h=null}this.v.src='';this.v.load();this.c=null}}
+let player=null;
+
+function playChannel(ch){const s=document.getElementById('player-section'),v=document.getElementById('video-player');s.classList.remove('hidden');s.scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('video-overlay').classList.remove('hidden');document.getElementById('overlay-msg').textContent='Cargando stream...';document.getElementById('player-name').textContent=ch.name;document.getElementById('player-group').textContent=ch.isArg?'Argentina':ch.category;document.getElementById('player-fallback').classList.add('hidden');S.curCh=ch;if(!player)player=new SP(v);player.play(ch);document.getElementById('np-bar').classList.remove('hidden');document.getElementById('np-name').textContent=ch.name;document.getElementById('np-group').textContent=ch.group;updatePFavBtn();renderGrid()}
+function stopPlay(){if(player){player.destroy();player=null}document.getElementById('player-section').classList.add('hidden');document.getElementById('np-bar').classList.add('hidden');S.curCh=null;renderGrid()}
+
+/* ===========================================================
+   RENDER
+   =========================================================== */
+function getInit(n){return n.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase().substring(0,2)}
+function mkCard(ch,idx){const f=S.favs.includes(norm(ch.name)),p=S.curCh&&norm(S.curCh.name)===norm(ch.name),cc={deportes:'bg-emerald-500/15 text-emerald-400',peliculas:'bg-amber-500/15 text-amber-400',series:'bg-violet-500/15 text-violet-400',noticias:'bg-sky-500/15 text-sky-400',musica:'bg-pink-500/15 text-pink-400',infantil:'bg-lime-500/15 text-lime-400',documentales:'bg-teal-500/15 text-teal-400',entretenimiento:'bg-orange-500/15 text-orange-400',otros:'bg-gray-500/15 text-gray-400'}[ch.category]||'bg-gray-500/15 text-gray-400',d=document.createElement('div');d.className=`card-fade group relative bg-card border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:border-accent/40 hover:bg-card-h ${p?'border-accent ring-1 ring-accent/30':'border-bdr'}`;d.style.animationDelay=`${Math.min(idx*20,400)}ms`;d.innerHTML=`<div class="aspect-video bg-bg/60 flex items-center justify-center relative overflow-hidden">${ch.logo?`<img src="${ch.logo}" alt="" class="w-full h-full object-contain p-3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="absolute inset-0 items-center justify-center text-2xl font-display font-bold text-muted/40" style="display:none">${getInit(ch.name)}</div>`:`<span class="text-2xl font-display font-bold text-muted/40">${getInit(ch.name)}</span>`}${p?'<div class="absolute top-2 left-2 flex items-center gap-1 bg-err/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-white live-dot"></span>VIVO</div>':''}${ch.isArg?`<div class="absolute top-2 left-2 bg-sky-500/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded" ${p?'style="left:auto;right:2px"':''}>AR</div>`:''}<div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity ${ch.isArg&&!p?'top-8':''}"><button data-fav="${norm(ch.name)}" class="w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-xs ${f?'text-err':'text-white/60 hover:text-err'}"><i class="fa-${f?'solid':'regular'} fa-heart"></i></button></div><div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1"><span class="text-[10px] text-accent font-medium"><i class="fa-solid fa-play mr-1"></i>Reproducir</span></div></div><div class="p-2.5"><p class="text-xs font-medium truncate leading-tight">${ch.name}</p><div class="flex items-center gap-1.5 mt-1.5"><span class="text-[10px] px-1.5 py-0.5 rounded-full ${cc}">${ch.category}</span><span class="text-[10px] text-muted/50">${ch.urls.length>1?ch.urls.length+' enl.':''}</span></div></div>`;d.addEventListener('click',e=>{if(!e.target.closest('[data-fav]'))playChannel(ch)});const fb=d.querySelector('[data-fav]');if(fb)fb.addEventListener('click',e=>{e.stopPropagation();togFav(norm(ch.name))});return d}
+
+function renderGrid(){const g=document.getElementById('channel-grid'),em=document.getElementById('empty-state'),lm=document.getElementById('load-more-wrap'),cn=document.getElementById('grid-count'),ti=document.getElementById('grid-title');g.innerHTML='';if(!S.filtCh.length){em.classList.remove('hidden');lm.classList.add('hidden');cn.textContent='0 canales';return}em.classList.add('hidden');cn.textContent=`${S.filtCh.length} canales`;if(S.favsOnly)ti.textContent='Mis favoritos';else if(S.query)ti.textContent=`"${S.query}"`;else if(S.curCat==='all')ti.textContent='Todos los canales';else if(S.curCat==='argentina')ti.textContent='Canales de Argentina';else ti.textContent=S.curCat.charAt(0).toUpperCase()+S.curCat.slice(1);const end=Math.min(S.disp,S.filtCh.length),fr=document.createDocumentFragment();S.filtCh.slice(0,end).forEach((c,i)=>fr.appendChild(mkCard(c,i)));g.appendChild(fr);lm.classList.toggle('hidden',end>=S.filtCh.length)}
+
+/* ===========================================================
+   FILTROS Y FAVORITOS
+   =========================================================== */
+function applyFilters(){let c=[...S.allCh];if(S.favsOnly)c=c.filter(x=>S.favs.includes(norm(x.name)));if(S.curCat==='argentina')c=c.filter(x=>x.isArg);else if(S.curCat!=='all')c=c.filter(x=>x.category===S.curCat);if(S.query){const q=norm(S.query);c=c.filter(x=>norm(x.name).includes(q)||norm(x.group).includes(q))}S.filtCh=c;S.disp=S.perP;renderGrid()}
+function togFav(k){const i=S.favs.indexOf(k);if(i>=0){S.favs.splice(i,1);toast('Quitado de favoritos','info')}else{S.favs.push(k);toast('Agregado a favoritos','ok')}localStorage.setItem('sv_favs',JSON.stringify(S.favs));renderGrid();updFavBtn();updatePFavBtn()}
+function updFavBtn(){const b=document.getElementById('btn-favs');b.classList.toggle('bg-accent/20',S.favsOnly);b.classList.toggle('text-accent',S.favsOnly);b.classList.toggle('border-accent/40',S.favsOnly);b.classList.toggle('text-muted',!S.favsOnly)}
+function updatePFavBtn(){const b=document.getElementById('btn-fav-channel');if(!S.curCh)return;const f=S.favs.includes(norm(S.curCh.name));b.innerHTML=`<i class="fa-${f?'solid':'regular'} fa-heart"></i>`;b.className=`text-sm transition ${f?'text-err':'text-muted hover:text-accent'}`}
+
+/* ===========================================================
+   MANEJO DE ARCHIVOS (Drag & Drop + File Picker)
+   =========================================================== */
+function initFileHandling(){
+    const dz=document.getElementById('drop-zone'),fi=document.getElementById('file-input'),finfo=document.getElementById('file-info'),fnEl=document.getElementById('file-name'),fsEl=document.getElementById('file-size'),frem=document.getElementById('file-remove'),fnl=document.getElementById('file-name-label'),fin=document.getElementById('input-file-name'),fbtn=document.getElementById('btn-load-file');
+
+    // Click en drop zone abre file picker
+    dz.addEventListener('click',()=>fi.click());
+
+    // File picker change
+    fi.addEventListener('change',e=>{if(e.target.files.length)handleFile(e.target.files[0])});
+
+    // Drag events
+    dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over')});
+    dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+    dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');if(e.dataTransfer.files.length)handleFile(e.dataTransfer.files[0])});
+
+    function handleFile(file){
+        const ext=file.name.toLowerCase();
+        if(!ext.endsWith('.m3u')&&!ext.endsWith('.m3u8')&&!ext.endsWith('.txt')){toast('Solo se aceptan .m3u, .m3u8 y .txt','warn');return}
+        const reader=new FileReader();
+        reader.onload=()=>{loadedFileText=reader.result;loadedFileName=file.name;fnEl.textContent=file.name;fsEl.textContent=fmtSize(file.size);finfo.classList.remove('hidden');fnl.classList.remove('hidden');fin.classList.remove('hidden');fin.placeholder=file.name.replace(/\.[^.]+$/,'');fbtn.disabled=false};
+        reader.onerror=()=>toast('Error al leer el archivo','err');
+        reader.readAsText(file);
+    }
+
+    // Remover archivo
+    frem.addEventListener('click',()=>{loadedFileText=null;loadedFileName='';finfo.classList.add('hidden');fnl.classList.add('hidden');fin.classList.add('hidden');fbtn.disabled=true;fi.value=''});
+
+    // Boton cargar archivo
+    fbtn.addEventListener('click',()=>{if(!loadedFileText)return;const name=fin.value.trim()||loadedFileName;closeM('modal-load');loadFromFileText(loadedFileText,name);loadedFileText=null;loadedFileName='';finfo.classList.add('hidden');fnl.classList.add('hidden');fin.classList.add('hidden');fbtn.disabled=true;fi.value=''});
+}
+
+/* ===========================================================
+   EVENTOS
+   =========================================================== */
+function initEvents(){
+    let st;
+    document.getElementById('search-input').addEventListener('input',e=>{clearTimeout(st);st=setTimeout(()=>{S.query=e.target.value.trim();applyFilters()},250)});
+    document.querySelectorAll('.cat-pill').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.cat-pill').forEach(x=>{x.className='cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt'});b.className='cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent';S.curCat=b.dataset.cat;S.favsOnly=false;updFavBtn();applyFilters()})});
+    document.getElementById('btn-favs').addEventListener('click',()=>{S.favsOnly=!S.favsOnly;if(S.favsOnly){S.curCat='all';document.querySelectorAll('.cat-pill').forEach(x=>{x.className='cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt'});document.querySelector('[data-cat="all"]').className='cat-pill shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent'}updFavBtn();applyFilters()});
+    document.getElementById('player-close').addEventListener('click',stopPlay);
+    document.getElementById('np-close').addEventListener('click',stopPlay);
+    const vid=document.getElementById('video-player');
+    document.getElementById('btn-play').addEventListener('click',()=>{if(vid.paused)vid.play().catch(()=>{});else vid.pause()});
+    document.getElementById('np-play').addEventListener('click',()=>{if(vid.paused)vid.play().catch(()=>{});else vid.pause()});
+    vid.addEventListener('play',()=>{document.getElementById('btn-play').innerHTML='<i class="fa-solid fa-pause"></i>';document.getElementById('np-play').innerHTML='<i class="fa-solid fa-pause text-sm"></i>'});
+    vid.addEventListener('pause',()=>{document.getElementById('btn-play').innerHTML='<i class="fa-solid fa-play"></i>';document.getElementById('np-play').innerHTML='<i class="fa-solid fa-play text-sm"></i>'});
+    const vs=document.getElementById('vol-slider');vs.addEventListener('input',()=>{vid.volume=vs.value/100});vid.volume=0.8;
+    document.getElementById('btn-fs').addEventListener('click',()=>{const w=document.querySelector('.video-wrap');if(document.fullscreenElement)document.exitFullscreen();else w.requestFullscreen().catch(()=>{})});
+    document.getElementById('btn-pip').addEventListener('click',async()=>{try{if(document.pictureInPictureElement)await document.exitPictureInPicture();else await vid.requestPictureInPicture()}catch(e){toast('PiP no soportado','warn')}});
+    document.getElementById('btn-fav-channel').addEventListener('click',()=>{if(S.curCh)togFav(norm(S.curCh.name))});
+    document.getElementById('btn-load-more').addEventListener('click',()=>{S.disp+=S.perP;renderGrid()});
+
+    // Banner: cargar listas
+    document.getElementById('banner-url').addEventListener('click',()=>{openM('modal-load');switchTab('url')});
+    document.getElementById('banner-file').addEventListener('click',()=>{openM('modal-load');switchTab('file')});
+    document.getElementById('banner-web').addEventListener('click',()=>openM('modal-web'));
+
+    // Modal: tabs
+    document.querySelectorAll('.tab-btn').forEach(b=>{b.addEventListener('click',()=>switchTab(b.dataset.tab))});
+
+    // Modal: cargar por URL
+    document.getElementById('btn-load-url').addEventListener('click',()=>{const u=document.getElementById('input-list-url').value.trim(),n=document.getElementById('input-list-name').value.trim();if(!u){toast('Ingresa una URL','warn');return}closeM('modal-load');document.getElementById('input-list-url').value='';document.getElementById('input-list-name').value='';loadCustomList(u,n)});
+
+    // Modal: buscar web
+    document.getElementById('btn-web').addEventListener('click',()=>{openM('modal-web');document.getElementById('web-results').innerHTML='<p class="text-muted text-xs text-center py-6">Escribí algo y presiona buscar</p>'});
+    document.getElementById('btn-web-search').addEventListener('click',()=>{const q=document.getElementById('web-search-input').value.trim();if(q)searchWeb(q);else toast('Escribí un termino','warn')});
+    document.getElementById('web-search-input').addEventListener('keydown',e=>{if(e.key==='Enter'){const q=e.target.value.trim();if(q)searchWeb(q)}});
+    document.querySelectorAll('.web-quick').forEach(b=>{b.addEventListener('click',()=>{document.getElementById('web-search-input').value=b.dataset.q;searchWeb(b.dataset.q)})});
+
+    // Modal: URL directa
+    document.getElementById('btn-play-url').addEventListener('click',()=>{const u=document.getElementById('input-url').value.trim(),n=document.getElementById('input-url-name').value.trim();if(!u){toast('Ingresa una URL','warn');return}closeM('modal-url');document.getElementById('input-url').value='';document.getElementById('input-url-name').value='';const s=document.getElementById('player-section');s.classList.remove('hidden');s.scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('video-overlay').classList.remove('hidden');document.getElementById('overlay-msg').textContent='Cargando stream...';document.getElementById('player-name').textContent=n||'Stream directo';document.getElementById('player-group').textContent='Manual';document.getElementById('np-bar').classList.remove('hidden');document.getElementById('np-name').textContent=n||'Stream directo';document.getElementById('np-group').textContent='URL directa';if(!player)player=new SP(vid);player.playUrl(u,n||'Stream directo')});
+
+    // Cerrar modales
+    document.querySelectorAll('.modal-cancel').forEach(b=>b.addEventListener('click',()=>b.closest('.modal-overlay').classList.remove('active')));
+    document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active')}));
+
+    // Actualizar
+    document.getElementById('btn-refresh')?.addEventListener('click',async()=>{toast('Actualizando...','info');sessionStorage.removeItem('sv_cc');sessionStorage.removeItem('sv_ct');await loadAllLists(true);applyFilters();document.getElementById('last-update').textContent=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});toast('Actualizado','ok')});
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click',lockApp);
+
+    // Historial limpiar
+    document.getElementById('btn-clear-history').addEventListener('click',()=>{localStorage.removeItem('sv_list_history');renderHistory();toast('Historial limpiado','info')});
+
+    // Escape
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.active').forEach(m=>m.classList.remove('active'))});
+
+    // Init file handling
+    initFileHandling();
+}
+
+function switchTab(tab){
+    document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.toggle('active',b.dataset.tab===tab);b.classList.toggle('text-muted',b.dataset.tab!==tab)});
+    document.getElementById('tab-url').classList.toggle('hidden',tab!=='url');
+    document.getElementById('tab-file').classList.toggle('hidden',tab!=='file');
+}
+
+/* ===========================================================
+   INICIO
+   =========================================================== */
+async function initApp(){if(S.inited)return;S.inited=true;initEvents();updFavBtn();renderHistory();document.getElementById('loading-screen').style.display='flex';try{await loadAllLists();document.getElementById('last-update').textContent=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});applyFilters()}catch(e){toast('Error al cargar','err')}const ls=document.getElementById('loading-screen');ls.style.transition='opacity 0.5s';ls.style.opacity='0';setTimeout(()=>{ls.style.display='none'},500);setInterval(async()=>{try{sessionStorage.removeItem('sv_cc');await loadAllLists(true);applyFilters();document.getElementById('last-update').textContent=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})}catch(e){}},30*60*1000)}
+document.addEventListener('DOMContentLoaded',initLock);
+</script>
+</body>
+  </html>
