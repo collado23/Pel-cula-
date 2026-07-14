@@ -1,0 +1,5 @@
+.category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.card { background: #181822; padding: 10px; border-radius: 8px; border: 1px solid #2a2a3a; cursor: pointer; transition: 0.2s; }
+.card:hover { border-color: #e8a020; }
+.spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #e8a020; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
