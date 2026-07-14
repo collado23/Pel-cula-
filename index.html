@@ -42,61 +42,33 @@
         .kb:hover{background:#20202e;border-color:#e8a020;color:#e8a020}.kb:active{transform:scale(.92);background:#e8a020;color:#0a0a0f}
         @keyframes sp{to{transform:rotate(360deg)}}.spin{animation:sp 1s linear infinite}
         .dz{border:2px dashed #2a2a3a;border-radius:12px;transition:all .25s;cursor:pointer}.dz:hover,.dz.do{border-color:var(--accent);background:rgba(232,160,32,.05)}
-        .tb{transition:all .2s}.tb.on{color:var(--accent);border-color:var(--accent);background:rgba(232,160,32,.1)}
         .hi{transition:all .15s}.hi:hover{background:#20202e}
         .pa{background:#0a0a0f;border:2px dashed #2a2a3a;border-radius:12px;transition:all .25s;resize:vertical;min-height:200px;font-family:'DM Sans',monospace;font-size:12px;color:#eaeaf0;line-height:1.5}
         .pa:focus{border-color:var(--accent);outline:none}.pa::placeholder{color:#4a4a5a}
         .ed-item{transition:all .15s;cursor:pointer}.ed-item:hover{background:#20202e}.ed-item.active{border-color:rgba(232,160,32,.4);background:rgba(232,160,32,.05)}
         .link-found{transition:all .15s}.link-found:hover{background:#20202e;border-color:rgba(232,160,32,.3)}
+        /* Resumen por categoría */
+        .cat-summary-item{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:500}
         @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
         @media(max-width:380px){.kb{width:58px;height:58px;font-size:18px}}
     </style>
 </head>
 <body class="text-txt min-h-screen relative">
-
 <div class="bg-glow"></div>
 <div id="toasts" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm"></div>
 
 <!-- CLAVE -->
-<div id="lock-screen" class="ls">
-    <div class="bg-glow"></div>
-    <div class="relative z-10 text-center px-6 w-full max-w-sm">
-        <div class="lk text-5xl text-accent mb-6"><i class="fa-solid fa-lock"></i></div>
-        <h1 id="lkt" class="font-display text-2xl font-bold mb-1">StreamVault</h1>
-        <p id="lks" class="text-muted text-sm mb-8">Ingresá tu clave</p>
-        <div id="pind" class="flex justify-center gap-3 mb-8"><div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
-        <div class="flex flex-col items-center gap-3" id="keypad">
-            <div class="flex gap-3"><button class="kb" data-k="1">1</button><button class="kb" data-k="2">2</button><button class="kb" data-k="3">3</button></div>
-            <div class="flex gap-3"><button class="kb" data-k="4">4</button><button class="kb" data-k="5">5</button><button class="kb" data-k="6">6</button></div>
-            <div class="flex gap-3"><button class="kb" data-k="7">7</button><button class="kb" data-k="8">8</button><button class="kb" data-k="9">9</button></div>
-            <div class="flex gap-3"><button class="kb" data-k="x" style="visibility:hidden"></button><button class="kb" data-k="0">0</button><button class="kb" data-k="d"><i class="fa-solid fa-delete-left text-lg"></i></button></div>
-        </div>
-        <p id="lke" class="text-err text-xs mt-5 opacity-0 transition-opacity">Clave incorrecta</p>
-    </div>
-</div>
+<div id="lock-screen" class="ls"><div class="bg-glow"></div><div class="relative z-10 text-center px-6 w-full max-w-sm"><div class="lk text-5xl text-accent mb-6"><i class="fa-solid fa-lock"></i></div><h1 id="lkt" class="font-display text-2xl font-bold mb-1">StreamVault</h1><p id="lks" class="text-muted text-sm mb-8">Ingresá tu clave</p><div id="pind" class="flex justify-center gap-3 mb-8"><div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div><div class="flex flex-col items-center gap-3" id="keypad"><div class="flex gap-3"><button class="kb" data-k="1">1</button><button class="kb" data-k="2">2</button><button class="kb" data-k="3">3</button></div><div class="flex gap-3"><button class="kb" data-k="4">4</button><button class="kb" data-k="5">5</button><button class="kb" data-k="6">6</button></div><div class="flex gap-3"><button class="kb" data-k="7">7</button><button class="kb" data-k="8">8</button><button class="kb" data-k="9">9</button></div><div class="flex gap-3"><button class="kb" data-k="x" style="visibility:hidden"></button><button class="kb" data-k="0">0</button><button class="kb" data-k="d"><i class="fa-solid fa-delete-left text-lg"></i></button></div></div><p id="lke" class="text-err text-xs mt-5 opacity-0 transition-opacity">Clave incorrecta</p></div></div>
 
 <!-- CARGA -->
-<div id="load-scr" class="fixed inset-0 z-40 bg-bg flex flex-col items-center justify-center gap-6" style="display:none">
-    <div class="text-center"><h1 class="font-display text-5xl font-bold text-accent tracking-tight">StreamVault</h1><p class="text-muted mt-2 text-sm">Cargando canales...</p></div>
-    <div class="w-64 h-1.5 bg-surface rounded-full overflow-hidden"><div id="loadbar" class="h-full bg-accent rounded-full transition-all duration-500" style="width:0%"></div></div>
-    <p id="loadst" class="text-muted text-xs">Conectando...</p>
-</div>
+<div id="load-scr" class="fixed inset-0 z-40 bg-bg flex flex-col items-center justify-center gap-6" style="display:none"><div class="text-center"><h1 class="font-display text-5xl font-bold text-accent tracking-tight">StreamVault</h1><p class="text-muted mt-2 text-sm">Cargando canales...</p></div><div class="w-64 h-1.5 bg-surface rounded-full overflow-hidden"><div id="loadbar" class="h-full bg-accent rounded-full transition-all duration-500" style="width:0%"></div></div><p id="loadst" class="text-muted text-xs">Conectando...</p></div>
 
 <!-- HEADER -->
 <header id="hdr" class="relative z-10 border-b border-bdr bg-surface/80 backdrop-blur-md sticky top-0" style="display:none">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-        <div class="flex items-center gap-2 shrink-0">
-            <div class="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center"><i class="fa-solid fa-tower-broadcast text-accent text-sm"></i></div>
-            <span class="font-display font-bold text-lg text-txt hidden sm:block">StreamVault</span>
-        </div>
-        <div class="flex-1 max-w-md relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm"></i>
-            <input id="sinput" type="text" placeholder="Buscar canales..." class="w-full bg-card border border-bdr rounded-lg pl-9 pr-4 py-2 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition">
-        </div>
-        <div class="flex items-center gap-1.5">
-            <button id="bfav" title="Favoritos" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-accent hover:border-accent/40 transition text-sm"><i class="fa-solid fa-heart"></i></button>
-            <button id="bout" title="Salir" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-err hover:border-err/40 transition text-sm"><i class="fa-solid fa-right-from-bracket"></i></button>
-        </div>
+        <div class="flex items-center gap-2 shrink-0"><div class="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center"><i class="fa-solid fa-tower-broadcast text-accent text-sm"></i></div><span class="font-display font-bold text-lg text-txt hidden sm:block">StreamVault</span></div>
+        <div class="flex-1 max-w-md relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm"></i><input id="sinput" type="text" placeholder="Buscar canales..." class="w-full bg-card border border-bdr rounded-lg pl-9 pr-4 py-2 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition"></div>
+        <div class="flex items-center gap-1.5"><button id="bfav" title="Favoritos" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-accent hover:border-accent/40 transition text-sm"><i class="fa-solid fa-heart"></i></button><button id="bout" title="Salir" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-err hover:border-err/40 transition text-sm"><i class="fa-solid fa-right-from-bracket"></i></button></div>
     </div>
     <div class="cs flex gap-2 px-4 pb-3 max-w-7xl mx-auto">
         <button data-c="all" class="cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent">Todos</button>
@@ -115,194 +87,53 @@
 <!-- REPRODUCTOR -->
 <section id="psec" class="relative z-10 hidden max-w-7xl mx-auto px-4 mt-4">
     <div class="pe bg-surface border border-bdr rounded-xl overflow-hidden">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-bdr">
-            <div class="flex items-center gap-3 min-w-0"><span class="live-dot w-2.5 h-2.5 rounded-full bg-err shrink-0"></span><span id="pname" class="font-display font-semibold text-sm truncate">-</span><span id="pgrp" class="text-xs text-muted bg-card px-2 py-0.5 rounded-full shrink-0">-</span></div>
-            <div class="flex items-center gap-2 shrink-0"><span id="pfb" class="text-xs text-warn hidden"><i class="fa-solid fa-rotate mr-1"></i>Alt...</span><button id="pcls" class="w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition"><i class="fa-solid fa-xmark"></i></button></div>
-        </div>
+        <div class="flex items-center justify-between px-4 py-3 border-b border-bdr"><div class="flex items-center gap-3 min-w-0"><span class="live-dot w-2.5 h-2.5 rounded-full bg-err shrink-0"></span><span id="pname" class="font-display font-semibold text-sm truncate">-</span><span id="pgrp" class="text-xs text-muted bg-card px-2 py-0.5 rounded-full shrink-0">-</span></div><div class="flex items-center gap-2 shrink-0"><span id="pfb" class="text-xs text-warn hidden"><i class="fa-solid fa-rotate mr-1"></i>Alt...</span><button id="pcls" class="w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition"><i class="fa-solid fa-xmark"></i></button></div></div>
         <div class="vw relative bg-black"><video id="vid" controls playsinline></video><div id="vov" class="absolute inset-0 bg-black/60 flex items-center justify-center hidden"><div class="text-center"><i class="fa-solid fa-satellite-dish text-4xl text-accent mb-3 block animate-pulse"></i><p class="text-sm text-muted" id="vomsg">Cargando...</p></div></div></div>
-        <div class="flex items-center gap-4 px-4 py-2.5">
-            <button id="bplay" class="text-accent hover:text-accent-h transition"><i class="fa-solid fa-play"></i></button>
-            <div class="flex items-center gap-2 flex-1 max-w-xs"><i class="fa-solid fa-volume-high text-muted text-xs"></i><input id="vslider" type="range" min="0" max="100" value="80" class="vs flex-1"></div>
-            <button id="bpip" class="text-muted hover:text-accent transition text-sm"><i class="fa-solid fa-clone"></i></button>
-            <button id="bfs" class="text-muted hover:text-accent transition text-sm"><i class="fa-solid fa-expand"></i></button>
-            <button id="bfch" class="text-muted hover:text-accent transition text-sm"><i class="fa-regular fa-heart"></i></button>
-        </div>
+        <div class="flex items-center gap-4 px-4 py-2.5"><button id="bplay" class="text-accent hover:text-accent-h transition"><i class="fa-solid fa-play"></i></button><div class="flex items-center gap-2 flex-1 max-w-xs"><i class="fa-solid fa-volume-high text-muted text-xs"></i><input id="vslider" type="range" min="0" max="100" value="80" class="vs flex-1"></div><button id="bpip" class="text-muted hover:text-accent transition text-sm"><i class="fa-solid fa-clone"></i></button><button id="bfs" class="text-muted hover:text-accent transition text-sm"><i class="fa-solid fa-expand"></i></button><button id="bfch" class="text-muted hover:text-accent transition text-sm"><i class="fa-regular fa-heart"></i></button></div>
     </div>
 </section>
 
 <!-- CONTENIDO -->
 <main id="mainc" class="relative z-10 max-w-7xl mx-auto px-4 py-6" style="display:none">
-    <!-- BANNER -->
     <div class="bg-gradient-to-r from-accent/10 via-card to-card border border-accent/20 rounded-xl p-5 mb-6">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="w-11 h-11 rounded-xl bg-accent/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-folder-plus text-accent text-lg"></i></div>
-            <div><h3 class="font-display font-bold text-sm">Cargar listas M3U</h3><p class="text-muted text-xs mt-0.5">Editor propio, pegar texto, URL, archivo o explorar paginas web</p></div>
-        </div>
+        <div class="flex items-center gap-3 mb-4"><div class="w-11 h-11 rounded-xl bg-accent/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-folder-plus text-accent text-lg"></i></div><div><h3 class="font-display font-bold text-sm">Cargar listas M3U</h3><p class="text-muted text-xs mt-0.5">Solo se cargan los canales reproducibles. Lo demas se descarta automaticamente.</p></div></div>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
             <button id="bb-editor" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-accent text-bg text-xs font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-file-pen"></i>Mi Editor</button>
             <button id="bb-paste" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-paste"></i>Pegar texto</button>
-            <button id="bb-url" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-link"></i>Desde URL</button>
+            <button id="bb-url" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-link"></i>URL</button>
             <button id="bb-file" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-file-arrow-up"></i>Archivo</button>
             <button id="bb-explorer" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition col-span-2 sm:col-span-1"><i class="fa-solid fa-globe"></i>Explorar web</button>
         </div>
     </div>
-
-    <!-- HISTORIAL -->
-    <div id="histsec" class="mb-6 hidden">
-        <div class="flex items-center justify-between mb-2"><h3 class="text-xs font-medium text-muted"><i class="fa-solid fa-clock-rotate-left mr-1.5"></i>Cargadas recientemente</h3><button id="bclrh" class="text-[10px] text-muted/50 hover:text-err transition">Limpiar</button></div>
-        <div id="histlist" class="flex gap-2 overflow-x-auto cs pb-1"></div>
+    <!-- Resumen de última carga -->
+    <div id="load-summary" class="hidden bg-card border border-bdr rounded-xl p-4 mb-6">
+        <div class="flex items-center justify-between mb-2"><h3 class="text-xs font-medium text-muted"><i class="fa-solid fa-chart-pie mr-1.5"></i>Resumen de última carga</h3><button id="sum-close" class="text-muted/50 hover:text-txt transition text-xs"><i class="fa-solid fa-xmark"></i></button></div>
+        <div id="sum-cats" class="flex flex-wrap gap-1.5"></div>
+        <p id="sum-total" class="text-[10px] text-muted/50 mt-2"></p>
     </div>
-
-    <div class="flex items-center justify-between mb-4">
-        <div><h2 id="gtitle" class="font-display text-xl font-bold">Todos los canales</h2><p id="gcount" class="text-xs text-muted mt-0.5">0 canales</p></div>
-        <div class="text-xs text-muted"><i class="fa-solid fa-clock mr-1"></i><span id="lup">-</span></div>
-    </div>
+    <div id="histsec" class="mb-6 hidden"><div class="flex items-center justify-between mb-2"><h3 class="text-xs font-medium text-muted"><i class="fa-solid fa-clock-rotate-left mr-1.5"></i>Recientes</h3><button id="bclrh" class="text-[10px] text-muted/50 hover:text-err transition">Limpiar</button></div><div id="histlist" class="flex gap-2 overflow-x-auto cs pb-1"></div></div>
+    <div class="flex items-center justify-between mb-4"><div><h2 id="gtitle" class="font-display text-xl font-bold">Todos los canales</h2><p id="gcount" class="text-xs text-muted mt-0.5">0 canales</p></div><div class="text-xs text-muted"><i class="fa-solid fa-clock mr-1"></i><span id="lup">-</span></div></div>
     <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"></div>
     <div id="lmwrap" class="text-center mt-6 hidden"><button id="blm" class="px-6 py-2.5 rounded-lg bg-card border border-bdr text-sm text-muted hover:text-accent hover:border-accent/40 transition">Cargar mas</button></div>
     <div id="emptyst" class="hidden text-center py-20"><i class="fa-solid fa-satellite-dish text-5xl text-bdr mb-4 block"></i><p class="text-muted text-sm">No se encontraron canales</p></div>
 </main>
 
-<!-- NOW PLAYING -->
-<div id="npbar" class="nb fixed bottom-0 left-0 right-0 z-30 hidden px-4 py-3">
-    <div class="max-w-7xl mx-auto flex items-center gap-4">
-        <div class="flex items-center gap-3 flex-1 min-w-0"><span class="live-dot w-2 h-2 rounded-full bg-err shrink-0"></span><span id="npn" class="text-sm font-medium truncate">-</span></div>
-        <div class="flex items-center gap-2">
-            <button id="npp" class="w-9 h-9 rounded-full bg-accent/20 text-accent flex items-center justify-center hover:bg-accent/30 transition"><i class="fa-solid fa-pause text-sm"></i></button>
-            <button id="npc" class="w-9 h-9 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-    </div>
-</div>
+<div id="npbar" class="nb fixed bottom-0 left-0 right-0 z-30 hidden px-4 py-3"><div class="max-w-7xl mx-auto flex items-center gap-4"><div class="flex items-center gap-3 flex-1 min-w-0"><span class="live-dot w-2 h-2 rounded-full bg-err shrink-0"></span><span id="npn" class="text-sm font-medium truncate">-</span></div><div class="flex items-center gap-2"><button id="npp" class="w-9 h-9 rounded-full bg-accent/20 text-accent flex items-center justify-center hover:bg-accent/30 transition"><i class="fa-solid fa-pause text-sm"></i></button><button id="npc" class="w-9 h-9 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition"><i class="fa-solid fa-xmark"></i></button></div></div></div>
 
-<!-- ==================== MODAL: EDITOR PROPIO ==================== -->
-<div id="m-editor" class="mo">
-    <div class="mb">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-file-pen text-accent mr-2"></i>Mi Editor M3U</h3>
-            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <p class="text-muted text-xs mb-4">Guardá y editá tus listas M3U como en un Bloc de Notas. Todo se guarda en tu navegador.</p>
+<!-- MODALES: Editor, Pegar, URL, Archivo, Explorador (iguales que antes pero simplificados) -->
+<div id="m-editor" class="mo"><div class="mb"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-bold text-lg"><i class="fa-solid fa-file-pen text-accent mr-2"></i>Mi Editor M3U</h3><button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button></div><p class="text-muted text-xs mb-4">Guardá y editá tus listas. Solo se cargan los canales reproducibles (HLS).</p><div class="flex items-center justify-between mb-2"><span class="text-xs font-medium text-muted">Guardadas</span><button id="ed-new" class="text-xs text-accent hover:text-accent-h transition font-medium"><i class="fa-solid fa-plus mr-1"></i>Nueva</button></div><div id="ed-list" class="space-y-1.5 mb-4 max-h-40 overflow-y-auto"></div><div id="ed-area" class="hidden"><input id="ed-name" type="text" placeholder="Nombre" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-3"><textarea id="ed-text" class="pa w-full rounded-xl p-4 mb-2" placeholder="#EXTINF:-1 group-title=&quot;Deportes&quot;,Canal HD&#10;https://ejemplo.com/canal.m3u8"></textarea><p id="ed-count" class="text-[10px] text-muted/50 mb-4">Sin contenido</p><div class="flex flex-wrap gap-2"><button id="ed-save" class="px-4 py-2 rounded-lg bg-accent text-bg text-xs font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Guardar</button><button id="ed-load" class="px-4 py-2 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-play mr-1.5"></i>Cargar</button><button id="ed-del" class="px-4 py-2 rounded-lg bg-card border border-err/30 text-xs font-medium text-err/70 hover:text-err transition"><i class="fa-solid fa-trash mr-1.5"></i>Eliminar</button><button id="ed-cancel" class="px-4 py-2 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-txt transition ml-auto">Cancelar</button></div></div></div></div>
 
-        <!-- Lista de guardados -->
-        <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-muted">Mis listas guardadas</span>
-            <button id="ed-new" class="text-xs text-accent hover:text-accent-h transition font-medium"><i class="fa-solid fa-plus mr-1"></i>Nueva</button>
-        </div>
-        <div id="ed-list" class="space-y-1.5 mb-4 max-h-40 overflow-y-auto"></div>
+<div id="m-paste" class="mo"><div class="mb"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-bold text-lg"><i class="fa-solid fa-paste text-accent mr-2"></i>Pegar texto M3U</h3><button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button></div><p class="text-muted text-xs mb-3">Se descartan automaticamente los enlaces que no se pueden reproducir (RTMP, etc).</p><textarea id="pt-text" class="pa w-full rounded-xl p-4 mb-2" placeholder="Pegá todo el contenido de tu lista aca..."></textarea><p id="pt-count" class="text-[10px] text-muted/50 mb-1">Sin contenido</p><input id="pt-name" type="text" placeholder="Nombre (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4"><div class="flex justify-end"><button id="pt-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition disabled:opacity-40" disabled><i class="fa-solid fa-plus mr-1.5"></i>Agregar</button></div></div></div>
 
-        <!-- Editor -->
-        <div id="ed-area" class="hidden">
-            <label class="text-xs text-muted mb-1.5 block">Nombre de la lista</label>
-            <input id="ed-name" type="text" placeholder="Mi lista de deportes" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-3">
-            <label class="text-xs text-muted mb-1.5 block">Contenido M3U</label>
-            <textarea id="ed-text" class="pa w-full rounded-xl p-4 mb-2" placeholder="#EXTINF:-1 group-title=&quot;Deportes&quot;,Canal HD&#10;https://ejemplo.com/canal.m3u8&#10;&#10;Pegá o escribí tu lista aca..."></textarea>
-            <p id="ed-count" class="text-[10px] text-muted/50 mb-4">Sin contenido</p>
-            <div class="flex flex-wrap gap-2">
-                <button id="ed-save" class="px-4 py-2 rounded-lg bg-accent text-bg text-xs font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Guardar</button>
-                <button id="ed-load" class="px-4 py-2 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-play mr-1.5"></i>Cargar canales</button>
-                <button id="ed-del" class="px-4 py-2 rounded-lg bg-card border border-err/30 text-xs font-medium text-err/70 hover:text-err hover:border-err/50 transition"><i class="fa-solid fa-trash mr-1.5"></i>Eliminar</button>
-                <button id="ed-cancel" class="px-4 py-2 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-txt transition ml-auto">Cancelar</button>
-            </div>
-        </div>
-    </div>
-</div>
+<div id="m-url" class="mo"><div class="mb"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-bold text-lg"><i class="fa-solid fa-link text-accent mr-2"></i>Desde URL</h3><button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button></div><input id="ur-in" type="url" placeholder="https://ejemplo.com/lista.m3u" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-2"><input id="ur-nm" type="text" placeholder="Nombre (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4"><div class="flex justify-end"><button id="ur-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-download mr-1.5"></i>Cargar</button></div></div></div>
 
-<!-- ==================== MODAL: PEGAR TEXTO ==================== -->
-<div id="m-paste" class="mo">
-    <div class="mb">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-paste text-accent mr-2"></i>Pegar texto M3U</h3>
-            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <textarea id="pt-text" class="pa w-full rounded-xl p-4 mb-2" placeholder="#EXTINF:-1 group-title=&quot;Deportes&quot;,Canal HD&#10;https://ejemplo.com/canal.m3u8&#10;&#10;Pegá todo el contenido de tu lista aca..."></textarea>
-        <p id="pt-count" class="text-[10px] text-muted/50 mb-1">Sin contenido</p>
-        <input id="pt-name" type="text" placeholder="Nombre (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4">
-        <div class="flex justify-end"><button id="pt-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition disabled:opacity-40" disabled><i class="fa-solid fa-plus mr-1.5"></i>Agregar canales</button></div>
-    </div>
-</div>
+<div id="m-file" class="mo"><div class="mb"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-bold text-lg"><i class="fa-solid fa-file-arrow-up text-accent mr-2"></i>Archivo</h3><button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button></div><div id="dropz" class="dz p-8 text-center mb-4"><input type="file" id="finp" accept=".m3u,.m3u8,.txt" class="hidden"><i class="fa-solid fa-cloud-arrow-up text-3xl text-muted/40 mb-3 block"></i><p class="text-sm text-muted mb-1">Arrastrá tu archivo</p><p class="text-xs text-muted/50 mb-4">o clic para seleccionar</p><span class="inline-block px-4 py-2 rounded-lg bg-card border border-bdr text-xs text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-folder-open mr-1.5"></i>Seleccionar</span></div><div id="finfo" class="hidden bg-bg border border-bdr rounded-lg p-3 mb-4"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines text-accent text-sm"></i></div><div class="flex-1 min-w-0"><p id="fnm" class="text-sm font-medium truncate">-</p><p id="fsz" class="text-[10px] text-muted">-</p></div><button id="frem" class="w-7 h-7 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition text-xs"><i class="fa-solid fa-xmark"></i></button></div></div><div class="flex justify-end"><button id="fl-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition disabled:opacity-40" disabled><i class="fa-solid fa-plus mr-1.5"></i>Agregar</button></div></div></div>
 
-<!-- ==================== MODAL: DESDE URL ==================== -->
-<div id="m-url" class="mo">
-    <div class="mb">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-link text-accent mr-2"></i>Desde URL</h3>
-            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <p class="text-muted text-xs mb-3">Pegá la URL directa de un archivo .m3u o .m3u8</p>
-        <input id="ur-in" type="url" placeholder="https://ejemplo.com/lista.m3u" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-2">
-        <input id="ur-nm" type="text" placeholder="Nombre (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4">
-        <div class="flex justify-end"><button id="ur-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-download mr-1.5"></i>Cargar lista</button></div>
-    </div>
-</div>
+<div id="m-explorer" class="mo"><div class="mb"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-bold text-lg"><i class="fa-solid fa-globe text-accent mr-2"></i>Explorador Web</h3><button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button></div><div class="flex gap-2 mb-3"><input id="ex-in" type="url" placeholder="https://github.com/usuario/repo" class="flex-1 bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition"><button id="ex-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition shrink-0"><i class="fa-solid fa-magnifying-glass"></i></button></div><div id="ex-status" class="hidden bg-bg border border-bdr rounded-lg p-3 mb-3"><div class="flex items-center gap-2"><i class="fa-solid fa-spinner spin text-accent text-sm"></i><span class="text-xs text-muted" id="ex-stmsg">Analizando...</span></div></div><div id="ex-results" class="space-y-2 max-h-72 overflow-y-auto"></div><div id="ex-empty" class="hidden text-center py-8"><p class="text-muted text-xs">No se encontraron archivos M3U</p></div></div></div>
 
-<!-- ==================== MODAL: ARCHIVO ==================== -->
-<div id="m-file" class="mo">
-    <div class="mb">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-file-arrow-up text-accent mr-2"></i>Archivo local</h3>
-            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div id="dropz" class="dz p-8 text-center mb-4">
-            <input type="file" id="finp" accept=".m3u,.m3u8,.txt" class="hidden">
-            <i class="fa-solid fa-cloud-arrow-up text-3xl text-muted/40 mb-3 block"></i>
-            <p class="text-sm text-muted mb-1">Arrastrá tu archivo aca</p>
-            <p class="text-xs text-muted/50 mb-4">o hacé clic para seleccionar</p>
-            <span class="inline-block px-4 py-2 rounded-lg bg-card border border-bdr text-xs text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-folder-open mr-1.5"></i>Seleccionar</span>
-            <p class="text-[10px] text-muted/40 mt-3">.m3u, .m3u8, .txt</p>
-        </div>
-        <div id="finfo" class="hidden bg-bg border border-bdr rounded-lg p-3 mb-4">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines text-accent text-sm"></i></div>
-                <div class="flex-1 min-w-0"><p id="fnm" class="text-sm font-medium truncate">-</p><p id="fsz" class="text-[10px] text-muted">-</p></div>
-                <button id="frem" class="w-7 h-7 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition text-xs"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-        </div>
-        <div class="flex justify-end"><button id="fl-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition disabled:opacity-40" disabled><i class="fa-solid fa-plus mr-1.5"></i>Agregar</button></div>
-    </div>
-</div>
-
-<!-- ==================== MODAL: EXPLORADOR WEB ==================== -->
-<div id="m-explorer" class="mo">
-    <div class="mb">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-globe text-accent mr-2"></i>Explorador Web</h3>
-            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <p class="text-muted text-xs mb-3">Pegá la URL de cualquier pagina web (GitHub, repositorios, downloaders) y busco todos los archivos M3U que tenga para cargarlos.</p>
-        <div class="flex gap-2 mb-3">
-            <input id="ex-in" type="url" placeholder="https://github.com/usuario/repo" class="flex-1 bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition">
-            <button id="ex-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition shrink-0"><i class="fa-solid fa-magnifying-glass"></i></button>
-        </div>
-        <div class="flex flex-wrap gap-1.5 mb-4">
-            <span class="text-[10px] text-muted/50 self-center mr-1">Ejemplos:</span>
-            <button class="ex-q text-[10px] px-2.5 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-u="https://github.com/Free-TV/IPTV">Free-TV IPTV</button>
-            <button class="ex-q text-[10px] px-2.5 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-u="https://github.com/iptv-org/iptv">iptv-org</button>
-            <button class="ex-q text-[10px] px-2.5 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-u="https://github.com/username/iptv-list">Otro repo</button>
-        </div>
-        <div id="ex-status" class="hidden bg-bg border border-bdr rounded-lg p-3 mb-3">
-            <div class="flex items-center gap-2"><i class="fa-solid fa-spinner spin text-accent text-sm"></i><span class="text-xs text-muted" id="ex-stmsg">Analizando pagina...</span></div>
-        </div>
-        <div id="ex-results" class="space-y-2 max-h-72 overflow-y-auto"></div>
-        <div id="ex-empty" class="hidden text-center py-8"><i class="fa-solid fa-magnifying-glass text-3xl text-bdr mb-3 block"></i><p class="text-muted text-xs">No se encontraron archivos M3U en esa pagina</p><p class="text-muted/50 text-[10px] mt-1">Probá con otra URL o usá el editor para pegar el contenido directamente</p></div>
-    </div>
-</div>
-
-<!-- MODAL: URL DIRECTA -->
-<div id="m-dir" class="mo">
-    <div class="mb">
-        <h3 class="font-display font-bold text-lg mb-1">Reproducir URL directa</h3>
-        <p class="text-muted text-xs mb-4">Pega un enlace M3U8</p>
-        <input id="dr-in" type="url" placeholder="https://ejemplo.com/stream.m3u8" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-3">
-        <input id="dr-nm" type="text" placeholder="Nombre (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4">
-        <div class="flex gap-3 justify-end"><button class="mx px-4 py-2 rounded-lg text-sm text-muted hover:text-txt transition">Cancelar</button><button id="dr-go" class="px-5 py-2 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition">Reproducir</button></div>
-    </div>
-</div>
-
-<footer id="ftr" class="relative z-10 border-t border-bdr mt-12 pb-20" style="display:none">
-    <div class="max-w-7xl mx-auto px-4 py-6 text-center"><p class="text-muted text-xs">StreamVault &mdash; TV Argentina e IPTV</p></div>
-</footer>
+<footer id="ftr" class="relative z-10 border-t border-bdr mt-12 pb-20" style="display:none"><div class="max-w-7xl mx-auto px-4 py-6 text-center"><p class="text-muted text-xs">StreamVault &mdash; Solo canales reproducibles</p></div></footer>
 
 <script>
-/* === CLAVE === */
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
 const PN={v:'',m:'login',l:true,a:0};
 function initLock(){const s=localStorage.getItem('svp'),t=$('lkt'),b=$('lks');if(s){PN.m='login';t.textContent='StreamVault';b.textContent='Ingresá tu clave'}else{PN.m='setup';t.textContent='Crear clave';b.textContent='Elegí un PIN de 4 digitos';document.querySelector('.lk').innerHTML='<i class="fa-solid fa-lock-open"></i>'}document.querySelectorAll('#keypad .kb').forEach(e=>e.addEventListener('click',()=>hK(e.dataset.k)));document.addEventListener('keydown',e=>{if(!PN.l)return;if(e.key>='0'&&e.key<='9')hK(e.key);else if(e.key==='Backspace')hK('d')})}
@@ -317,7 +148,19 @@ function showApp(){['hdr','mainc','ftr'].forEach(i=>$(i).style.display='');initA
 /* === ESTADO === */
 const DL=[{i:'ar',n:'Argentina',u:'https://iptv-org.github.io/iptv/countries/ar.m3u'},{i:'sa',n:'Sudamerica',u:'https://iptv-org.github.io/iptv/regions/south-america.m3u'},{i:'la',n:'Latinoamerica',u:'https://iptv-org.github.io/iptv/regions/latin-america.m3u'},{i:'sp',n:'Espanol',u:'https://iptv-org.github.io/iptv/languages/spa.m3u'},{i:'ds',n:'Deportes',u:'https://iptv-org.github.io/iptv/categories/sports.m3u'},{i:'mv',n:'Peliculas',u:'https://iptv-org.github.io/iptv/categories/movies.m3u'},{i:'nw',n:'Noticias',u:'https://iptv-org.github.io/iptv/categories/news.m3u'},{i:'en',n:'Entretenimiento',u:'https://iptv-org.github.io/iptv/categories/entertainment.m3u'},{i:'mu',n:'Musica',u:'https://iptv-org.github.io/iptv/categories/music.m3u'},{i:'ki',n:'Infantil',u:'https://iptv-org.github.io/iptv/categories/kids.m3u'},{i:'dc',n:'Documentales',u:'https://iptv-org.github.io/iptv/categories/documentary.m3u'}];
 const AK=['argentina','america tv','telefe','canal 13','elnueve','canal 9','canal 7','publica','tyc sports','fox sports argentina','espn argentina','depotv','flow','telecentro','cronica','canal 26','a24','ln+','cablenoticias','cn23','misiones','formosa','cordoba','rosario','mendoza','tucuman','salta','net tv','magazine','panamericana'];
-const CK={deportes:['deporte','sports','futbol','football','soccer','nba','nfl','f1','formula','tenis','boxeo','wwe','ufc','motor','racing','bein','espn','fox sport','tyc sport','directv sport'],peliculas:['pelicula','movie','film','cinema','cine','amc','star cinema','golden','paramount'],series:['serie','series','show','sitcom','comedia','drama'],noticias:['noticia','news','24h','24 hor','cnne','telefe','milenio','adn40','cronica','canal 26','a24','ln+','cable','cn23'],musica:['musica','music','mtv','vh1','hit','radio','concert','banda','rock','pop','jazz'],infantil:['infantil','kids','children','nickelodeon','cartoon','disney channel','anime','boomerang','baby','nick','pj mask','paw patrol'],documentales:['documental','documentary','discovery','nat geo','national geographic','history','historia','animal','natura'],entretenimiento:['entretenimiento','entertainment','reality','variedad','programa','concurso','televisa','univision','magazine']};
+
+/* === KEYWORDS DE CATEGORIAS (español + ingles) === */
+const CK={
+    deportes:['deporte','sports','futbol','football','soccer','nba','nfl','mlb','f1','formula','golf','tenis','boxeo','wwe','ufc','motor','racing','bein','espn','fox sport','tyc sport','directv sport','basketball','hockey','cricket','rugby','boxing','cycling','volley','swimming','athletics','olympic','premier league','liga','champions','bundesliga','serie a'],
+    peliculas:['pelicula','movie','movies','film','films','cinema','cine','amc','star cinema','golden','paramount','hbo','max','disney','pixar','dreamworks','universal','warner','sony','columbia','trailer','estreno','estrenos','drama','thriller','horror','comedia','romance','accion','aventura','ciencia ficcion','sci-fi','fantasia','animacion','animation'],
+    series:['serie','series','show','sitcom','comedia','drama','temporada','season','capitulo','episode','capitulos','episodios','miniserie','web serie','netflix','amazon prime','disney+','star plus','hbo max','apple tv','serie de tv','tv show'],
+    noticias:['noticia','news','24h','24 hor','cnne','telefe','milenio','adn40','cronica','canal 26','a24','ln+','cable','cn23','informe','reportaje','tiempo','weather','politica','economia','debat','editorial','interview','press'],
+    musica:['musica','music','mtv','vh1','hit','radio','concert','banda','rock','pop','jazz','reggaeton','cumbia','salsa','bachata','hip hop','rap','electronic','edm','techno','house','dj','playlist','top 40','clip','video musical','videoclip'],
+    infantil:['infantil','kids','children','nickelodeon','cartoon','disney channel','anime','boomerang','baby','nick','pj mask','paw patrol','peppa','dinosaurio','doras','pocoyo','heidi','tom y jerry','looney','marvel','super heroes','draw','dibujo'],
+    documentales:['documental','documentary','documentales','discovery','nat geo','national geographic','history','historia','animal','natura','nature','science','ciencia','space','espacio','oceano','ocean','selva','desierto','polar','investigacion','crime','true crime','misterio','mystery'],
+    entretenimiento:['entretenimiento','entertainment','reality','variedad','show','programa','concurso','televisa','univision','magazine','talk show','game show','cooking','cocina','travel','viaje','lifestyle','estilo de vida','fashion','moda','comedia en vivo','stand up']
+};
+
 const S={all:[],fl:[],cat:'all',q:'',fov:false,fav:JSON.parse(localStorage.getItem('svf')||'[]'),d:0,pp:48,cur:null,ini:false};
 let lft=null,lfn='',editingId=null;
 
@@ -328,172 +171,236 @@ function nm(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u0
 function fsz(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
 
-/* === EDITOR PROPIO === */
+/* === DETECTAR TIPO: solo HLS es reproducible en navegador === */
+function isHLS(url){
+    const u=url.toLowerCase();
+    if(u.startsWith('rtmp')||u.startsWith('rtmps'))return false;
+    return true; // Todo lo demás se intenta como HLS
+}
+
+/* === EDITOR === */
 function gEd(){return JSON.parse(localStorage.getItem('sve')||'[]')}
 function sEd(list){localStorage.setItem('sve',JSON.stringify(list))}
-function rEdList(){
-    const list=gEd(),el=$('ed-list');
-    if(!list.length){el.innerHTML='<p class="text-muted/50 text-xs text-center py-4">No hay listas guardadas. Creá una nueva.</p>';return}
-    el.innerHTML='';
-    list.forEach(item=>{
-        const ch=pM(item.text,'e').length;
-        const d=document.createElement('div');
-        d.className='ed-item flex items-center gap-3 p-2.5 rounded-lg border border-bdr' + (editingId===item.id?' active':'');
-        d.innerHTML=`<div class="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines text-accent text-xs"></i></div><div class="flex-1 min-w-0"><p class="text-xs font-medium truncate">${item.name}</p><p class="text-[10px] text-muted/50">${ch} canales &middot; ${new Date(item.date).toLocaleDateString('es')}</p></div><div class="flex gap-1 shrink-0"><button class="ed-load-btn w-7 h-7 rounded-md hover:bg-accent/20 flex items-center justify-center text-muted hover:text-accent transition text-xs" title="Cargar"><i class="fa-solid fa-play"></i></button><button class="ed-edit-btn w-7 h-7 rounded-md hover:bg-card flex items-center justify-center text-muted hover:text-txt transition text-xs" title="Editar"><i class="fa-solid fa-pen"></i></button></div>`;
-        d.querySelector('.ed-load-btn').addEventListener('click',e=>{e.stopPropagation();loadFT(item.text,item.name);cM('m-editor')});
-        d.querySelector('.ed-edit-btn').addEventListener('click',e=>{e.stopPropagation();openEditor(item.id)});
-        d.addEventListener('click',()=>openEditor(item.id));
-        el.appendChild(d);
-    });
-}
-function openEditor(id){
-    const list=gEd();
-    editingId=id;
-    rEdList();
-    const area=$('ed-area');
-    area.classList.remove('hidden');
-    if(id){
-        const item=list.find(x=>x.id===id);
-        if(item){$('ed-name').value=item.name;$('ed-text').value=item.text;updEdCount()}
-    }else{$('ed-name').value='';$('ed-text').value='';$('ed-count').textContent='Sin contenido';$('ed-del').classList.add('hidden')}
-}
-function updEdCount(){const t=$('ed-text').value.trim();if(!t){$('ed-count').textContent='Sin contenido';return}const urls=t.split('\n').filter(l=>l.trim().startsWith('http')).length,exts=t.split('\n').filter(l=>l.trim().startsWith('#EXTINF')).length;$('ed-count').textContent=`${exts} canales / ${urls} enlaces`}
+function rEdList(){const list=gEd(),el=$('ed-list');if(!list.length){el.innerHTML='<p class="text-muted/50 text-xs text-center py-4">No hay listas guardadas.</p>';return}el.innerHTML='';list.forEach(item=>{const ch=pM(item.text,'e'),hls=ch.filter(c=>c.urls.some(isHLS)).length;const d=document.createElement('div');d.className='ed-item flex items-center gap-3 p-2.5 rounded-lg border border-bdr'+(editingId===item.id?' active':'');d.innerHTML=`<div class="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines text-accent text-xs"></i></div><div class="flex-1 min-w-0"><p class="text-xs font-medium truncate">${item.name}</p><p class="text-[10px] text-muted/50">${hls} reproducibles</p></div><div class="flex gap-1 shrink-0"><button class="elb w-7 h-7 rounded-md hover:bg-accent/20 flex items-center justify-center text-muted hover:text-accent transition text-xs"><i class="fa-solid fa-play"></i></button><button class="eeb w-7 h-7 rounded-md hover:bg-card flex items-center justify-center text-muted hover:text-txt transition text-xs"><i class="fa-solid fa-pen"></i></button></div>`;d.querySelector('.elb').addEventListener('click',e=>{e.stopPropagation();loadFT(item.text,item.name);cM('m-editor')});d.querySelector('.eeb').addEventListener('click',e=>{e.stopPropagation();openEditor(item.id)});d.addEventListener('click',()=>openEditor(item.id));el.appendChild(d)})}
+function openEditor(id){const list=gEd();editingId=id;rEdList();$('ed-area').classList.remove('hidden');if(id){const item=list.find(x=>x.id===id);if(item){$('ed-name').value=item.name;$('ed-text').value=item.text;updEdCount()}}else{$('ed-name').value='';$('ed-text').value='';$('ed-count').textContent='Sin contenido';$('ed-del').classList.add('hidden')}}
+function updEdCount(){const t=$('ed-text').value.trim();if(!t){$('ed-count').textContent='Sin contenido';return}const parsed=pM(t,'e'),hls=parsed.filter(c=>c.urls.some(isHLS)).length,rechazados=parsed.length-hls;$('ed-count').innerHTML=`${parsed.length} canales encontrados: <span class="text-ok">${hls} reproducibles</span>, <span class="text-err">${rechazados} descartados (no HLS)`}`}
 
 /* === HISTORIAL === */
 function gH(){return JSON.parse(localStorage.getItem('svh')||'[]')}
 function aH(n,u,c){const h=gH();h.unshift({n,u,c,t:Date.now()});if(h.length>20)h.length=20;localStorage.setItem('svh',JSON.stringify(h));rH()}
 function rH(){const h=gH(),s=$('histsec'),l=$('histlist');if(!h.length){s.classList.add('hidden');return}s.classList.remove('hidden');l.innerHTML='';h.forEach(i=>{const e=document.createElement('button');e.className='hi shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-bdr text-left';e.innerHTML=`<div class="w-7 h-7 rounded-md bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-list text-accent text-[10px]"></i></div><div class="min-w-0"><p class="text-[11px] font-medium truncate max-w-[120px]">${i.n}</p><p class="text-[9px] text-muted/50">${i.c} canales</p></div>`;if(i.u!=='archivo-local')e.addEventListener('click',()=>loadCust(i.u,i.n));l.appendChild(e)})}
 
-/* === PARSER === */
-function pM(t,sid){const ls=t.split('\n'),ch=[];let c=null;for(const r of ls){const l=r.trim();if(!l)continue;if(l.startsWith('#EXTINF:')){c={};const lm=l.match(/tvg-logo="([^"]*)"/),gm=l.match(/group-title="([^"]*)"/),ci=l.lastIndexOf(',');c.logo=lm?lm[1]:'';c.group=gm?gm[1]:'Otros';c.name=ci>=0?l.substring(ci+1).trim():'Sin nombre';if(!c.name)c.name='Sin nombre'}else if(!l.startsWith('#')&&c){if(l.startsWith('http')||l.startsWith('rtmp')||l.startsWith('rtsp')){c.url=l;c.sid=sid;ch.push(c)}c=null}}return ch}
+/* === PARSER: detecta canales con URLs reproducibles === */
+function pM(text,sid){
+    const lines=text.split('\n'),ch=[];
+    let cur=null;
+    for(const raw of lines){
+        const line=raw.trim();
+        if(!line)continue;
+        if(line.match(/#EXTINF/i)){
+            cur={};
+            const logoM=line.match(/tvg-logo="([^"]*)"/);
+            const groupM=line.match(/group-title="([^"]*)"/);
+            let nameStart=line.lastIndexOf(',');
+            if(nameStart<0)nameStart=line.indexOf(' ',Math.min(line.length,80));
+            cur.logo=logoM?logoM[1]:'';
+            cur.group=groupM?groupM[1]:'Otros';
+            cur.name=nameStart>=0?line.substring(nameStart+1).trim():'Canal';
+            if(!cur.name)cur.name='Canal';
+        }
+        else if(!line.startsWith('#')&&cur){
+            const urlMatch=line.match(/(https?:\/\/[^\s,]+)/i)||(line.match(/(rtmp[s]?:\/\/[^\s,]+)/i);
+            if(urlMatch){
+                cur.url=urlMatch[1];
+                cur.sid=sid;
+                ch.push(cur);
+            }
+            cur=null;
+        }
+        else if(!line.startsWith('#')&&!cur){
+            const urlMatch=line.match(/(https?:\/\/[^\s,]+)/i)||(line.match(/(rtmp[s]?:\/\/[^\s,]+)/i));
+            if(urlMatch)ch.push({name:'Canal '+String(ch.length+1),logo:'',group:'Otros',url:urlMatch[1],sid:sid});
+        }
+    }
+    return ch;
+}
+
 function iA(n,g){const t=nm(n+' '+g);return AK.some(k=>t.includes(nm(k)))}
-function cl(n,g){const t=nm(n+' '+g);for(const[c,ks]of Object.entries(CK))for(const k of ks)if(t.includes(nm(k)))return c;return'otros'}
-function mg(ls){const m=new Map();for(const l of ls)for(const c of l){const k=nm(c.name);if(m.has(k)){const e=m.get(k);if(!e.urls.includes(c.url))e.urls.push(c.url);if(!e.logo&&c.logo)e.logo=c.logo;if(c.sid==='ar'&&!e.arg)e.arg=iA(c.name,c.group)}else m.set(k,{name:c.name,logo:c.logo,group:c.group,cat:cl(c.name,c.group),urls:[c.url],sid:c.sid,arg:c.sid==='ar'||iA(c.name,c.group)})}return Array.from(m.values())}
 
-/* === CARGA === */
-async function loadAll(f){const ck='sv2',ct='sv3';if(!f){const c=sessionStorage.getItem(ck),ca=parseInt(sessionStorage.getItem(ct)||'0');if(c&&Date.now()-ca<30*60*1000){S.all=JSON.parse(c);return S.all}}const bar=$('loadbar'),st=$('loadst'),tot=DL.length;let d=0;const res=await Promise.allSettled(DL.map(async l=>{try{const r=await fetch(l.u);if(!r.ok)throw 0;const t=await r.text(),p=pM(t,l.i);d++;bar.style.width=`${(d/tot)*100}%`;st.textContent=`${l.n}: ${p.length}`;return p}catch(e){d++;bar.style.width=`${(d/tot)*100}%`;st.textContent=`${l.n}: -`;return[]}}));const al=[];for(const r of res)if(r.status==='fulfilled'&&r.value.length)al.push(r.value);S.all=mg(al);sessionStorage.setItem(ck,JSON.stringify(S.all));sessionStorage.setItem(ct,Date.now().toString());return S.all}
+/* === CLASIFICAR POR CATEGORIA (mejorado) === */
+function cl(n,g){
+    const t=nm(n+' '+g);
+    for(const[c,ks]of Object.entries(CK)){
+        for(const kw of ks){
+            if(t.includes(nm(kw)))return c;
+        }
+    }
+    return 'otros';
+}
 
-async function loadCust(url,ln){toast('Cargando lista...','info');try{const r=await fetch(url);if(!r.ok)throw new Error(r.status);const t=await r.text(),p=pM(t,'c');if(!p.length)throw new Error('Lista vacia');doM(p,ln||url.split('/').pop()||'Lista');aH(ln||'Lista',url,p.length);toast(`+${p.length} canales`,'ok')}catch(e){toast('Error: '+e.message,'err')}}
+function mg(ls){
+    const m=new Map();
+    for(const l of ls)for(const c of l){
+        const k=nm(c.name);
+        if(m.has(k)){
+            const e=m.get(k);
+            if(!e.urls.includes(c.url))e.urls.push(c.url);
+            if(!e.logo&&c.logo)e.logo=c.logo;
+            if(c.sid==='ar'&&!e.arg)e.arg=iA(c.name,c.group);
+        }else m.set(k,{name:c.name,logo:c.logo,group:c.group,cat:cl(c.name,c.group),urls:[c.url],sid:c.sid,arg:c.sid==='ar'||iA(c.name,c.group)});
+    }
+    return Array.from(m.values());
+}
 
-function loadFT(t,n){const p=pM(t,'f');if(!p.length){toast('Sin canales validos','warn');return}doM(p,n);aH(n,'archivo-local',p.length);toast(`+${p.length} canales de ${n}`,'ok')}
+/* === CARGA: solo canales con HLS === */
+async function loadAll(f){
+    const ck='sv2',ct='sv3';
+    if(!f){const c=sessionStorage.getItem(ck),ca=parseInt(sessionStorage.getItem(ct)||'0');if(c&&Date.now()-ca<30*60*1000){S.all=JSON.parse(c);return S.all}}
+    const bar=$('loadbar'),st=$('loadst'),tot=DL.length;let d=0;
+    const res=await Promise.allSettled(DL.map(async l=>{try{const r=await fetch(l.u);if(!r.ok)throw 0;const t=await r.text();const p=pM(t,l.i);d++;bar.style.width=`${(d/tot)*100}%`;st.textContent=`${l.n}: ${p.length}`;return p}catch(e){d++;bar.style.width=`${(d/tot)*100}%`;st.textContent=`${l.n}: -`;return[]}}));
+    const al=[];for(const r of res)if(r.status==='fulfilled'&&r.value.length)al.push(r.value);
+    // Filtrar: solo canales con al menos un enlace HLS
+    const filtered=al.flat().filter(c=>c.urls.some(isHLS));
+    // Re-merge con solo los que funcionan
+    S.all=mg([filtered]);
+    sessionStorage.setItem(ck,JSON.stringify(S.all));sessionStorage.setItem(ct,Date.now().toString());
+    return S.all;
+}
 
-function doM(p,n){const fm=new Map();for(const c of S.all)fm.set(nm(c.name),{...c});let a=0;for(const c of p){const k=nm(c.name);if(fm.has(k)){const e=fm.get(k);if(!e.urls.includes(c.url)){e.urls.push(c.url);a++}}else{fm.set(k,{name:c.name,logo:c.logo,group:c.group,cat:cl(c.name,c.group),urls:[c.url],sid:'c',arg:iA(c.name,c.group)});a++}}S.all=Array.from(fm.values());applyF()}
+async function loadCust(url,ln){
+    toast('Cargando...','info');
+    try{
+        const r=await fetch(url);if(!r.ok)throw new Error(r.status);
+        const t=await r.text();const raw=pM(t,'c');
+        // Filtrar solo HLS
+        const hls=raw.filter(c=>c.urls.some(isHLS));
+        if(!hls.length)throw new Error('No hay canales reproducibles en esta lista');
+        doM(hls,ln||url.split('/').pop()||'Lista');
+        showSummary(hls);
+        aH(ln||'Lista',url,hls.length);
+        toast(`+${hls.length} canales reproducibles cargados`,'ok');
+    }catch(e){toast('Error: '+e.message,'err')}
+}
+
+function loadFT(t,n){
+    const raw=pM(t,'f');
+    const hls=raw.filter(c=>c.urls.some(isHLS));
+    const rechazados=raw.length-hls;
+    if(!hls.length){
+        if(rechazados>0)toast(`Se encontraron ${raw.length} canales pero ninguno es reproducible en el navegador (todos son RTMP u otro formato). Proba con otra lista.`,'warn');
+        else toast('No se detectaron canales en ese texto','warn');
+        return;
+    }
+    doM(hls,n);
+    showSummary(hls);
+    aH(n,'archivo-local',hls.length);
+    toast(`+${hls.length} canales cargados (${rechazados} descartados)`,'ok');
+}
+
+/* === MOSTRAR RESUMEN POR CATEGORÍA === */
+function showSummary(channels){
+    const cats={};
+    channels.forEach(c=>{
+        const cat=c.cat||'otros';
+        if(!cats[cat])cats[cat]=0;
+        cats[cat]++;
+    });
+    const el=$('sum-cats');
+    const catColors={deportes:'bg-emerald-500/15 text-emerald-400',peliculas:'bg-amber-500/15 text-amber-400',series:'bg-violet-500/15 text-violet-400',noticias:'bg-sky-500/15 text-sky-400',musica:'bg-pink-500/15 text-pink-400',infantil:'bg-lime-500/15 text-lime-400',documentales:'bg-teal-500/15 text-teal-400',entretenimiento:'bg-orange-500/15 text-orange-400',otros:'bg-gray-500/15 text-gray-400'};
+    const catNames={deportes:'Deportes',peliculas:'Peliculas',series:'Series',noticias:'Noticias',musica:'Musica',infantil:'Infantil',documentales:'Documentales',entretenimiento:'Entretenimiento',otros:'Otros'};
+    el.innerHTML='';
+    const sorted=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+    sorted.forEach(([cat,count])=>{
+        const s=document.createElement('span');
+        s.className=`cat-summary-item ${catColors[cat]||catColors.otros}`;
+        s.textContent=`${catNames[cat]||cat}: ${count}`;
+        el.appendChild(s);
+    });
+    $('sum-total').textContent=`Total: ${channels.length} canales reproducibles`;
+    $('load-summary').classList.remove('hidden');
+}
+
+function doM(p,n){
+    const fm=new Map();
+    for(const c of S.all)fm.set(nm(c.name),{...c});
+    let a=0;
+    for(const c of p){
+        const k=nm(c.name);
+        if(fm.has(k)){const e=fm.get(k);if(!e.urls.includes(c.url)){e.urls.push(c.url);a++}}
+        else{fm.set(k,{name:c.name,logo:c.logo,group:c.group,cat:cl(c.name,c.group),urls:[c.url],sid:'c',arg:iA(c.name,c.group)});a++}
+    }
+    S.all=Array.from(fm.values());
+    applyF();
+}
 
 /* === EXPLORADOR WEB === */
 async function explorePage(url){
     const st=$('ex-status'),res=$('ex-results'),emp=$('ex-empty');
-    st.classList.remove('hidden');emp.classList.add('hidden');res.innerHTML='';
-    $('ex-stmsg').textContent='Conectando con la pagina...';
-
+    st.classList.remove('hidden');emp.classList.add('hidden');res.innerHTML='';$('ex-stmsg').textContent='Conectando...';
     try{
-        // Usar proxy CORS para leer cualquier pagina
         const proxyUrl=`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        const resp=await fetch(proxyUrl);
-        if(!resp.ok)throw new Error('No se pudo acceder a la pagina');
-
-        $('ex-stmsg').textContent='Buscando archivos M3U...';
-        const html=await resp.text();
-
-        // Buscar todos los links M3U/M3U8 en el HTML
-        const found=new Set();
-
-        // 1. Links en href
-        const hrefRegex=/href=["']([^"']*(?:\.m3u8?|\.M3U8?)[^"']*)["']/gi;
-        let match;
-        while((match=hrefRegex.exec(html))!==null){found.add(match[1])}
-
-        // 2. URLs sueltas en el texto que sean M3U
-        const urlRegex=/https?:\/\/[^\s"'<>]+\.m3u8?[^\s"'<>]*/gi;
-        while((match=urlRegex.exec(html))!==null){found.add(match[0])}
-
-        // 3. Para GitHub: buscar raw.githubusercontent.com links
-        const rawRegex=/https?:\/\/raw\.githubusercontent\.com\/[^\s"'<>]+/gi;
-        while((match=rawRegex.exec(html))!==null){
-            const u=match[0];
-            if(u.match(/\.(m3u8?|M3U8?)(\?|$)/))found.add(u);
-        }
-
-        // 4. Links de descarga tipicos
-        const dlRegex=/(?:download|descargar|file|archivo)["']?\s*[:=]\s*["']?(https?:\/\/[^\s"'<>]+)/gi;
-        while((match=dlRegex.exec(html))!==null){
-            if(match[1].match(/\.(m3u8?|M3U8?)(\?|$)/))found.add(match[1]);
-        }
-
-        st.classList.add('hidden');
-        const links=[...found].filter(u=>u.startsWith('http'));
-
+        const resp=await fetch(proxyUrl);if(!resp.ok)throw new Error('No se pudo acceder');
+        $('ex-stmsg').textContent='Buscando M3U...';
+        const html=await resp.text();const found=new Set();let m;
+        const h1=/href=["']([^"']*(?:\.m3u8?|\.M3U8?)[^"']*)["']/gi;while((m=h1.exec(html))!==null)found.add(m[1]);
+        const h2=/https?:\/\/[^\s"'<>]+\.m3u8?[^\s"'<>]*/gi;while((m=h2.exec(html))!==null)found.add(m[0]);
+        const h3=/https?:\/\/raw\.githubusercontent\.com\/[^\s"'<>]+/gi;while((m=h3.exec(html))!==null){if(m[0].match(/\.(m3u8?|M3U8?)(\?|$)/))found.add(m[0])}
+        st.classList.add('hidden');const links=[...found].filter(u=>u.startsWith('http'));
         if(!links.length){emp.classList.remove('hidden');return}
-
+        if(url.includes('github.com')){const gh=url.match(/github\.com\/([^\/]+)\/([^\/]+)/);if(gh){try{const ar=await fetch(`https://api.github.com/repos/${gh[1]}/${gh[2]}/contents/`);if(ar.ok){const files=await ar.json();for(const f of files)if((f.name.endsWith('.m3u')||f.name.endsWith('.m3u8'))&&f.download_url)links.push(f.download_url)}}catch(e){}}}
         res.innerHTML='';
-        // Si es GitHub, intentar usar la API para buscar archivos
-        if(url.includes('github.com')){
-            const ghMatch=url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-            if(ghMatch){
-                $('ex-stmsg').textContent='Tambien buscando via API de GitHub...';
-                st.classList.remove('hidden');
-                try{
-                    const apiRes=await fetch(`https://api.github.com/repos/${ghMatch[1]}/${ghMatch[2]}/contents/`);
-                    if(apiRes.ok){
-                        const files=await apiRes.json();
-                        for(const f of files){
-                            if(f.name.endsWith('.m3u')||f.name.endsWith('.m3u8')||f.name.endsWith('.M3U')){
-                                if(f.download_url)links.push(f.download_url);
-                            }
-                        }
-                    }
-                }catch(e){}
-                st.classList.add('hidden');
-            }
-        }
-
-        // Deduplicar y mostrar
-        const unique=[...new Set(links)];
-        unique.forEach((link,i)=>{
-            const fileName=link.split('/').pop().split('?')[0];
-            const el=document.createElement('div');
-            el.className='link-found bg-card border border-bdr rounded-lg p-3';
-            el.innerHTML=`<div class="flex items-start gap-3">
-                <div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-file-code text-accent text-sm"></i></div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium truncate">${fileName}</p>
-                    <p class="text-[10px] text-muted/60 truncate mt-0.5">${link}</p>
-                </div>
-                <button class="ex-load-btn shrink-0 px-3 py-1.5 rounded-lg bg-accent/15 text-accent text-xs font-medium hover:bg-accent/25 transition">Cargar</button>
-            </div>`;
-            el.querySelector('.ex-load-btn').addEventListener('click',async()=>{
-                const btn=el.querySelector('.ex-load-btn');
-                btn.innerHTML='<i class="fa-solid fa-spinner spin"></i>';btn.disabled=true;
-                try{
-                    const r=await fetch(link);
-                    if(!r.ok)throw 0;
-                    const t=await r.text(),p=pM(t,'ex');
-                    if(!p.length)throw 0;
-                    doM(p,fileName);aH(fileName,link,p.length);
-                    toast(`+${p.length} canales de ${fileName}`,'ok');
-                    btn.innerHTML='<i class="fa-solid fa-check"></i>';btn.classList.replace('text-accent','text-ok');
-                }catch(e){toast('Error al cargar','err');btn.innerHTML='Cargar';btn.disabled=false}
-            });
-            res.appendChild(el);
-        });
-
-        $('ex-stmsg').textContent=`${unique.length} archivos M3U encontrados`;
-
-    }catch(e){
-        st.classList.add('hidden');
-        toast('Error: '+e.message,'err');
-        res.innerHTML=`<p class="text-err text-xs text-center py-4">No se pudo acceder a esa pagina. Puede que tenga bloqueado el acceso externo.</p><p class="text-muted/50 text-[10px] text-center">Probá copiar el contenido manualmente desde "Mi Editor" o "Pegar texto"</p>`;
-    }
+        [...new Set(links)].forEach(link=>{const fn=link.split('/').pop().split('?')[0];const el=document.createElement('div');el.className='link-found bg-card border border-bdr rounded-lg p-3';el.innerHTML=`<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-code text-accent text-sm"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${fn}</p><p class="text-[10px] text-muted/60 truncate mt-0.5">${link}</p></div><button class="elb shrink-0 px-3 py-1.5 rounded-lg bg-accent/15 text-accent text-xs font-medium hover:bg-accent/25 transition">Cargar</button></div>`;
+        el.querySelector('.elb').addEventListener('click',async()=>{const btn=el.querySelector('.elb');btn.innerHTML='<i class="fa-solid fa-spinner spin"></i>';btn.disabled=true;try{const r=await fetch(link);if(!r.ok)throw 0;const t=await r.text(),p=pM(t,'ex');const hls=p.filter(c=>c.urls.some(isHLS));if(!hls.length)throw 0;doM(hls,fn);showSummary(hls);aH(fn,link,hls.length);toast(`+${hls.length} de ${fn}`,'ok');btn.innerHTML='<i class="fa-solid fa-check"></i>';btn.classList.replace('text-accent','text-ok')}catch(e){toast('Error o sin canales HLS','err');btn.innerHTML='Cargar';btn.disabled=false}});
+        res.appendChild(el)})
+    }catch(e){st.classList.add('hidden');toast('Error: '+e.message,'err');res.innerHTML=`<p class="text-err text-xs text-center py-4">No se pudo acceder. Probá pegar desde "Mi Editor".</p>`}
 }
 
 /* === REPRODUCTOR === */
-class RP{constructor(v){this.v=v;this.h=null;this.c=null;this.i=0;this.d=false}play(c){this.x();this.d=false;this.c=c;this.i=0;this._t()}playUrl(u,n){this.x();this.d=false;this.c={name:n||'Stream',group:'Manual',urls:[u],logo:''};this.i=0;this._t()}_t(){if(this.d)return;if(this.i>=this.c.urls.length){this._e('Todos los enlaces fallaron.');$('pfb').classList.add('hidden');return}const u=this.c.urls[this.i],fb=$('pfb');if(this.i>0){fb.classList.remove('hidden');fb.innerHTML=`<i class="fa-solid fa-rotate mr-1"></i>${this.i+1}/${this.c.urls.length}`}if(Hls.isSupported()){this.h=new Hls({maxBufferLength:30,maxMaxBufferLength:60,startLevel:-1,fragLoadingTimeOut:15000,manifestLoadingTimeOut:15000,levelLoadingTimeOut:15000});this.h.loadSource(u);this.h.attachMedia(this.v);this.h.on(Hls.Events.MANIFEST_PARSED,()=>{if(!this.d){this.v.play().catch(()=>{});fb.classList.add('hidden');$('vov').classList.add('hidden')}});this.h.on(Hls.Events.ERROR,(_,d)=>{if(this.d)return;if(d.fatal){this.i++;if(this.h)this.h.destroy();this.h=null;setTimeout(()=>this._t(),800)}})}else if(this.v.canPlayType('application/vnd.apple.mpegurl')){this.v.src=u;this.v.addEventListener('loadeddata',()=>{if(!this.d){this.v.play().catch(()=>{});fb.classList.add('hidden');$('vov').classList.add('hidden')}},{once:true});this.v.addEventListener('error',()=>{if(!this.d){this.i++;setTimeout(()=>this._t(),800)}},{once:true})}else this._e('Sin soporte HLS')}_e(m){$('vov').classList.remove('hidden');$('vomsg').textContent=m;toast(m,'err')}x(){this.d=true;if(this.h){this.h.destroy();this.h=null}this.v.src='';this.v.load();this.c=null}}
+class RP{constructor(v){this.v=v;this.h=null;this.c=null;this.i=0;this.d=false}
+play(c){this.x();this.d=false;this.c=c;this.i=0;this._t()}
+_t(){
+    if(this.d)return;
+    const hlsUrls=this.c.urls.filter(isHLS);
+    if(!hls.length){this._e('Sin enlaces HLS disponibles');return}
+    if(this.i>=hlsUrls.length){this._e('Todos los enlaces fallaron');$('pfb').classList.add('hidden');return}
+    const u=hlsUrls[this.i],fb=$('pfb');
+    if(this.i>0)fb.innerHTML=`<i class="fa-solid fa-rotate mr-1"></i>${this.i+1}/${hlsUrls.length}`;
+    if(Hls.isSupported()){
+        this.h=new Hls({maxBufferLength:30,maxMaxBufferLength:60,startLevel:-1,fragLoadingTimeOut:15000,manifestLoadingTimeOut:15000,levelLoadingTimeOut:15000});
+        this.h.loadSource(u);this.h.attachMedia(this.v);
+        this.h.on(Hls.Events.MANIFEST_PARSED,()=>{if(!this.d){this.v.play().catch(()=>{});fb.classList.add('hidden');$('vov').classList.add('hidden')}});
+        this.h.on(Hls.Events.ERROR,(_,d)=>{if(this.d)return;if(d.fatal){this.i++;if(this.h)this.h.destroy();this.h=null;setTimeout(()=>this._t(),800)}});
+    }else if(this.v.canPlayType('application/vnd.apple.mpegurl')){
+        this.v.src=u;this.v.addEventListener('loadeddata',()=>{if(!this.d){this.v.play().catch(()=>{});fb.classList.add('hidden');$('vov').classList.add('hidden')}},{once:true});
+        this.v.addEventListener('error',()=>{if(!this.d){this.i++;setTimeout(()=>this._t(),800)}},{once:true});
+    }else this._e('Sin soporte HLS')
+}
+_e(m){$('vov').classList.remove('hidden');$('vomsg').textContent=m;toast(m,'err')}
+x(){this.d=true;if(this.h){this.h.destroy();this.h=null}this.v.src='';this.v.load();this.c=null}}
+
 let pl=null;
-function playCh(ch){const s=$('psec'),v=$('vid');s.classList.remove('hidden');s.scrollIntoView({behavior:'smooth',block:'start'});$('vov').classList.remove('hidden');$('vomsg').textContent='Cargando...';$('pname').textContent=ch.name;$('pgrp').textContent=ch.arg?'Argentina':ch.cat;$('pfb').classList.add('hidden');S.cur=ch;if(!pl)pl=new RP(v);pl.play(ch);$('npbar').classList.remove('hidden');$('npn').textContent=ch.name;$('npg').textContent=ch.group;uPF();rG()}
+function playCh(ch){
+    const s=$('psec'),v=$('vid');s.classList.remove('hidden');s.scrollIntoView({behavior:'smooth',block:'start'});
+    $('vov').classList.remove('hidden');$('vomsg').textContent='Cargando...';$('pname').textContent=ch.name;
+    $('pgrp').textContent=ch.arg?'Argentina':ch.cat;$('pfb').classList.add('hidden');
+    S.cur=ch;if(!pl)pl=new RP(v);pl.play(ch);
+    $('npbar').classList.remove('hidden');$('npn').textContent=ch.name;$('npg').textContent=ch.group;uPF();rG()
+}
 function stopP(){if(pl){pl.x();pl=null}$('psec').classList.add('hidden');$('npbar').classList.add('hidden');S.cur=null;rG()}
 
 /* === RENDER === */
 function gI(n){return n.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase().substring(0,2)}
-function mC(ch,idx){const f=S.fav.includes(nm(ch.name)),p=S.cur&&nm(S.cur.name)===nm(ch.name),cc={deportes:'bg-emerald-500/15 text-emerald-400',peliculas:'bg-amber-500/15 text-amber-400',series:'bg-violet-500/15 text-violet-400',noticias:'bg-sky-500/15 text-sky-400',musica:'bg-pink-500/15 text-pink-400',infantil:'bg-lime-500/15 text-lime-400',documentales:'bg-teal-500/15 text-teal-400',entretenimiento:'bg-orange-500/15 text-orange-400',otros:'bg-gray-500/15 text-gray-400'}[ch.cat]||'bg-gray-500/15 text-gray-400',d=document.createElement('div');d.className=`cf group relative bg-card border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:border-accent/40 hover:bg-card-h ${p?'border-accent ring-1 ring-accent/30':'border-bdr'}`;d.style.animationDelay=`${Math.min(idx*20,400)}ms`;d.innerHTML=`<div class="aspect-video bg-bg/60 flex items-center justify-center relative overflow-hidden">${ch.logo?`<img src="${ch.logo}" alt="" class="w-full h-full object-contain p-3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="absolute inset-0 items-center justify-center text-2xl font-display font-bold text-muted/40" style="display:none">${gI(ch.name)}</div>`:`<span class="text-2xl font-display font-bold text-muted/40">${gI(ch.name)}</span>`}${p?'<div class="absolute top-2 left-2 flex items-center gap-1 bg-err/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-white live-dot"></span>VIVO</div>':''}${ch.arg?`<div class="absolute top-2 left-2 bg-sky-500/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded" ${p?'style="left:auto;right:2px"':''}>AR</div>`:''}<div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity ${ch.arg&&!p?'top-8':''}"><button data-fav="${nm(ch.name)}" class="w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-xs ${f?'text-err':'text-white/60 hover:text-err'}"><i class="fa-${f?'solid':'regular'} fa-heart"></i></button></div><div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1"><span class="text-[10px] text-accent font-medium"><i class="fa-solid fa-play mr-1"></i>Reproducir</span></div></div><div class="p-2.5"><p class="text-xs font-medium truncate leading-tight">${ch.name}</p><div class="flex items-center gap-1.5 mt-1.5"><span class="text-[10px] px-1.5 py-0.5 rounded-full ${cc}">${ch.cat}</span><span class="text-[10px] text-muted/50">${ch.urls.length>1?ch.urls.length+' enl.':''}</span></div></div>`;d.addEventListener('click',e=>{if(!e.target.closest('[data-fav]'))playCh(ch)});const fb=d.querySelector('[data-fav]');if(fb)fb.addEventListener('click',e=>{e.stopPropagation();tF(nm(ch.name))});return d}
+function mC(ch,idx){
+    const f=S.fav.includes(nm(ch.name)),p=S.cur&&nm(S.cur.name)===nm(ch.name);
+    const cc={deportes:'bg-emerald-500/15 text-emerald-400',peliculas:'bg-amber-500/15 text-amber-400',series:'bg-violet-500/15 text-violet-400',noticias:'bg-sky-500/15 text-sky-400',musica:'bg-pink-500/15 text-pink-400',infantil:'bg-lime-500/15 text-lime-400',documentales:'bg-teal-500/15 text-teal-400',entretenimiento:'bg-orange-500/15 text-orange-400',otros:'bg-gray-500/15 text-gray-400'}[ch.cat]||'bg-gray-500/15 text-gray-400';
+    const d=document.createElement('div');
+    d.className=`cf group relative bg-card border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:border-accent/40 hover:bg-card-h ${p?'border-accent ring-1 ring-accent/30':'border-bdr'}`;
+    d.style.animationDelay=`${Math.min(idx*20,400)}ms`;
+    d.innerHTML=`<div class="aspect-video bg-bg/60 flex items-center justify-center relative overflow-hidden">${ch.logo?`<img src="${ch.logo}" alt="" class="w-full h-full object-contain p-3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="absolute inset-0 items-center justify-center text-2xl font-display font-bold text-muted/40" style="display:none">${gI(ch.name)}</div>`:`<span class="text-2xl font-display font-bold text-muted/40">${gI(ch.name)}</span>`}${p?'<div class="absolute top-2 left-2 flex items-center gap-1 bg-err/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-white live-dot"></span>VIVO</div>':''}${ch.arg?`<div class="absolute top-2 left-2 bg-sky-500/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded" ${p?'style="left:auto;right:2px"':''}>AR</div>`:''}<div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity ${ch.arg&&!p?'top-8':''}"><button data-fav="${nm(ch.name)}" class="w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-xs ${f?'text-err':'text-white/60 hover:text-err'}"><i class="fa-${f?'solid':'regular'} fa-heart"></i></button></div><div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1"><span class="text-[10px] text-accent font-medium"><i class="fa-solid fa-play mr-1"></i>Reproducir</span></div></div><div class="p-2.5"><p class="text-xs font-medium truncate leading-tight">${ch.name}</p><div class="flex items-center gap-1.5 mt-1.5"><span class="text-[10px] px-1.5 py-0.5 rounded-full ${cc}">${ch.cat}</span>${ch.urls.length>1?`<span class="text-[9px] text-muted/40">${ch.urls.length}enl.</span>`:''}</div></div>`;
+    d.addEventListener('click',e=>{if(!e.target.closest('[data-fav]'))playCh(ch)});
+    const fb=d.querySelector('[data-fav]');if(fb)fb.addEventListener('click',e=>{e.stopPropagation();tF(nm(ch.name))});
+    return d;
+}
 function rG(){const g=$('grid'),em=$('emptyst'),lm=$('lmwrap'),cn=$('gcount'),ti=$('gtitle');g.innerHTML='';if(!S.fl.length){em.classList.remove('hidden');lm.classList.add('hidden');cn.textContent='0 canales';return}em.classList.add('hidden');cn.textContent=S.fl.length+' canales';if(S.fov)ti.textContent='Mis favoritos';else if(S.q)ti.textContent=`"${S.q}"`;else if(S.cat==='all')ti.textContent='Todos los canales';else if(S.cat==='argentina')ti.textContent='Canales de Argentina';else ti.textContent=S.cat.charAt(0).toUpperCase()+S.cat.slice(1);const end=Math.min(S.d,S.fl.length),fr=document.createDocumentFragment();S.fl.slice(0,end).forEach((c,i)=>fr.appendChild(mC(c,i)));g.appendChild(fr);lm.classList.toggle('hidden',end>=S.fl.length)}
 
 /* === FILTROS === */
@@ -522,45 +429,24 @@ function initEv(){
     $('bpip').addEventListener('click',async()=>{try{document.pictureInPictureElement?await document.exitPictureInPicture():await vid.requestPictureInPicture()}catch(e){toast('PiP no soportado','warn')}});
     $('bfch').addEventListener('click',()=>{if(S.cur)tF(nm(S.cur.name))});
     $('blm').addEventListener('click',()=>{S.d+=S.pp;rG()});
-
-    // Banner
     $('bb-editor').addEventListener('click',()=>{oM('m-editor');editingId=null;rEdList();$('ed-area').classList.add('hidden')});
     $('bb-paste').addEventListener('click',()=>oM('m-paste'));
     $('bb-url').addEventListener('click',()=>oM('m-url'));
     $('bb-file').addEventListener('click',()=>oM('m-file'));
     $('bb-explorer').addEventListener('click',()=>oM('m-explorer'));
-
-    // Editor propio
     $('ed-new').addEventListener('click',()=>openEditor(null));
     $('ed-text').addEventListener('input',updEdCount);
-    $('ed-save').addEventListener('click',()=>{
-        const name=$('ed-name').value.trim()||'Sin nombre',text=$('ed-text').value.trim();
-        if(!text){toast('Escribí algo','warn');return}
-        const list=gEd();
-        if(editingId){const item=list.find(x=>x.id===editingId);if(item){item.name=name;item.text=text;item.date=Date.now()}}else{list.push({id:uid(),name,text,date:Date.now()})}
-        sEd(list);editingId=null;rEdList();$('ed-area').classList.add('hidden');toast('Lista guardada','ok');
-    });
+    $('ed-save').addEventListener('click',()=>{const name=$('ed-name').value.trim()||'Sin nombre',text=$('ed-text').value.trim();if(!text){toast('Escribí algo','warn');return}const list=gEd();if(editingId){const item=list.find(x=>x.id===editingId);if(item){item.name=name;item.text=text;item.date=Date.now()}}else{list.push({id:uid(),name,text,date:Date.now()})}sEd(list);editingId=null;rEdList();$('ed-area').classList.add('hidden');toast('Guardada','ok')});
     $('ed-load').addEventListener('click',()=>{const text=$('ed-text').value.trim(),name=$('ed-name').value.trim()||'Lista';if(!text){toast('Sin contenido','warn');return}loadFT(text,name);cM('m-editor')});
     $('ed-del').addEventListener('click',()=>{if(!editingId)return;let list=gEd();list=list.filter(x=>x.id!==editingId);sEd(list);editingId=null;rEdList();$('ed-area').classList.add('hidden');toast('Eliminada','info')});
     $('ed-cancel').addEventListener('click',()=>{editingId=null;rEdList();$('ed-area').classList.add('hidden')});
-
-    // Pegar texto
     const pt=$('pt-text'),pc=$('pt-count'),pb=$('pt-go');
-    pt.addEventListener('input',()=>{const t=pt.value.trim();if(!t){pc.textContent='Sin contenido';pb.disabled=true;return}const urls=t.split('\n').filter(l=>l.trim().startsWith('http')).length,exts=t.split('\n').filter(l=>l.trim().startsWith('#EXTINF')).length;pc.textContent=`${exts} canales / ${urls} enlaces`;pb.disabled=urls===0});
-    pb.addEventListener('click',()=>{const t=pt.value.trim();if(!t)return;cM('m-paste');loadFT(t,$('pt-name').value.trim()||'Lista pegada');pt.value='';$('pt-name').value='';pc.textContent='Sin contenido';pb.disabled=true});
-
-    // URL
+    pt.addEventListener('input',()=>{const t=pt.value.trim();if(!t){pc.textContent='Sin contenido';pb.disabled=true;return}const parsed=pM(t,'p'),hls=parsed.filter(c=>c.urls.some(isHLS)).length,rech=parsed.length-hls;pc.innerHTML=`${parsed.length} canales: <span class="text-ok">${hls} reproducibles</span>${rech>0?`, <span class="text-err">${rech} descartados</span>`:''}`;pb.disabled=hls===0});
+    pb.addEventListener('click',()=>{const t=pt.value.trim();if(!t)return;cM('m-paste');loadFT(t,$('pt-name').value.trim()||'Lista');pt.value='';$('pt-name').value='';pc.textContent='Sin contenido';pb.disabled=true});
     $('ur-go').addEventListener('click',()=>{const u=$('ur-in').value.trim();if(!u){toast('Ingresa URL','warn');return}cM('m-url');loadCust(u,$('ur-nm').value.trim());$('ur-in').value='';$('ur-nm').value=''});
-
-    // Explorador web
-    $('ex-go').addEventListener('click',()=>{const u=$('ex-in').value.trim();if(!u){toast('Ingresa una URL','warn');return}explorePage(u)});
+    $('ex-go').addEventListener('click',()=>{const u=$('ex-in').value.trim();if(!u){toast('Ingresa URL','warn');return}explorePage(u)});
     $('ex-in').addEventListener('keydown',e=>{if(e.key==='Enter'){const u=e.target.value.trim();if(u)explorePage(u)}});
-    document.querySelectorAll('.ex-q').forEach(b=>{b.addEventListener('click',()=>{$('ex-in').value=b.dataset.u;explorePage(b.dataset.u)})});
-
-    // URL directa
-    $('dr-go').addEventListener('click',()=>{const u=$('dr-in').value.trim();if(!u){toast('Ingresa URL','warn');return}cM('m-dir');$('dr-in').value='';$('dr-nm').value='';const s=$('psec');s.classList.remove('hidden');s.scrollIntoView({behavior:'smooth',block:'start'});$('vov').classList.remove('hidden');$('vomsg').textContent='Cargando...';$('pname').textContent=$('dr-nm')||'Stream';$('pgrp').textContent='Manual';$('npbar').classList.remove('hidden');$('npn').textContent='Nombre';$('npg').textContent='URL directa';if(!pl)pl=new RP(vid);pl.playUrl(u,$('dr-nm').value.trim()||'Stream')});
-
-    // Cerrar modales
+    $('sum-close').addEventListener('click',()=>$('load-summary').classList.add('hidden'));
     document.querySelectorAll('.mx').forEach(b=>b.addEventListener('click',()=>b.closest('.mo').classList.remove('on')));
     document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on')}));
     $('bclrh').addEventListener('click',()=>{localStorage.removeItem('svh');rH();toast('Historial limpio','info')});
@@ -569,9 +455,8 @@ function initEv(){
     initFH();
 }
 
-/* === INICIO === */
 async function initApp(){if(S.ini)return;S.ini=true;initEv();uFB();rH();$('load-scr').style.display='flex';try{await loadAll();$('lup').textContent=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});applyF()}catch(e){toast('Error al cargar','err')}const ls=$('load-scr');ls.style.transition='opacity 0.5s';ls.style.opacity='0';setTimeout(()=>{ls.style.display='none'},500);setInterval(async()=>{try{sessionStorage.removeItem('sv2');await loadAll(true);applyF();$('lup').textContent=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})}catch(e){}},30*60*1000)}
 document.addEventListener('DOMContentLoaded',initLock);
 </script>
 </body>
-            </html>
+                                                                                                                                                                                                                                                                                                                                                      </html>
