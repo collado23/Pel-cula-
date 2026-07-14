@@ -2,18 +2,23 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>StreamVault Pro</title>
+    <title>StreamVault Pro (1500+ Canales)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-[#0a0a0f] text-white p-4">
     <div class="max-w-6xl mx-auto">
         <h1 class="text-2xl font-bold text-[#e8a020] mb-4">StreamVault Pro</h1>
+        
         <div class="bg-[#111118] p-4 rounded-xl border border-[#2a2a3a] mb-6">
-            <button onclick="cargarLista('listas/mi-lista.m3u')" class="bg-[#e8a020] text-black px-4 py-2 rounded text-sm font-bold">Cargar Lista Principal</button>
-            <button onclick="limpiarCaidos()" class="bg-red-900/30 text-red-400 px-4 py-2 rounded text-sm ml-2">Limpiar Caídos</button>
-            <div id="loader" class="hidden spinner"></div>
+            <div class="flex gap-2 mb-4">
+                <button onclick="cargarLista('canales.m3u')" class="bg-[#e8a020] text-black px-4 py-2 rounded text-sm font-bold">Cargar 1500+ Canales</button>
+                <button onclick="limpiarCaidos()" class="bg-red-900/30 text-red-400 px-4 py-2 rounded text-sm">Limpiar Caídos</button>
+            </div>
+            <input type="text" id="buscador" onkeyup="filtrarCanales()" placeholder="🔍 Filtrar entre 1500 canales..." class="w-full bg-black border border-[#2a2a3a] p-2 rounded text-sm text-white">
+            <div id="loader" class="hidden mt-2 spinner"></div>
         </div>
+
         <div id="container"></div>
     </div>
     <script src="app.js"></script>
