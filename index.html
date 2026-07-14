@@ -6,8 +6,7 @@
     <title>StreamVault - TV en Vivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>
     tailwind.config={theme:{extend:{fontFamily:{display:['Space Grotesk','sans-serif'],body:['DM Sans','sans-serif']},colors:{bg:'#0a0a0f',surface:'#111118',card:'#181822','card-h':'#20202e',bdr:'#2a2a3a',txt:'#eaeaf0',muted:'#7a7a95',accent:'#e8a020','accent-h':'#f0b840',ok:'#22c55e',err:'#ef4444',warn:'#f59e0b'}}}}
@@ -15,7 +14,7 @@
     <style>
         :root{--accent:#e8a020;--bg:#0a0a0f}
         *{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#2a2a3a transparent}
-        ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
         body{font-family:'DM Sans',sans-serif;background:var(--bg);overflow-x:hidden;margin:0}
         .bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 400px at 20% 10%,rgba(232,160,32,.06),transparent),radial-gradient(ellipse 500px 500px at 80% 80%,rgba(220,80,50,.04),transparent);animation:gl 20s ease-in-out infinite alternate}
         @keyframes gl{to{opacity:.7;transform:scale(1.1)}}
@@ -30,7 +29,7 @@
         .vs::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--accent);border-radius:50%;cursor:pointer}
         .mo{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
         .mo.on{opacity:1;pointer-events:auto}
-        .mb{background:#181822;border:1px solid #2a2a3a;border-radius:16px;padding:24px;max-width:620px;width:94%;max-height:88vh;overflow-y:auto;transform:scale(.95);transition:transform .25s}
+        .mb{background:#181822;border:1px solid #2a2a3a;border-radius:16px;padding:24px;max-width:600px;width:94%;max-height:85vh;overflow-y:auto;transform:scale(.95);transition:transform .25s}
         .mo.on .mb{transform:scale(1)}
         .nb{backdrop-filter:blur(16px);background:rgba(17,17,24,.92);border-top:1px solid #2a2a3a}
         .ls{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .5s,transform .5s}
@@ -40,35 +39,66 @@
         @keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
         .kb{width:68px;height:68px;border-radius:50%;background:#181822;border:1px solid #2a2a3a;color:#eaeaf0;font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;user-select:none}
         .kb:hover{background:#20202e;border-color:#e8a020;color:#e8a020}.kb:active{transform:scale(.92);background:#e8a020;color:#0a0a0f}
-        @keyframes sp{to{transform:rotate(360deg)}}.spin{animation:sp 1s linear infinite}
         .dz{border:2px dashed #2a2a3a;border-radius:12px;transition:all .25s;cursor:pointer}.dz:hover,.dz.do{border-color:var(--accent);background:rgba(232,160,32,.05)}
-        .hi{transition:all .15s}.hi:hover{background:#20202e}
-        .pa{background:#0a0a0f;border:2px dashed #2a2a3a;border-radius:12px;transition:all .25s;resize:vertical;min-height:200px;font-family:'DM Sans',monospace;font-size:12px;color:#eaeaf0;line-height:1.5}
+        .pa{background:#0a0a0f;border:2px dashed #2a2a3a;border-radius:12px;transition:all .25s;resize:vertical;min-height:180px;font-family:'DM Sans',monospace;font-size:12px;color:#eaeaf0;line-height:1.5}
         .pa:focus{border-color:var(--accent);outline:none}.pa::placeholder{color:#4a4a5a}
-        .ed-item{transition:all .15s;cursor:pointer}.ed-item:hover{background:#20202e}.ed-item.active{border-color:rgba(232,160,32,.4);background:rgba(232,160,32,.05)}
-        .link-found{transition:all .15s}.link-found:hover{background:#20202e;border-color:rgba(232,160,32,.3)}
-        /* Resumen por categoría */
-        .cat-summary-item{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:500}
+        .hi{transition:all .15s}.hi:hover{background:#20202e}
         @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
         @media(max-width:380px){.kb{width:58px;height:58px;font-size:18px}}
     </style>
 </head>
 <body class="text-txt min-h-screen relative">
+
 <div class="bg-glow"></div>
 <div id="toasts" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm"></div>
 
 <!-- CLAVE -->
-<div id="lock-screen" class="ls"><div class="bg-glow"></div><div class="relative z-10 text-center px-6 w-full max-w-sm"><div class="lk text-5xl text-accent mb-6"><i class="fa-solid fa-lock"></i></div><h1 id="lkt" class="font-display text-2xl font-bold mb-1">StreamVault</h1><p id="lks" class="text-muted text-sm mb-8">Ingresá tu clave</p><div id="pind" class="flex justify-center gap-3 mb-8"><div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div><div class="flex flex-col items-center gap-3" id="keypad"><div class="flex gap-3"><button class="kb" data-k="1">1</button><button class="kb" data-k="2">2</button><button class="kb" data-k="3">3</button></div><div class="flex gap-3"><button class="kb" data-k="4">4</button><button class="kb" data-k="5">5</button><button class="kb" data-k="6">6</button></div><div class="flex gap-3"><button class="kb" data-k="7">7</button><button class="kb" data-k="8">8</button><button class="kb" data-k="9">9</button></div><div class="flex gap-3"><button class="kb" data-k="x" style="visibility:hidden"></button><button class="kb" data-k="0">0</button><button class="kb" data-k="d"><i class="fa-solid fa-delete-left text-lg"></i></button></div></div><p id="lke" class="text-err text-xs mt-5 opacity-0 transition-opacity">Clave incorrecta</p></div></div>
+<div id="lock-screen" class="ls">
+    <div class="bg-glow"></div>
+    <div class="relative z-10 text-center px-6 w-full max-w-sm">
+        <div class="lk text-5xl text-accent mb-6"><i class="fa-solid fa-lock"></i></div>
+        <h1 id="lkt" class="font-display text-2xl font-bold mb-1">StreamVault</h1>
+        <p id="lks" class="text-muted text-sm mb-8">Ingresá tu clave</p>
+        <div id="pind" class="flex justify-center gap-3 mb-8">
+            <div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div>
+        </div>
+        <div class="flex flex-col items-center gap-3" id="keypad">
+            <div class="flex gap-3"><button class="kb" data-k="1">1</button><button class="kb" data-k="2">2</button><button class="kb" data-k="3">3</button></div>
+            <div class="flex gap-3"><button class="kb" data-k="4">4</button><button class="kb" data-k="5">5</button><button class="kb" data-k="6">6</button></div>
+            <div class="flex gap-3"><button class="kb" data-k="7">7</button><button class="kb" data-k="8">8</button><button class="kb" data-k="9">9</button></div>
+            <div class="flex gap-3"><button class="kb" data-k="x" style="visibility:hidden"></button><button class="kb" data-k="0">0</button><button class="kb" data-k="d"><i class="fa-solid fa-delete-left text-lg"></i></button></div>
+        </div>
+        <p id="lke" class="text-err text-xs mt-5 opacity-0 transition-opacity">Clave incorrecta</p>
+    </div>
+</div>
 
 <!-- CARGA -->
-<div id="load-scr" class="fixed inset-0 z-40 bg-bg flex flex-col items-center justify-center gap-6" style="display:none"><div class="text-center"><h1 class="font-display text-5xl font-bold text-accent tracking-tight">StreamVault</h1><p class="text-muted mt-2 text-sm">Cargando canales...</p></div><div class="w-64 h-1.5 bg-surface rounded-full overflow-hidden"><div id="loadbar" class="h-full bg-accent rounded-full transition-all duration-500" style="width:0%"></div></div><p id="loadst" class="text-muted text-xs">Conectando...</p></div>
+<div id="load-scr" class="fixed inset-0 z-40 bg-bg flex flex-col items-center justify-center gap-6" style="display:none">
+    <div class="text-center">
+        <h1 class="font-display text-5xl font-bold text-accent tracking-tight">StreamVault</h1>
+        <p class="text-muted mt-2 text-sm">Cargando canales...</p>
+    </div>
+    <div class="w-64 h-1.5 bg-surface rounded-full overflow-hidden">
+        <div id="loadbar" class="h-full bg-accent rounded-full transition-all duration-500" style="width:0%"></div>
+    </div>
+    <p id="loadst" class="text-muted text-xs">Conectando...</p>
+</div>
 
 <!-- HEADER -->
-<header id="hdr" class="relative z-10 border-b border-bdr bg-surface/80 backdrop-blur-md sticky top-0" style="display:none">
+<header id="hdr" class="relative z-10 border-b border-bdr bg-surface/80 backdrop-filter:blur-md sticky top-0" style="display:none">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-        <div class="flex items-center gap-2 shrink-0"><div class="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center"><i class="fa-solid fa-tower-broadcast text-accent text-sm"></i></div><span class="font-display font-bold text-lg text-txt hidden sm:block">StreamVault</span></div>
-        <div class="flex-1 max-w-md relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm"></i><input id="sinput" type="text" placeholder="Buscar canales..." class="w-full bg-card border border-bdr rounded-lg pl-9 pr-4 py-2 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition"></div>
-        <div class="flex items-center gap-1.5"><button id="bfav" title="Favoritos" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-accent hover:border-accent/40 transition text-sm"><i class="fa-solid fa-heart"></i></button><button id="bout" title="Salir" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-err hover:border-err/40 transition text-sm"><i class="fa-solid fa-right-from-bracket"></i></button></div>
+        <div class="flex items-center gap-2 shrink-0">
+            <div class="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center"><i class="fa-solid fa-tower-broadcast text-accent text-sm"></i></div>
+            <span class="font-display font-bold text-lg text-txt hidden sm:block">StreamVault</span>
+        </div>
+        <div class="flex-1 max-w-md relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm"></i>
+            <input id="sinput" type="text" placeholder="Buscar canales..." class="w-full bg-card border border-bdr rounded-lg pl-9 pr-4 py-2 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition">
+        </div>
+        <div class="flex items-center gap-1.5">
+            <button id="bfav" title="Favoritos" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-accent hover:border-accent/40 transition text-sm"><i class="fa-solid fa-heart"></i></button>
+            <button id="bout" title="Salir" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-err hover:border-err/40 transition text-sm"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
     </div>
     <div class="cs flex gap-2 px-4 pb-3 max-w-7xl mx-auto">
         <button data-c="all" class="cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent">Todos</button>
@@ -87,376 +117,1201 @@
 <!-- REPRODUCTOR -->
 <section id="psec" class="relative z-10 hidden max-w-7xl mx-auto px-4 mt-4">
     <div class="pe bg-surface border border-bdr rounded-xl overflow-hidden">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-bdr"><div class="flex items-center gap-3 min-w-0"><span class="live-dot w-2.5 h-2.5 rounded-full bg-err shrink-0"></span><span id="pname" class="font-display font-semibold text-sm truncate">-</span><span id="pgrp" class="text-xs text-muted bg-card px-2 py-0.5 rounded-full shrink-0">-</span></div><div class="flex items-center gap-2 shrink-0"><span id="pfb" class="text-xs text-warn hidden"><i class="fa-solid fa-rotate mr-1"></i>Alt...</span><button id="pcls" class="w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition"><i class="fa-solid fa-xmark"></i></button></div></div>
-        <div class="vw relative bg-black"><video id="vid" controls playsinline></video><div id="vov" class="absolute inset-0 bg-black/60 flex items-center justify-center hidden"><div class="text-center"><i class="fa-solid fa-satellite-dish text-4xl text-accent mb-3 block animate-pulse"></i><p class="text-sm text-muted" id="vomsg">Cargando...</p></div></div></div>
-        <div class="flex items-center gap-4 px-4 py-2.5"><button id="bplay" class="text-accent hover:text-accent-h transition"><i class="fa-solid fa-play"></i></button><div class="flex items-center gap-2 flex-1 max-w-xs"><i class="fa-solid fa-volume-high text-muted text-xs"></i><input id="vslider" type="range" min="0" max="100" value="80" class="vs flex-1"></div><button id="bpip" class="text-muted hover:text-accent transition text-sm"><i class="fa-solid fa-clone"></i></button><button id="bfs" class="text-muted hover:text-accent transition text-sm"><i class="fa-solid fa-expand"></i></button><button id="bfch" class="text-muted hover:text-accent transition text-sm"><i class="fa-regular fa-heart"></i></button></div>
+        <div class="flex items-center justify-between px-4 py-3 border-b border-bdr">
+            <div class="flex items-center gap-3 min-w-0">
+                <span class="live-dot w-2.5 h-2.5 rounded-full bg-err shrink-0"></span>
+                <span id="pname" class="font-display font-semibold text-sm truncate">-</span>
+                <span id="pgrp" class="text-xs text-muted bg-card px-2 py-0.5 rounded-full shrink-0">-</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <span id="pfb" class="text-xs text-warn hidden"><i class="fa-solid fa-rotate mr-1"></i>Alt...</span>
+                <button id="pcls" class="w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+        <div class="vw relative bg-black">
+            <video id="vid" controls playsinline></video>
+            <div id="vov" class="absolute inset-0 bg-black/60 flex items-center justify-center hidden">
+                <div class="text-center">
+                    <i class="fa-solid fa-satellite-dish text-4xl text-accent mb-3 block animate-pulse"></i>
+                    <p class="text-sm text-muted" id="vomsg">Cargando...</p>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 px-4 py-2.5">
+            <button id="bplay" class="text-accent hover:text-accent-h transition"><i class="fa-solid fa-play"></i></button>
+            <div class="flex items-center gap-2 flex-1 max-w-xs">
+                <i class="fa-solid fa-volume-high text-muted text-xs"></i>
+                <input id="vslider" type="range" min="0" max="100" value="80" class="vs flex-1">
+            </div>
+            <button id="bpip" class="text-muted hover:text-accent transition text-sm"><i class="fa-solid fa-clone"></i></button>
+            <button id="bfs" class="text-muted hover:text-accent transition text-sm"><i class="fa-solid fa-expand"></i></button>
+            <button id="bfch" class="text-muted hover:text-accent transition text-sm"><i class="fa-regular fa-heart"></i></button>
+        </div>
     </div>
 </section>
 
 <!-- CONTENIDO -->
 <main id="mainc" class="relative z-10 max-w-7xl mx-auto px-4 py-6" style="display:none">
     <div class="bg-gradient-to-r from-accent/10 via-card to-card border border-accent/20 rounded-xl p-5 mb-6">
-        <div class="flex items-center gap-3 mb-4"><div class="w-11 h-11 rounded-xl bg-accent/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-folder-plus text-accent text-lg"></i></div><div><h3 class="font-display font-bold text-sm">Cargar listas M3U</h3><p class="text-muted text-xs mt-0.5">Solo se cargan los canales reproducibles. Lo demas se descarta automaticamente.</p></div></div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-            <button id="bb-editor" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-accent text-bg text-xs font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-file-pen"></i>Mi Editor</button>
-            <button id="bb-paste" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-paste"></i>Pegar texto</button>
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-11 h-11 rounded-xl bg-accent/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-folder-plus text-accent text-lg"></i></div>
+            <div>
+                <h3 class="font-display font-bold text-sm">Cargar listas M3U</h3>
+                <p class="text-muted text-xs mt-0.5">Solo se cargan canales reproducibles. Lo demas se descarta automaticamente.</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button id="bb-paste" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-accent text-bg text-xs font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-paste"></i>Pegar texto</button>
             <button id="bb-url" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-link"></i>URL</button>
             <button id="bb-file" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-file-arrow-up"></i>Archivo</button>
-            <button id="bb-explorer" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition col-span-2 sm:col-span-1"><i class="fa-solid fa-globe"></i>Explorar web</button>
+            <button id="bb-web" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition col-span-2 sm:col-span-1"><i class="fa-solid fa-globe"></i>Buscar web</button>
         </div>
     </div>
-    <!-- Resumen de última carga -->
+
+    <!-- Resumen por categoría -->
     <div id="load-summary" class="hidden bg-card border border-bdr rounded-xl p-4 mb-6">
-        <div class="flex items-center justify-between mb-2"><h3 class="text-xs font-medium text-muted"><i class="fa-solid fa-chart-pie mr-1.5"></i>Resumen de última carga</h3><button id="sum-close" class="text-muted/50 hover:text-txt transition text-xs"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-medium text-muted"><i class="fa-solid fa-chart-pie mr-1.5"></i>Resumen de ultima carga</h3>
+            <button id="sum-close" class="text-muted/50 hover:text-txt transition text-xs"><i class="fa-solid fa-xmark"></i></button>
+        </div>
         <div id="sum-cats" class="flex flex-wrap gap-1.5"></div>
         <p id="sum-total" class="text-[10px] text-muted/50 mt-2"></p>
     </div>
-    <div id="histsec" class="mb-6 hidden"><div class="flex items-center justify-between mb-2"><h3 class="text-xs font-medium text-muted"><i class="fa-solid fa-clock-rotate-left mr-1.5"></i>Recientes</h3><button id="bclrh" class="text-[10px] text-muted/50 hover:text-err transition">Limpiar</button></div><div id="histlist" class="flex gap-2 overflow-x-auto cs pb-1"></div></div>
-    <div class="flex items-center justify-between mb-4"><div><h2 id="gtitle" class="font-display text-xl font-bold">Todos los canales</h2><p id="gcount" class="text-xs text-muted mt-0.5">0 canales</p></div><div class="text-xs text-muted"><i class="fa-solid fa-clock mr-1"></i><span id="lup">-</span></div></div>
+
+    <div id="histsec" class="mb-6 hidden">
+        <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-medium text-muted"><i class="fa-solid fa-clock-rotate-left mr-1.5"></i>Recientes</h3>
+            <button id="bclrh" class="text-[10px] text-muted/50 hover:text-err transition">Limpiar</button>
+        </div>
+        <div id="histlist" class="flex gap-2 overflow-x-auto cs pb-1"></div>
+    </div>
+
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h2 id="gtitle" class="font-display text-xl font-bold">Todos los canales</h2>
+            <p id="gcount" class="text-xs text-muted mt-0.5">0 canales</p>
+        </div>
+        <div class="text-xs text-muted"><i class="fa-solid fa-clock mr-1"></i><span id="lup">-</span></div>
+    </div>
+
     <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"></div>
-    <div id="lmwrap" class="text-center mt-6 hidden"><button id="blm" class="px-6 py-2.5 rounded-lg bg-card border border-bdr text-sm text-muted hover:text-accent hover:border-accent/40 transition">Cargar mas</button></div>
-    <div id="emptyst" class="hidden text-center py-20"><i class="fa-solid fa-satellite-dish text-5xl text-bdr mb-4 block"></i><p class="text-muted text-sm">No se encontraron canales</p></div>
+    <div id="lmwrap" class="text-center mt-6 hidden">
+        <button id="blm" class="px-6 py-2.5 rounded-lg bg-card border border-bdr text-sm text-muted hover:text-accent hover:border-accent/40 transition">Cargar mas</button>
+    </div>
+    <div id="emptyst" class="hidden text-center py-20">
+        <i class="fa-solid fa-satellite-dish text-5xl text-bdr mb-4 block"></i>
+        <p class="text-muted text-sm">No se encontraron canales</p>
+    </div>
 </main>
 
-<div id="npbar" class="nb fixed bottom-0 left-0 right-0 z-30 hidden px-4 py-3"><div class="max-w-7xl mx-auto flex items-center gap-4"><div class="flex items-center gap-3 flex-1 min-w-0"><span class="live-dot w-2 h-2 rounded-full bg-err shrink-0"></span><span id="npn" class="text-sm font-medium truncate">-</span></div><div class="flex items-center gap-2"><button id="npp" class="w-9 h-9 rounded-full bg-accent/20 text-accent flex items-center justify-center hover:bg-accent/30 transition"><i class="fa-solid fa-pause text-sm"></i></button><button id="npc" class="w-9 h-9 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition"><i class="fa-solid fa-xmark"></i></button></div></div></div>
+<!-- NOW PLAYING -->
+<div id="npbar" class="nb fixed bottom-0 left-0 right-0 z-30 hidden px-4 py-3">
+    <div class="max-w-7xl mx-auto flex items-center gap-4">
+        <div class="flex items-center gap-3 flex-1 min-w-0">
+            <span class="live-dot w-2 h-2 rounded-full bg-err shrink-0"></span>
+            <span id="npn" class="text-sm font-medium truncate">-</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button id="npp" class="w-9 h-9 rounded-full bg-accent/20 text-accent flex items-center justify-center hover:bg-accent/30 transition">
+                <i class="fa-solid fa-pause text-sm"></i>
+            </button>
+            <button id="npc" class="w-9 h-9 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
+</div>
 
-<!-- MODALES: Editor, Pegar, URL, Archivo, Explorador (iguales que antes pero simplificados) -->
-<div id="m-editor" class="mo"><div class="mb"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-bold text-lg"><i class="fa-solid fa-file-pen text-accent mr-2"></i>Mi Editor M3U</h3><button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button></div><p class="text-muted text-xs mb-4">Guardá y editá tus listas. Solo se cargan los canales reproducibles (HLS).</p><div class="flex items-center justify-between mb-2"><span class="text-xs font-medium text-muted">Guardadas</span><button id="ed-new" class="text-xs text-accent hover:text-accent-h transition font-medium"><i class="fa-solid fa-plus mr-1"></i>Nueva</button></div><div id="ed-list" class="space-y-1.5 mb-4 max-h-40 overflow-y-auto"></div><div id="ed-area" class="hidden"><input id="ed-name" type="text" placeholder="Nombre" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-3"><textarea id="ed-text" class="pa w-full rounded-xl p-4 mb-2" placeholder="#EXTINF:-1 group-title=&quot;Deportes&quot;,Canal HD&#10;https://ejemplo.com/canal.m3u8"></textarea><p id="ed-count" class="text-[10px] text-muted/50 mb-4">Sin contenido</p><div class="flex flex-wrap gap-2"><button id="ed-save" class="px-4 py-2 rounded-lg bg-accent text-bg text-xs font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Guardar</button><button id="ed-load" class="px-4 py-2 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-play mr-1.5"></i>Cargar</button><button id="ed-del" class="px-4 py-2 rounded-lg bg-card border border-err/30 text-xs font-medium text-err/70 hover:text-err transition"><i class="fa-solid fa-trash mr-1.5"></i>Eliminar</button><button id="ed-cancel" class="px-4 py-2 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-txt transition ml-auto">Cancelar</button></div></div></div></div>
+<!-- MODAL: PEGAR TEXTO -->
+<div id="m-paste" class="mo">
+    <div class="mb">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-paste text-accent mr-2"></i>Pegar texto M3U</h3>
+            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p class="text-muted text-xs mb-3">Se descartan automaticamente los que no se pueden reproducir (RTMP, etc).</p>
+        <textarea id="pt-text" class="pa w-full rounded-xl p-4 mb-2" placeholder="Pegá todo el contenido de tu lista aca..."></textarea>
+        <p id="pt-count" class="text-[10px] text-muted/50 mb-1">Sin contenido</p>
+        <input id="pt-name" type="text" placeholder="Nombre (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4">
+        <div class="flex justify-end">
+            <button id="pt-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition disabled:opacity-40" disabled>
+                <i class="fa-solid fa-plus mr-1.5"></i>Agregar
+            </button>
+        </div>
+    </div>
+</div>
 
-<div id="m-paste" class="mo"><div class="mb"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-bold text-lg"><i class="fa-solid fa-paste text-accent mr-2"></i>Pegar texto M3U</h3><button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button></div><p class="text-muted text-xs mb-3">Se descartan automaticamente los enlaces que no se pueden reproducir (RTMP, etc).</p><textarea id="pt-text" class="pa w-full rounded-xl p-4 mb-2" placeholder="Pegá todo el contenido de tu lista aca..."></textarea><p id="pt-count" class="text-[10px] text-muted/50 mb-1">Sin contenido</p><input id="pt-name" type="text" placeholder="Nombre (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4"><div class="flex justify-end"><button id="pt-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition disabled:opacity-40" disabled><i class="fa-solid fa-plus mr-1.5"></i>Agregar</button></div></div></div>
+<!-- MODAL: URL -->
+<div id="m-url" class="mo">
+    <div class="mb">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-link text-accent mr-2"></i>Desde URL</h3>
+            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <input id="ur-in" type="url" placeholder="https://ejemplo.com/lista.m3u" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-2">
+        <input id="ur-nm" type="text" placeholder="Nombre (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4">
+        <div class="flex justify-end">
+            <button id="ur-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition">
+                <i class="fa-solid fa-download mr-1.5"></i>Cargar
+            </button>
+        </div>
+    </div>
+</div>
 
-<div id="m-url" class="mo"><div class="mb"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-bold text-lg"><i class="fa-solid fa-link text-accent mr-2"></i>Desde URL</h3><button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button></div><input id="ur-in" type="url" placeholder="https://ejemplo.com/lista.m3u" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-2"><input id="ur-nm" type="text" placeholder="Nombre (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4"><div class="flex justify-end"><button id="ur-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-download mr-1.5"></i>Cargar</button></div></div></div>
+<!-- MODAL: ARCHIVO -->
+<div id="m-file" class="mo">
+    <div class="mb">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-file-arrow-up text-accent mr-2"></i>Archivo</h3>
+            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="dropz" class="dz p-8 text-center mb-4">
+            <input type="file" id="finp" accept=".m3u,.m3u8,.txt" class="hidden">
+            <i class="fa-solid fa-cloud-arrow-up text-3xl text-muted/40 mb-3 block"></i>
+            <p class="text-sm text-muted mb-1">Arrastrá tu archivo aca</p>
+            <p class="text-xs text-muted/50 mb-4">o clic para seleccionar</p>
+            <span class="inline-block px-4 py-2 rounded-lg bg-card border border-bdr text-xs text-muted hover:text-accent hover:border-accent/40 transition">
+                <i class="fa-solid fa-folder-open mr-1.5"></i>Seleccionar
+            </span>
+            <p class="text-[10px] text-muted/40 mt-3">.m3u, .m3u8, .txt</p>
+        </div>
+        <div id="finfo" class="hidden bg-bg border border-bdr rounded-lg p-3 mb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-file-lines text-accent text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p id="fnm" class="text-sm font-medium truncate">-</p>
+                    <p id="fsz" class="text-[10px] text-muted">-</p>
+                </div>
+                <button id="frem" class="w-7 h-7 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="flex justify-end">
+            <button id="fl-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition disabled:opacity-40" disabled>
+                <i class="fa-solid fa-plus mr-1.5"></i>Agregar
+            </button>
+        </div>
+    </div>
+</div>
 
-<div id="m-file" class="mo"><div class="mb"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-bold text-lg"><i class="fa-solid fa-file-arrow-up text-accent mr-2"></i>Archivo</h3><button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button></div><div id="dropz" class="dz p-8 text-center mb-4"><input type="file" id="finp" accept=".m3u,.m3u8,.txt" class="hidden"><i class="fa-solid fa-cloud-arrow-up text-3xl text-muted/40 mb-3 block"></i><p class="text-sm text-muted mb-1">Arrastrá tu archivo</p><p class="text-xs text-muted/50 mb-4">o clic para seleccionar</p><span class="inline-block px-4 py-2 rounded-lg bg-card border border-bdr text-xs text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-folder-open mr-1.5"></i>Seleccionar</span></div><div id="finfo" class="hidden bg-bg border border-bdr rounded-lg p-3 mb-4"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines text-accent text-sm"></i></div><div class="flex-1 min-w-0"><p id="fnm" class="text-sm font-medium truncate">-</p><p id="fsz" class="text-[10px] text-muted">-</p></div><button id="frem" class="w-7 h-7 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition text-xs"><i class="fa-solid fa-xmark"></i></button></div></div><div class="flex justify-end"><button id="fl-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition disabled:opacity-40" disabled><i class="fa-solid fa-plus mr-1.5"></i>Agregar</button></div></div></div>
+<!-- MODAL: EXPLORADOR WEB -->
+<div id="m-web" class="mo">
+    <div class="mb">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-globe text-accent mr-2"></i>Buscar en la web</h3>
+            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p class="text-muted text-xs mb-3">Busca repositorios en GitHub con listas M3U de Argentina y Latinoamerica</p>
+        <div class="flex gap-2 mb-3">
+            <input id="webq" type="text" placeholder="iptv argentina 2025" value="iptv argentina m3u" class="flex-1 bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition">
+            <button id="web-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition shrink-0">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </div>
+        <div class="flex flex-wrap gap-1.5 mb-4">
+            <button class="wq text-[11px] px-3 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-q="iptv argentina m3u">Argentina</button>
+            <button class="wq text-[11px] px-3 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-q="iptv deportes argentina m3u8">Deportes AR</button>
+            <button class="wq text-[11px] px-3 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-q="lista iptv espanol 2025">Espanol 2025</button>
+            <button class="wq text-[11px] px-3 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-q="free iptv m3u south america">South America</button>
+        </div>
+        <div id="web-status" class="hidden bg-bg border border-bdr rounded-lg p-3 mb-3">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-spinner spin text-accent text-sm"></i>
+                <span class="text-xs text-muted" id="web-stmsg">Buscando...</span>
+            </div>
+        </div>
+        <div id="web-results" class="space-y-2 max-h-72 overflow-y-auto"></div>
+        <div id="web-empty" class="hidden text-center py-8">
+            <i class="fa-solid fa-magnifying-glass text-3xl text-bdr mb-3 block"></i>
+            <p class="text-muted text-xs">No se encontraron listas M3U</p>
+        </div>
+    </div>
+</div>
 
-<div id="m-explorer" class="mo"><div class="mb"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-bold text-lg"><i class="fa-solid fa-globe text-accent mr-2"></i>Explorador Web</h3><button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button></div><div class="flex gap-2 mb-3"><input id="ex-in" type="url" placeholder="https://github.com/usuario/repo" class="flex-1 bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition"><button id="ex-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition shrink-0"><i class="fa-solid fa-magnifying-glass"></i></button></div><div id="ex-status" class="hidden bg-bg border border-bdr rounded-lg p-3 mb-3"><div class="flex items-center gap-2"><i class="fa-solid fa-spinner spin text-accent text-sm"></i><span class="text-xs text-muted" id="ex-stmsg">Analizando...</span></div></div><div id="ex-results" class="space-y-2 max-h-72 overflow-y-auto"></div><div id="ex-empty" class="hidden text-center py-8"><p class="text-muted text-xs">No se encontraron archivos M3U</p></div></div></div>
-
-<footer id="ftr" class="relative z-10 border-t border-bdr mt-12 pb-20" style="display:none"><div class="max-w-7xl mx-auto px-4 py-6 text-center"><p class="text-muted text-xs">StreamVault &mdash; Solo canales reproducibles</p></div></footer>
+<footer id="ftr" class="relative z-10 border-t border-bdr mt-12 pb-20" style="display:none">
+    <div class="max-w-7xl mx-auto px-4 py-6 text-center">
+        <p class="text-muted text-xs">StreamVault &mdash; Solo canales reproducibles &middot; Se descartan los que no funcionan automaticamente</p>
+    </div>
+</footer>
 
 <script>
-async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
-const PN={v:'',m:'login',l:true,a:0};
-function initLock(){const s=localStorage.getItem('svp'),t=$('lkt'),b=$('lks');if(s){PN.m='login';t.textContent='StreamVault';b.textContent='Ingresá tu clave'}else{PN.m='setup';t.textContent='Crear clave';b.textContent='Elegí un PIN de 4 digitos';document.querySelector('.lk').innerHTML='<i class="fa-solid fa-lock-open"></i>'}document.querySelectorAll('#keypad .kb').forEach(e=>e.addEventListener('click',()=>hK(e.dataset.k)));document.addEventListener('keydown',e=>{if(!PN.l)return;if(e.key>='0'&&e.key<='9')hK(e.key);else if(e.key==='Backspace')hK('d')})}
-function $(i){return document.getElementById(i)}
-async function hK(k){if(!PN.l)return;$('lke').style.opacity='0';if(k==='d'){PN.v=PN.v.slice(0,-1);uD();return}if(/^\d$/.test(k)&&PN.v.length<4){PN.v+=k;uD();if(PN.v.length===4)setTimeout(sP,200)}}
-function uD(){document.querySelectorAll('#pind .pd').forEach((d,i)=>{d.className='pd'+(i<PN.v.length?' f':'')})}
-async function sP(){const h=await sha(PN.v),er=$('lke'),ds=document.querySelectorAll('#pind .pd');if(PN.m==='setup'){localStorage.setItem('svp',h);unl()}else if(h===localStorage.getItem('svp')){PN.a=0;unl()}else{PN.a++;ds.forEach(d=>{d.className='pd e'});er.textContent=PN.a>=3?'Demasiados intentos.':'Clave incorrecta';er.style.opacity='1';setTimeout(()=>{PN.v='';uD()},600)}}
-function unl(){PN.l=false;$('lock-screen').classList.add('out');setTimeout(()=>{$('lock-screen').style.display='none';showApp()},500)}
-function lockApp(){if(pl){pl.x();pl=null}PN.l=true;PN.v='';PN.a=0;uD();$('lke').style.opacity='0';$('lock-screen').style.display='flex';setTimeout(()=>$('lock-screen').classList.remove('out'),50);if(localStorage.getItem('svp')){PN.m='login';$('lkt').textContent='StreamVault';$('lks').textContent='Ingresá tu clave';document.querySelector('.lk').innerHTML='<i class="fa-solid fa-lock"></i>'}['hdr','mainc','ftr'].forEach(i=>$(i).style.display='none');$('psec').classList.add('hidden');$('npbar').classList.add('hidden')}
-function showApp(){['hdr','mainc','ftr'].forEach(i=>$(i).style.display='');initApp()}
-
-/* === ESTADO === */
-const DL=[{i:'ar',n:'Argentina',u:'https://iptv-org.github.io/iptv/countries/ar.m3u'},{i:'sa',n:'Sudamerica',u:'https://iptv-org.github.io/iptv/regions/south-america.m3u'},{i:'la',n:'Latinoamerica',u:'https://iptv-org.github.io/iptv/regions/latin-america.m3u'},{i:'sp',n:'Espanol',u:'https://iptv-org.github.io/iptv/languages/spa.m3u'},{i:'ds',n:'Deportes',u:'https://iptv-org.github.io/iptv/categories/sports.m3u'},{i:'mv',n:'Peliculas',u:'https://iptv-org.github.io/iptv/categories/movies.m3u'},{i:'nw',n:'Noticias',u:'https://iptv-org.github.io/iptv/categories/news.m3u'},{i:'en',n:'Entretenimiento',u:'https://iptv-org.github.io/iptv/categories/entertainment.m3u'},{i:'mu',n:'Musica',u:'https://iptv-org.github.io/iptv/categories/music.m3u'},{i:'ki',n:'Infantil',u:'https://iptv-org.github.io/iptv/categories/kids.m3u'},{i:'dc',n:'Documentales',u:'https://iptv-org.github.io/iptv/categories/documentary.m3u'}];
-const AK=['argentina','america tv','telefe','canal 13','elnueve','canal 9','canal 7','publica','tyc sports','fox sports argentina','espn argentina','depotv','flow','telecentro','cronica','canal 26','a24','ln+','cablenoticias','cn23','misiones','formosa','cordoba','rosario','mendoza','tucuman','salta','net tv','magazine','panamericana'];
-
-/* === KEYWORDS DE CATEGORIAS (español + ingles) === */
-const CK={
-    deportes:['deporte','sports','futbol','football','soccer','nba','nfl','mlb','f1','formula','golf','tenis','boxeo','wwe','ufc','motor','racing','bein','espn','fox sport','tyc sport','directv sport','basketball','hockey','cricket','rugby','boxing','cycling','volley','swimming','athletics','olympic','premier league','liga','champions','bundesliga','serie a'],
-    peliculas:['pelicula','movie','movies','film','films','cinema','cine','amc','star cinema','golden','paramount','hbo','max','disney','pixar','dreamworks','universal','warner','sony','columbia','trailer','estreno','estrenos','drama','thriller','horror','comedia','romance','accion','aventura','ciencia ficcion','sci-fi','fantasia','animacion','animation'],
-    series:['serie','series','show','sitcom','comedia','drama','temporada','season','capitulo','episode','capitulos','episodios','miniserie','web serie','netflix','amazon prime','disney+','star plus','hbo max','apple tv','serie de tv','tv show'],
-    noticias:['noticia','news','24h','24 hor','cnne','telefe','milenio','adn40','cronica','canal 26','a24','ln+','cable','cn23','informe','reportaje','tiempo','weather','politica','economia','debat','editorial','interview','press'],
-    musica:['musica','music','mtv','vh1','hit','radio','concert','banda','rock','pop','jazz','reggaeton','cumbia','salsa','bachata','hip hop','rap','electronic','edm','techno','house','dj','playlist','top 40','clip','video musical','videoclip'],
-    infantil:['infantil','kids','children','nickelodeon','cartoon','disney channel','anime','boomerang','baby','nick','pj mask','paw patrol','peppa','dinosaurio','doras','pocoyo','heidi','tom y jerry','looney','marvel','super heroes','draw','dibujo'],
-    documentales:['documental','documentary','documentales','discovery','nat geo','national geographic','history','historia','animal','natura','nature','science','ciencia','space','espacio','oceano','ocean','selva','desierto','polar','investigacion','crime','true crime','misterio','mystery'],
-    entretenimiento:['entretenimiento','entertainment','reality','variedad','show','programa','concurso','televisa','univision','magazine','talk show','game show','cooking','cocina','travel','viaje','lifestyle','estilo de vida','fashion','moda','comedia en vivo','stand up']
-};
-
-const S={all:[],fl:[],cat:'all',q:'',fov:false,fav:JSON.parse(localStorage.getItem('svf')||'[]'),d:0,pp:48,cur:null,ini:false};
-let lft=null,lfn='',editingId=null;
-
-/* === UTILS === */
-function toast(m,t){const c=$('toasts'),cs={info:'border-accent bg-accent/10 text-accent',ok:'border-ok bg-ok/10 text-ok',err:'border-err bg-err/10 text-err',warn:'border-warn bg-warn/10 text-warn'},is={info:'fa-circle-info',ok:'fa-circle-check',err:'fa-circle-xmark',warn:'fa-triangle-exclamation'},e=document.createElement('div');e.className=`ti flex items-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-medium ${cs[t||'info']}`;e.innerHTML=`<i class="fa-solid ${is[t||'info']}"></i><span>${m}</span>`;c.appendChild(e);setTimeout(()=>{e.classList.replace('ti','to');setTimeout(()=>e.remove(),300)},3500)}
-function oM(i){$(i).classList.add('on')}function cM(i){$(i).classList.remove('on')}
-function nm(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
-function fsz(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
-
-/* === DETECTAR TIPO: solo HLS es reproducible en navegador === */
-function isHLS(url){
-    const u=url.toLowerCase();
-    if(u.startsWith('rtmp')||u.startsWith('rtmps'))return false;
-    return true; // Todo lo demás se intenta como HLS
+/* === CLAVE PIN con SHA-256 === */
+async function sha(s) {
+    var b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(b)).map(function(x) { return x.toString(16).padStart(2, '0'); }).join('');
 }
 
-/* === EDITOR === */
-function gEd(){return JSON.parse(localStorage.getItem('sve')||'[]')}
-function sEd(list){localStorage.setItem('sve',JSON.stringify(list))}
-function rEdList(){const list=gEd(),el=$('ed-list');if(!list.length){el.innerHTML='<p class="text-muted/50 text-xs text-center py-4">No hay listas guardadas.</p>';return}el.innerHTML='';list.forEach(item=>{const ch=pM(item.text,'e'),hls=ch.filter(c=>c.urls.some(isHLS)).length;const d=document.createElement('div');d.className='ed-item flex items-center gap-3 p-2.5 rounded-lg border border-bdr'+(editingId===item.id?' active':'');d.innerHTML=`<div class="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines text-accent text-xs"></i></div><div class="flex-1 min-w-0"><p class="text-xs font-medium truncate">${item.name}</p><p class="text-[10px] text-muted/50">${hls} reproducibles</p></div><div class="flex gap-1 shrink-0"><button class="elb w-7 h-7 rounded-md hover:bg-accent/20 flex items-center justify-center text-muted hover:text-accent transition text-xs"><i class="fa-solid fa-play"></i></button><button class="eeb w-7 h-7 rounded-md hover:bg-card flex items-center justify-center text-muted hover:text-txt transition text-xs"><i class="fa-solid fa-pen"></i></button></div>`;d.querySelector('.elb').addEventListener('click',e=>{e.stopPropagation();loadFT(item.text,item.name);cM('m-editor')});d.querySelector('.eeb').addEventListener('click',e=>{e.stopPropagation();openEditor(item.id)});d.addEventListener('click',()=>openEditor(item.id));el.appendChild(d)})}
-function openEditor(id){const list=gEd();editingId=id;rEdList();$('ed-area').classList.remove('hidden');if(id){const item=list.find(x=>x.id===id);if(item){$('ed-name').value=item.name;$('ed-text').value=item.text;updEdCount()}}else{$('ed-name').value='';$('ed-text').value='';$('ed-count').textContent='Sin contenido';$('ed-del').classList.add('hidden')}}
-function updEdCount(){const t=$('ed-text').value.trim();if(!t){$('ed-count').textContent='Sin contenido';return}const parsed=pM(t,'e'),hls=parsed.filter(c=>c.urls.some(isHLS)).length,rechazados=parsed.length-hls;$('ed-count').innerHTML=`${parsed.length} canales encontrados: <span class="text-ok">${hls} reproducibles</span>, <span class="text-err">${rechazados} descartados (no HLS)`}`}
+var PN = { v: '', m: 'login', l: true, a: 0 };
 
-/* === HISTORIAL === */
-function gH(){return JSON.parse(localStorage.getItem('svh')||'[]')}
-function aH(n,u,c){const h=gH();h.unshift({n,u,c,t:Date.now()});if(h.length>20)h.length=20;localStorage.setItem('svh',JSON.stringify(h));rH()}
-function rH(){const h=gH(),s=$('histsec'),l=$('histlist');if(!h.length){s.classList.add('hidden');return}s.classList.remove('hidden');l.innerHTML='';h.forEach(i=>{const e=document.createElement('button');e.className='hi shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-bdr text-left';e.innerHTML=`<div class="w-7 h-7 rounded-md bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-list text-accent text-[10px]"></i></div><div class="min-w-0"><p class="text-[11px] font-medium truncate max-w-[120px]">${i.n}</p><p class="text-[9px] text-muted/50">${i.c} canales</p></div>`;if(i.u!=='archivo-local')e.addEventListener('click',()=>loadCust(i.u,i.n));l.appendChild(e)})}
+function initLock() {
+    var s = localStorage.getItem('svp');
+    var t = document.getElementById('lkt');
+    var b = document.getElementById('lks');
+    if (s) {
+        PN.m = 'login';
+        t.textContent = 'StreamVault';
+        b.textContent = 'Ingresá tu clave';
+    } else {
+        PN.m = 'setup';
+        t.textContent = 'Crear clave';
+        b.textContent = 'Elegí un PIN de 4 digitos';
+        document.querySelector('.lk').innerHTML = '<i class="fa-solid fa-lock-open"></i>';
+    }
+    var botones = document.querySelectorAll('#keypad .kb');
+    for (var i = 0; i < botones.length; i++) {
+        botones[i].addEventListener('click', (function(btn) {
+            return function() { hK(btn.dataset.k); };
+        })(botones[i]);
+    }
+    document.addEventListener('keydown', function(e) {
+        if (!PN.l) return;
+        if (e.key >= '0' && e.key <= '9') hK(e.key);
+        else if (e.key === 'Backspace') hK('d');
+    });
+}
 
-/* === PARSER: detecta canales con URLs reproducibles === */
-function pM(text,sid){
-    const lines=text.split('\n'),ch=[];
-    let cur=null;
-    for(const raw of lines){
-        const line=raw.trim();
-        if(!line)continue;
-        if(line.match(/#EXTINF/i)){
-            cur={};
-            const logoM=line.match(/tvg-logo="([^"]*)"/);
-            const groupM=line.match(/group-title="([^"]*)"/);
-            let nameStart=line.lastIndexOf(',');
-            if(nameStart<0)nameStart=line.indexOf(' ',Math.min(line.length,80));
-            cur.logo=logoM?logoM[1]:'';
-            cur.group=groupM?groupM[1]:'Otros';
-            cur.name=nameStart>=0?line.substring(nameStart+1).trim():'Canal';
-            if(!cur.name)cur.name='Canal';
+function hK(k) {
+    if (!PN.l) return;
+    document.getElementById('lke').style.opacity = '0';
+    if (k === 'd') {
+        PN.v = PN.v.slice(0, -1);
+        uD();
+        return;
+    }
+    if (/^\d$/.test(k) && PN.v.length < 4) {
+        PN.v += k;
+        uD();
+        if (PN.v.length === 4) setTimeout(sP, 200);
+    }
+}
+
+function uD() {
+    var dots = document.querySelectorAll('#pind .pd');
+    for (var i = 0; i < dots.length; i++) {
+        dots[i].className = 'pd' + (i < PN.v.length ? ' f' : '');
+    }
+}
+
+async function sP() {
+    var h = await sha(PN.v);
+    var er = document.getElementById('lke');
+    var ds = document.querySelectorAll('#pind .pd');
+    if (PN.m === 'setup') {
+        localStorage.setItem('svp', h);
+        unl();
+    } else if (h === localStorage.getItem('svp')) {
+        PN.a = 0;
+        unl();
+    } else {
+        PN.a++;
+        for (var i = 0; i < ds.length; i++) ds[i].className = 'pd e';
+        er.textContent = PN.a >= 3 ? 'Demasiados intentos.' : 'Clave incorrecta';
+        er.style.opacity = '1';
+        setTimeout(function() { PN.v = ''; uD(); }, 600);
+    }
+}
+
+function unl() {
+    PN.l = false;
+    var ls = document.getElementById('lock-screen');
+    ls.classList.add('out');
+    setTimeout(function() {
+        ls.style.display = 'none';
+        showApp();
+    }, 500);
+}
+
+function lockApp() {
+    if (pl) { pl.x(); pl = null; }
+    PN.l = true; PN.v = ''; PN.a = 0; uD();
+    document.getElementById('lke').style.opacity = '0';
+    var ls = document.getElementById('lock-screen');
+    ls.style.display = 'flex';
+    setTimeout(function() { ls.classList.remove('out'); }, 50);
+    if (localStorage.getItem('svp')) {
+        PN.m = 'login';
+        document.getElementById('lkt').textContent = 'StreamVault';
+        document.getElementById('lks').textContent = 'Ingresá tu clave';
+        document.querySelector('.lk').innerHTML = '<i class="fa-solid fa-lock"></i>';
+    }
+    document.getElementById('hdr').style.display = 'none';
+    document.getElementById('mainc').style.display = 'none';
+    document.getElementById('ftr').style.display = 'none';
+    document.getElementById('psec').classList.add('hidden');
+    document.getElementById('npbar').classList.add('hidden');
+}
+
+function showApp() {
+    document.getElementById('hdr').style.display = '';
+    document.getElementById('mainc').style.display = '';
+    document.getElementById('ftr').style.display = '';
+    initApp();
+}
+
+/* === ESTADO GLOBAL === */
+var S = {
+    all: [],
+    fl: [],
+    cat: 'all',
+    q: '',
+    fov: false,
+    fav: JSON.parse(localStorage.getItem('svf') || '[]'),
+    d: 0,
+    pp: 48,
+    cur: null,
+    ini: false
+};
+
+var lft = null, lfn = '';
+
+/* === UTILIDADES === */
+function $(id) { return document.getElementById(id); }
+
+function toast(msg, type) {
+    var c = document.getElementById('toasts');
+    var colors = { info: 'border-accent bg-accent/10 text-accent', ok: 'border-ok bg-ok/10 text-ok', err: 'border-err bg-err/10 text-err', warn: 'border-warn bg-warn/10 text-warn' };
+    var icons = { info: 'fa-circle-info', ok: 'fa-circle-check', err: 'circle-xmark', warn: 'fa-triangle-exclamation' };
+    var el = document.createElement('div');
+    el.className = 'ti flex items-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-medium ' + (colors[type || 'info']);
+    el.innerHTML = '<i class="fa-solid ' + (icons[type || 'info') + '"></i><span>' + msg + '</span>';
+    c.appendChild(el);
+    setTimeout(function() {
+        el.classList.replace('ti', 'to');
+        setTimeout(function() { el.remove(); }, 300);
+    }, 3500);
+}
+
+function oM(id) { document.getElementById(id).classList.add('on'); }
+function cM(id) { document.getElementById(id).classList.remove('on'); }
+function nm(s) {
+    return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+/* === LISTAS POR DEFECTO === */
+var DEFAULT_LISTS = [
+    { id: 'ar', name: 'Argentina', url: 'https://iptv-org.github.io/iptv/countries/ar.m3u' },
+    { id: 'sa', name: 'Sudamerica', url: 'https://iptv-org.github.io/iptv/regions/south-america.m3u' },
+    { id: 'la', name: 'Latinoamerica', url: 'https://iptv-org.github.io/iptv/regions/latin-america.m3u' },
+    { id: 'spa', name: 'Espanol', url: 'https://iptv-org.github.io/iptv/languages/spa.m3u' },
+    { id: 'ds', name: 'Deportes', url: 'https://iptv-org.github.io/iptv/categories/sports.m3u' },
+    { id: 'mv', name: 'Peliculas', url: 'https://iptv-org.github.io/iptv/categories/movies.m3u' },
+    { id: 'nw', name: 'Noticias', url: 'https://iptv-org.github.io/iptv/categories/news.m3u' },
+    { id: 'en', name: 'Entretenimiento', url: 'https://iptv-org.github.io/iptv/categories/entertainment.m3u' },
+    { id: 'mu', name: 'Musica', url: 'https://iptv-org.github.io/iptv/categories/music.m3u' },
+    { id: 'ki', name: 'Infantil', url: 'https://iptv-org.github.io/iptv/categories/kids.m3u' },
+    { id: 'dc', name: 'Documentales', url: 'https://iptv-org.github.io/iptv/categories/documentary.m3u' }
+];
+
+/* === KEYWORDS ARGENTINOS PARA CLASIFICAR (español + inglés) === */
+var CAT_KW = {
+    deportes: ['deporte','sports','futbol','football','soccer','nba','nfl','mlb','f1','formula','golf','tenis','boxeo','wwe','ufc','motor','racing','bein','espn','fox sport','tyc sport','directv sport','basketball','hockey','cricket','rugby','boxing','cycling','volley','swimming','athletics','olympic','premier league','liga','champions','bundesliga','serie a','basket','ligue','torneo','libertadores','boca','river','racing','motgp','f1直播','f1 live','match','fixture','gol','goal','partido','jornada'],
+    peliculas: ['pelicula','movie','movies','film','films','cinema','cine','amc','star cinema','golden','paramount','hbo','max','disney','pixar','dreamworks','universal','warner','sony','columbia','trailer','estreno','estrenos','drama','thriller','horror','comedia','romance','accion','aventura','ciencia ficcion','sci-fi','fantasia','animacion','animation','serie de tv','tv show','miniserie'],
+    series: ['serie','series','show','sitcom','comedia','drama','temporada','season','episodio','capitulo','capitulos','miniserie','web serie','netflix','amazon','disney+','star plus','hbo','apple tv'],
+    noticias: ['noticia','news','24h','24 hor','cnne','telefe','milenio','adn40','cronica','canal 26','a24','ln+','cable','cn23','informe','reportaje','tiempo','weather','politica','economia','debate','editorial','press','argentina en vivo','en vivo'],
+    musica: ['musica','music','mtv','vh1','hit','radio','concert','banda','rock','pop','jazz','reggaeton','cumbia','salsa','salsa','bachata','hip hop','rap','electronic','edm','techno','house','dj','playlist','top 40','clip','video musical','videoclip','music channel','musica en vivo'],
+    infantil: ['infantil','kids','children','nickelodeon','cartoon','disney channel','anime','boomerang','baby','nick','pj mask','paw patrol','peppa','dinosaurio','doras','pocoyo','heidi','tom y jerry','looney','marvel','super heroes','dibujo','niños','cartoon network'],
+    documentales: ['documental','documentary','documentales','discovery','nat geo','national geographic','history','historia','animal','natura','nature','science','ciencia','espacio','oceano','ocean','selva','desierto','polar','investigacion','crime','true crime','misterio','mystery'],
+    entretenimiento: ['entretenimiento','entertainment','reality','variedad','show','programa','concurso','televisa','univision','magazine','talk show','game show','cocina','cocinar','travel','viaje','lifestyle','estilo de vida','fashion','moda','comedia en vivo','stand up','humor','entretenimiento en vivo']
+};
+
+/* Keywords argentinos para filtro "Argentina" */
+var AR_KW = [
+    'argentina','america tv','telefe','canal 13','elnueve','canal 9','canal 7','publica','tyc sports','fox sports argentina','espn argentina','depotv','flow','telecentro','cronica','canal 26','a24','ln+','cablenoticias','cn23','misiones','formosa','cordoba','rosario','mendoza','tucuman','salta','net tv','magazine','panamericana','america2'
+];
+
+/* === DETECTAR si es HLS (solo estos se cargan) === */
+function isHLS(url) {
+    var u = url.toLowerCase();
+    if (u.startsWith('rtmp') || u.startsWith('rtmps')) return false;
+    return true;
+}
+
+/* === PARSER M3U === */
+function pM(text, sid) {
+    var lines = text.split('\n');
+    var ch = [];
+    var cur = null;
+    for (var li = 0; li < lines.length; li++) {
+        var line = lines[li].trim();
+        if (!line) continue;
+
+        if (line.match(/#EXTINF/i)) {
+            cur = {};
+            var logoM = line.match(/tvg-logo="([^"]*)"/);
+            var groupM = line.match(/group-title="([^"]*)"/);
+            var ci = line.lastIndexOf(',');
+            if (ci < 0) ci = line.indexOf(' ', Math.min(line.length, 80));
+            cur.logo = logoM ? logoM[1] : '';
+            cur.group = groupM ? groupM[1] : 'Otros';
+            cur.name = ci >= 0 ? line.substring(ci + 1).trim() : 'Canal';
+            if (!cur.name) cur.name = 'Canal';
         }
-        else if(!line.startsWith('#')&&cur){
-            const urlMatch=line.match(/(https?:\/\/[^\s,]+)/i)||(line.match(/(rtmp[s]?:\/\/[^\s,]+)/i);
-            if(urlMatch){
-                cur.url=urlMatch[1];
-                cur.sid=sid;
+        else if (!line.startsWith('#') && cur) {
+            var urlMatch = line.match(/(https?:\/\/[^\s,]+)/i);
+            if (!urlMatch) urlMatch = line.match(/(rtmp[s]?:\/\/[^\s,]+)/i);
+            if (urlMatch) {
+                cur.url = urlMatch[1];
+                cur.sid = sid;
                 ch.push(cur);
             }
-            cur=null;
+            cur = null;
         }
-        else if(!line.startsWith('#')&&!cur){
-            const urlMatch=line.match(/(https?:\/\/[^\s,]+)/i)||(line.match(/(rtmp[s]?:\/\/[^\s,]+)/i));
-            if(urlMatch)ch.push({name:'Canal '+String(ch.length+1),logo:'',group:'Otros',url:urlMatch[1],sid:sid});
+        else if (!line.startsWith('#') && !cur) {
+            var urlMatch = line.match(/(https?:\/\/[^\s,]+)/i);
+            if (!urlMatch) urlMatch = line.match(/(rtmp[s]?:\/\/[^\s,]+)/i);
+            if (urlMatch) {
+                ch.push({ name: 'Canal ' + String(ch.length + 1), logo: '', group: 'Otros', url: urlMatch[1], sid: esid });
+            }
         }
     }
     return ch;
 }
 
-function iA(n,g){const t=nm(n+' '+g);return AK.some(k=>t.includes(nm(k)))}
+/* === Detectar si es argentino === */
+function isArg(name, group) {
+    var t = nm(name + ' ' + group);
+    for (var i = 0; i < AR_KW.length; i++) {
+        if (t.includes(nm(AR_KW[i]))) return true;
+    }
+    return false;
+}
 
-/* === CLASIFICAR POR CATEGORIA (mejorado) === */
-function cl(n,g){
-    const t=nm(n+' '+g);
-    for(const[c,ks]of Object.entries(CK)){
-        for(const kw of ks){
-            if(t.includes(nm(kw)))return c;
+/* === CLASIFICAR por categoría === */
+function classify(name, group) {
+    var t = nm(name + ' ' + group);
+    var cats = Object.keys(CAT_KW);
+    for (var i = 0; i < cats.length; i++) {
+        var keywords = CAT_KW[cats[i]];
+        for (var j = 0; j < keywords.length; j++) {
+            if (t.includes(nm(keywords[j])) return cats[i];
         }
     }
     return 'otros';
 }
 
-function mg(ls){
-    const m=new Map();
-    for(const l of ls)for(const c of l){
-        const k=nm(c.name);
-        if(m.has(k)){
-            const e=m.get(k);
-            if(!e.urls.includes(c.url))e.urls.push(c.url);
-            if(!e.logo&&c.logo)e.logo=c.logo;
-            if(c.sid==='ar'&&!e.arg)e.arg=iA(c.name,c.group);
-        }else m.set(k,{name:c.name,logo:c.logo,group:c.group,cat:cl(c.name,c.group),urls:[c.url],sid:c.sid,arg:c.sid==='ar'||iA(c.name,c.group)});
+/* === MERGE canales deduplicando === */
+function mergeChannels(allLists) {
+    var map = new Map();
+    for (var l = 0; l < allLists.length; l++) {
+        for (var c = 0; c < allLists[l].length; c++) {
+            var key = nm(c.name);
+            if (map.has(key)) {
+                var ex = map.get(key);
+                if (!ex.urls.includes(c.url)) ex.urls.push(c.url);
+                if (!ex.logo && c.logo) ex.logo = c.logo;
+                if (c.sid === 'ar' && !ex.arg) ex.arg = isArg(c.name, c.group);
+            } else {
+                map.set(key, {
+                    name: c.name,
+                    logo: c.logo,
+                    group: c.group,
+                    cat: classify(c.name, c.group),
+                    urls: [c.url],
+                    sid: c.sid,
+                    arg: c.sid === 'ar' || isArg(c.name, c.group)
+                });
+            }
+        }
     }
-    return Array.from(m.values());
+    return Array.from(map.values());
 }
 
-/* === CARGA: solo canales con HLS === */
-async function loadAll(f){
-    const ck='sv2',ct='sv3';
-    if(!f){const c=sessionStorage.getItem(ck),ca=parseInt(sessionStorage.getItem(ct)||'0');if(c&&Date.now()-ca<30*60*1000){S.all=JSON.parse(c);return S.all}}
-    const bar=$('loadbar'),st=$('loadst'),tot=DL.length;let d=0;
-    const res=await Promise.allSettled(DL.map(async l=>{try{const r=await fetch(l.u);if(!r.ok)throw 0;const t=await r.text();const p=pM(t,l.i);d++;bar.style.width=`${(d/tot)*100}%`;st.textContent=`${l.n}: ${p.length}`;return p}catch(e){d++;bar.style.width=`${(d/tot)*100}%`;st.textContent=`${l.n}: -`;return[]}}));
-    const al=[];for(const r of res)if(r.status==='fulfilled'&&r.value.length)al.push(r.value);
-    // Filtrar: solo canales con al menos un enlace HLS
-    const filtered=al.flat().filter(c=>c.urls.some(isHLS));
-    // Re-merge con solo los que funcionan
-    S.all=mg([filtered]);
-    sessionStorage.setItem(ck,JSON.stringify(S.all));sessionStorage.setItem(ct,Date.now().toString());
+/* === CARGA de listas === */
+async function loadAll(force) {
+    var ck = 'sv2', ct = 'sv3';
+    if (!force) {
+        var cached = sessionStorage.getItem(ck);
+        var cachedAt = parseInt(sessionStorage.getItem(ct) || '0');
+        if (cached && Date.now() - cachedAt < 30 * 60 * 1000) {
+            S.all = JSON.parse(cached);
+            return S.all;
+        }
+    }
+
+    var bar = document.getElementById('loadbar');
+    var st = document.getElementById('loadst');
+    var total = DEFAULT_LISTS.length;
+    var done = 0;
+
+    var promises = DEFAULT_LISTS.map(function(l) {
+        return fetch(l.url).then(function(res) {
+            if (!res.ok) throw 'fail';
+            return res.text();
+        }).then(function(text) {
+            var parsed = pM(text, l.id);
+            done++;
+            bar.style.width = ((done / total) * 100) + '%';
+            st.textContent = l.name + ': ' + parsed.length;
+            return parsed;
+        }).catch(function() {
+            done++;
+            bar.style.width = ((done / total) * 100) + '%';
+            st.textContent = l.name + ': sin respuesta';
+            return [];
+        });
+    });
+
+    var results = await Promise.allSettled(promises);
+    var validLists = [];
+
+    for (var r = 0; r < results.length; r++) {
+        if (r.status === 'fulfilled' && r.value.length) validLists.push(r.value);
+    }
+
+    // Filtrar solo canales con al menos un enlace HLS (descarta RTMP y otros)
+    var filtered = [];
+    for (var i = 0; i < validLists.length; i++) {
+        for (var j = 0; j < validLists[i].length; j++) {
+            if (validLists[i][j].urls.some(isHLS)) {
+                filtered.push(validLists[i][j]);
+            }
+        }
+    }
+
+    S.all = mergeChannels(filtered);
+    sessionStorage.setItem(ck, JSON.stringify(S.all));
+    sessionStorage.setItem(ct, Date.now().toString());
     return S.all;
 }
 
-async function loadCust(url,ln){
-    toast('Cargando...','info');
-    try{
-        const r=await fetch(url);if(!r.ok)throw new Error(r.status);
-        const t=await r.text();const raw=pM(t,'c');
-        // Filtrar solo HLS
-        const hls=raw.filter(c=>c.urls.some(isHLS));
-        if(!hls.length)throw new Error('No hay canales reproducibles en esta lista');
-        doM(hls,ln||url.split('/').pop()||'Lista');
+/* Cargar desde URL */
+async function loadCust(url, listName) {
+    toast('Cargando...', 'info');
+    try {
+        var r = await fetch(url);
+        if (!r.ok) throw new Error(r.status);
+        var text = await r.text();
+        var raw = pM(text, 'c');
+        var hls = raw.filter(function(c) { return c.urls.some(isHLS); });
+        if (!hls.length) throw new Error('Sin canales reproducibles');
+        doMerge(hls, listName || url.split('/').pop() || 'Lista');
         showSummary(hls);
-        aH(ln||'Lista',url,hls.length);
-        toast(`+${hls.length} canales reproducibles cargados`,'ok');
-    }catch(e){toast('Error: '+e.message,'err')}
+        addHistory(listName || 'Lista', url, hls.length);
+        toast('+' + hls.length + ' canales reproducibles', 'ok');
+    } catch (e) {
+        toast('Error: ' + e.message, 'err');
+    }
 }
 
-function loadFT(t,n){
-    const raw=pM(t,'f');
-    const hls=raw.filter(c=>c.urls.some(isHLS));
-    const rechazados=raw.length-hls;
-    if(!hls.length){
-        if(rechazados>0)toast(`Se encontraron ${raw.length} canales pero ninguno es reproducible en el navegador (todos son RTMP u otro formato). Proba con otra lista.`,'warn');
-        else toast('No se detectaron canales en ese texto','warn');
+/* Cargar desde texto pegado */
+function loadFromText(text, listName) {
+    var raw = pM(text, 'p');
+    var hls = raw.filter(function(c) { return c.urls.some(isHLS); });
+    var descartados = raw.length - hls.length;
+    if (!hls.length) {
+        if (descartados > 0) {
+            toast('Se encontraron ' + raw.length + ' canales pero ninguno es reproducible en el navegador (son RTMP u otro formato).', 'warn');
+        } else {
+            toast('No se detectaron canales en ese texto', 'warn');
+        }
         return;
     }
-    doM(hls,n);
+    doMerge(hls, listName);
     showSummary(hls);
-    aH(n,'archivo-local',hls.length);
-    toast(`+${hls.length} canales cargados (${rechazados} descartados)`,'ok');
+    addHistory(listName || 'Lista', 'archivo-local', hls.length);
+    toast('+' + hls.length + ' canales cargados (' + descartados + ' descartados)', 'ok');
 }
 
-/* === MOSTRAR RESUMEN POR CATEGORÍA === */
-function showSummary(channels){
-    const cats={};
-    channels.forEach(c=>{
-        const cat=c.cat||'otros';
-        if(!cats[cat])cats[cat]=0;
-        cats[cat]++;
-    });
-    const el=$('sum-cats');
-    const catColors={deportes:'bg-emerald-500/15 text-emerald-400',peliculas:'bg-amber-500/15 text-amber-400',series:'bg-violet-500/15 text-violet-400',noticias:'bg-sky-500/15 text-sky-400',musica:'bg-pink-500/15 text-pink-400',infantil:'bg-lime-500/15 text-lime-400',documentales:'bg-teal-500/15 text-teal-400',entretenimiento:'bg-orange-500/15 text-orange-400',otros:'bg-gray-500/15 text-gray-400'};
-    const catNames={deportes:'Deportes',peliculas:'Peliculas',series:'Series',noticias:'Noticias',musica:'Musica',infantil:'Infantil',documentales:'Documentales',entretenimiento:'Entretenimiento',otros:'Otros'};
-    el.innerHTML='';
-    const sorted=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
-    sorted.forEach(([cat,count])=>{
-        const s=document.createElement('span');
-        s.className=`cat-summary-item ${catColors[cat]||catColors.otros}`;
-        s.textContent=`${catNames[cat]||cat}: ${count}`;
-        el.appendChild(s);
-    });
-    $('sum-total').textContent=`Total: ${channels.length} canales reproducibles`;
-    $('load-summary').classList.remove('hidden');
-}
-
-function doM(p,n){
-    const fm=new Map();
-    for(const c of S.all)fm.set(nm(c.name),{...c});
-    let a=0;
-    for(const c of p){
-        const k=nm(c.name);
-        if(fm.has(k)){const e=fm.get(k);if(!e.urls.includes(c.url)){e.urls.push(c.url);a++}}
-        else{fm.set(k,{name:c.name,logo:c.logo,group:c.group,cat:cl(c.name,c.group),urls:[c.url],sid:'c',arg:iA(c.name,c.group)});a++}
+/* Agregar canales mergeando (sin duplicados) */
+function doMerge(newChannels) {
+    var fm = new Map();
+    var added = 0;
+    for (var i = 0; i < newChannels.length; i++) {
+        var c = newChannels[i];
+        var key = nm(c.name);
+        if (fm.has(key)) {
+            var ex = fm.get(key);
+            if (!ex.urls.includes(c.url)) { ex.urls.push(c.url); added++; }
+            if (!ex.logo && c.logo) ex.logo = c.logo;
+            if (c.sid === 'ar' && !ex.arg) ex.arg = isArg(c.name, c.group);
+        } else {
+            fm.set(key, {
+                name: c.name, logo: c.logo, group: c.group,
+                cat: classify(c.name, c.group),
+                urls: [c.url], sid: c.sid,
+                arg: c.sid === 'ar' || isArg(c.name, c.group)
+            });
+            added++;
+        }
     }
-    S.all=Array.from(fm.values());
-    applyF();
+    S.all = Array.from(fm.values());
+    applyFilters();
 }
 
-/* === EXPLORADOR WEB === */
-async function explorePage(url){
-    const st=$('ex-status'),res=$('ex-results'),emp=$('ex-empty');
-    st.classList.remove('hidden');emp.classList.add('hidden');res.innerHTML='';$('ex-stmsg').textContent='Conectando...';
-    try{
-        const proxyUrl=`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        const resp=await fetch(proxyUrl);if(!resp.ok)throw new Error('No se pudo acceder');
-        $('ex-stmsg').textContent='Buscando M3U...';
-        const html=await resp.text();const found=new Set();let m;
-        const h1=/href=["']([^"']*(?:\.m3u8?|\.M3U8?)[^"']*)["']/gi;while((m=h1.exec(html))!==null)found.add(m[1]);
-        const h2=/https?:\/\/[^\s"'<>]+\.m3u8?[^\s"'<>]*/gi;while((m=h2.exec(html))!==null)found.add(m[0]);
-        const h3=/https?:\/\/raw\.githubusercontent\.com\/[^\s"'<>]+/gi;while((m=h3.exec(html))!==null){if(m[0].match(/\.(m3u8?|M3U8?)(\?|$)/))found.add(m[0])}
-        st.classList.add('hidden');const links=[...found].filter(u=>u.startsWith('http'));
-        if(!links.length){emp.classList.remove('hidden');return}
-        if(url.includes('github.com')){const gh=url.match(/github\.com\/([^\/]+)\/([^\/]+)/);if(gh){try{const ar=await fetch(`https://api.github.com/repos/${gh[1]}/${gh[2]}/contents/`);if(ar.ok){const files=await ar.json();for(const f of files)if((f.name.endsWith('.m3u')||f.name.endsWith('.m3u8'))&&f.download_url)links.push(f.download_url)}}catch(e){}}}
-        res.innerHTML='';
-        [...new Set(links)].forEach(link=>{const fn=link.split('/').pop().split('?')[0];const el=document.createElement('div');el.className='link-found bg-card border border-bdr rounded-lg p-3';el.innerHTML=`<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-code text-accent text-sm"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${fn}</p><p class="text-[10px] text-muted/60 truncate mt-0.5">${link}</p></div><button class="elb shrink-0 px-3 py-1.5 rounded-lg bg-accent/15 text-accent text-xs font-medium hover:bg-accent/25 transition">Cargar</button></div>`;
-        el.querySelector('.elb').addEventListener('click',async()=>{const btn=el.querySelector('.elb');btn.innerHTML='<i class="fa-solid fa-spinner spin"></i>';btn.disabled=true;try{const r=await fetch(link);if(!r.ok)throw 0;const t=await r.text(),p=pM(t,'ex');const hls=p.filter(c=>c.urls.some(isHLS));if(!hls.length)throw 0;doM(hls,fn);showSummary(hls);aH(fn,link,hls.length);toast(`+${hls.length} de ${fn}`,'ok');btn.innerHTML='<i class="fa-solid fa-check"></i>';btn.classList.replace('text-accent','text-ok')}catch(e){toast('Error o sin canales HLS','err');btn.innerHTML='Cargar';btn.disabled=false}});
-        res.appendChild(el)})
-    }catch(e){st.classList.add('hidden');toast('Error: '+e.message,'err');res.innerHTML=`<p class="text-err text-xs text-center py-4">No se pudo acceder. Probá pegar desde "Mi Editor".</p>`}
+/* Mostrar resumen por categoría */
+function showSummary(channels) {
+    var cats = {};
+    for (var i = 0; i < channels.length; i++) {
+        var cat = channels[i].cat || 'otros';
+        if (!cats[cat]) cats[cat] = 0;
+        cats[cat]++;
+    }
+    var el = document.getElementById('sum-cats');
+    var catColors = {
+        deportes: 'bg-emerald-500/15 text-emerald-400',
+        peliculas: 'bg-amber-500/15 text-amber-400',
+        series: 'bg-violet-500/15 text-violet-400',
+        noticias: 'bg-sky-500/15 text-sky-400',
+        musica: 'bg-pink-500/15 text-pink-400',
+        infantil: 'bg-lime-500/15 text-lime-400',
+        documentales: 'bg-teal-500/15 text-teal-400',
+        entretenimiento: 'bg-orange-500/15 text-orange-400',
+        otros: 'bg-gray-500/15 text-gray-400'
+    };
+    var catNames = {
+        deportes: 'Deportes', peliculas: 'Peliculas', series: 'Series', noticias: 'Noticias', musica: 'Música',
+        infantil: 'Infantil', documentales: 'Documentales', entretenimiento: 'Entretenimiento', otros: 'Otros'
+    };
+    el.innerHTML = '';
+    var sorted = Object.entries(cats).sort(function(a, b) { return b[1] - a[1]; });
+    for (var s = 0; s < sorted.length; s++) {
+        var cat = sorted[s][0], count = sorted[s][1];
+        var span = document.createElement('span');
+        span.className = 'cat-summary-item ' + (catColors[cat] || catColors.otros);
+        span.textContent = (catNames[cat] || cat) + ': ' + count;
+        el.appendChild(span);
+    }
+    document.getElementById('sum-total').textContent = 'Total: ' + channels.length + ' canales reproducibles';
+    document.getElementById('load-summary').classList.remove('hidden');
 }
 
-/* === REPRODUCTOR === */
-class RP{constructor(v){this.v=v;this.h=null;this.c=null;this.i=0;this.d=false}
-play(c){this.x();this.d=false;this.c=c;this.i=0;this._t()}
-_t(){
-    if(this.d)return;
-    const hlsUrls=this.c.urls.filter(isHLS);
-    if(!hls.length){this._e('Sin enlaces HLS disponibles');return}
-    if(this.i>=hlsUrls.length){this._e('Todos los enlaces fallaron');$('pfb').classList.add('hidden');return}
-    const u=hlsUrls[this.i],fb=$('pfb');
-    if(this.i>0)fb.innerHTML=`<i class="fa-solid fa-rotate mr-1"></i>${this.i+1}/${hlsUrls.length}`;
-    if(Hls.isSupported()){
-        this.h=new Hls({maxBufferLength:30,maxMaxBufferLength:60,startLevel:-1,fragLoadingTimeOut:15000,manifestLoadingTimeOut:15000,levelLoadingTimeOut:15000});
-        this.h.loadSource(u);this.h.attachMedia(this.v);
-        this.h.on(Hls.Events.MANIFEST_PARSED,()=>{if(!this.d){this.v.play().catch(()=>{});fb.classList.add('hidden');$('vov').classList.add('hidden')}});
-        this.h.on(Hls.Events.ERROR,(_,d)=>{if(this.d)return;if(d.fatal){this.i++;if(this.h)this.h.destroy();this.h=null;setTimeout(()=>this._t(),800)}});
-    }else if(this.v.canPlayType('application/vnd.apple.mpegurl')){
-        this.v.src=u;this.v.addEventListener('loadeddata',()=>{if(!this.d){this.v.play().catch(()=>{});fb.classList.add('hidden');$('vov').classList.add('hidden')}},{once:true});
-        this.v.addEventListener('error',()=>{if(!this.d){this.i++;setTimeout(()=>this._t(),800)}},{once:true});
-    }else this._e('Sin soporte HLS')
+/* Historial */
+function addHistory(name, url, count) {
+    var h = JSON.parse(localStorage.getItem('svh') || '[]');
+    h.unshift({ n: name, u: url, c: count, t: Date.now() });
+    if (h.length > 20) h.length = 20;
+    localStorage.setItem('svh', JSON.stringify(h));
+    renderHistory();
 }
-_e(m){$('vov').classList.remove('hidden');$('vomsg').textContent=m;toast(m,'err')}
-x(){this.d=true;if(this.h){this.h.destroy();this.h=null}this.v.src='';this.v.load();this.c=null}}
 
-let pl=null;
-function playCh(ch){
-    const s=$('psec'),v=$('vid');s.classList.remove('hidden');s.scrollIntoView({behavior:'smooth',block:'start'});
-    $('vov').classList.remove('hidden');$('vomsg').textContent='Cargando...';$('pname').textContent=ch.name;
-    $('pgrp').textContent=ch.arg?'Argentina':ch.cat;$('pfb').classList.add('hidden');
-    S.cur=ch;if(!pl)pl=new RP(v);pl.play(ch);
-    $('npbar').classList.remove('hidden');$('npn').textContent=ch.name;$('npg').textContent=ch.group;uPF();rG()
+function renderHistory() {
+    var h = JSON.parse(localStorage.getItem('svh') || '[]');
+    var sec = document.getElementById('histsec');
+    var list = document.getElementById('histlist');
+    if (!h.length) { sec.classList.add('hidden'); return; }
+    sec.classList.remove('hidden');
+    list.innerHTML = '';
+    for (var i = 0; i < h.length; i++) {
+        var item = h[i];
+        var btn = document.createElement('button');
+        btn.className = 'hi shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-bdr text-left';
+        btn.innerHTML = '<div class="w-7 h-7 rounded-md bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-list text-accent text-[10px]"></i></div><div class="flex-1 min-w-0"><p class="text-[11px] font-medium truncate max-w-[120px]">' + item.n + '</p><p class="text-[9px] text-muted/50">' + item.c + ' canales</p></div></div>';
+        btn.addEventListener('click', function() {
+            if (item.u !== 'archivo-local') loadCust(item.u, item.n);
+        });
+        list.appendChild(btn);
+    }
 }
-function stopP(){if(pl){pl.x();pl=null}$('psec').classList.add('hidden');$('npbar').classList.add('hidden');S.cur=null;rG()}
 
-/* === RENDER === */
-function gI(n){return n.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase().substring(0,2)}
-function mC(ch,idx){
-    const f=S.fav.includes(nm(ch.name)),p=S.cur&&nm(S.cur.name)===nm(ch.name);
-    const cc={deportes:'bg-emerald-500/15 text-emerald-400',peliculas:'bg-amber-500/15 text-amber-400',series:'bg-violet-500/15 text-violet-400',noticias:'bg-sky-500/15 text-sky-400',musica:'bg-pink-500/15 text-pink-400',infantil:'bg-lime-500/15 text-lime-400',documentales:'bg-teal-500/15 text-teal-400',entretenimiento:'bg-orange-500/15 text-orange-400',otros:'bg-gray-500/15 text-gray-400'}[ch.cat]||'bg-gray-500/15 text-gray-400';
-    const d=document.createElement('div');
-    d.className=`cf group relative bg-card border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:border-accent/40 hover:bg-card-h ${p?'border-accent ring-1 ring-accent/30':'border-bdr'}`;
-    d.style.animationDelay=`${Math.min(idx*20,400)}ms`;
-    d.innerHTML=`<div class="aspect-video bg-bg/60 flex items-center justify-center relative overflow-hidden">${ch.logo?`<img src="${ch.logo}" alt="" class="w-full h-full object-contain p-3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="absolute inset-0 items-center justify-center text-2xl font-display font-bold text-muted/40" style="display:none">${gI(ch.name)}</div>`:`<span class="text-2xl font-display font-bold text-muted/40">${gI(ch.name)}</span>`}${p?'<div class="absolute top-2 left-2 flex items-center gap-1 bg-err/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-white live-dot"></span>VIVO</div>':''}${ch.arg?`<div class="absolute top-2 left-2 bg-sky-500/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded" ${p?'style="left:auto;right:2px"':''}>AR</div>`:''}<div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity ${ch.arg&&!p?'top-8':''}"><button data-fav="${nm(ch.name)}" class="w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-xs ${f?'text-err':'text-white/60 hover:text-err'}"><i class="fa-${f?'solid':'regular'} fa-heart"></i></button></div><div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1"><span class="text-[10px] text-accent font-medium"><i class="fa-solid fa-play mr-1"></i>Reproducir</span></div></div><div class="p-2.5"><p class="text-xs font-medium truncate leading-tight">${ch.name}</p><div class="flex items-center gap-1.5 mt-1.5"><span class="text-[10px] px-1.5 py-0.5 rounded-full ${cc}">${ch.cat}</span>${ch.urls.length>1?`<span class="text-[9px] text-muted/40">${ch.urls.length}enl.</span>`:''}</div></div>`;
-    d.addEventListener('click',e=>{if(!e.target.closest('[data-fav]'))playCh(ch)});
-    const fb=d.querySelector('[data-fav]');if(fb)fb.addEventListener('click',e=>{e.stopPropagation();tF(nm(ch.name))});
+/* === FILTROS Y BÚSQUEDA === */
+function applyFilters() {
+    var c = S.all.slice();
+    if (S.fov) c = c.filter(function(x) { return S.fav.includes(nm(x.name)); });
+    if (S.cat === 'argentina') c = c.filter(function(x) { return x.arg; });
+    else if (S.cat !== 'all') c = c.filter(function(x) { return x.cat === S.cat; });
+    if (S.q) {
+        var q = nm(S.q);
+        c = c.filter(function(x) {
+            return nm(x.name).includes(q) || nm(x.group).includes(q);
+        });
+    }
+    S.fl = c;
+    S.d = S.pp;
+    renderGrid();
+}
+
+/* Toggle favoritos */
+function toggleFav(key) {
+    var idx = S.fav.indexOf(key);
+    if (idx >= 0) { S.fav.splice(idx, 1); toast('Quitado de favoritos', 'info'); }
+    else { S.fav.push(key); toast('Favorito', 'ok'); }
+    localStorage.setItem('svf', JSON.stringify(S.fav));
+    renderGrid();
+    updateFavBtn();
+    updatePlayerFavBtn();
+}
+
+function updateFavBtn() {
+    var btn = document.getElementById('bfav');
+    btn.classList.toggle('bg-accent/20', S.fov);
+    btn.classList.toggle('text-accent', S.fov);
+    btn.classList.toggle('border-accent/40', S.fov);
+    btn.classList.toggle('text-muted', !S.fov);
+}
+
+function updatePlayerFavBtn() {
+    var btn = document.getElementById('bfch');
+    if (!S.cur) return;
+    var f = S.fav.includes(nm(S.cur.name));
+    btn.innerHTML = '<i class="fa-' + (f ? 'solid' : 'regular') + ' fa-heart"></i>';
+    btn.className = 'text-sm transition ' + (f ? 'text-err' : 'text-muted hover:text-accent');
+}
+
+/* === REPRODUCTOR HLS con fallback automático === */
+var pl = null;
+
+function StreamPlayer(video) {
+    this.video = video;
+    this.hls = null;
+    this.channel = null;
+    this.idx = 0;
+    this.dead = false;
+}
+
+StreamPlayer.prototype.play = function(channel) {
+    this.destroy();
+    this.dead = false;
+    this.channel = channel;
+    this.idx = 0;
+    this._tryUrl();
+};
+
+StreamPlayer.prototype._tryUrl = function() {
+    if (this.dead) return;
+    var urls = this.channel.urls.filter(isHLS);
+    if (!urls.length) {
+        this._showError('Este canal no tiene enlaces compatibles con el navegador.');
+        return;
+    }
+    if (this.idx >= urls.length) {
+        this._showError('Todos los enlaces fallaron. Puede que estén caídos temporalmente. Intentá más tarde.');
+        document.getElementById('pfb').classList.add('hidden');
+        return;
+    }
+
+    var url = urls[this.idx];
+    var fb = document.getElementById('pfb');
+    if (this.idx > 0) {
+        fb.classList.remove('hidden');
+        fb.innerHTML = '<i class="fa-solid fa-rotate mr-1"></i>' + (this.idx + 1) + '/' + urls.length;
+    }
+
+    if (Hls.isSupported()) {
+        this.hls = new Hls({
+            maxBufferLength: 30, maxMaxBufferLength: 60, startLevel: -1,
+            fragLoadingTimeOut: 15000, manifestLoadingTimeOut: 15000, levelLoadingTimeOut: 15000
+        });
+        this.hls.loadSource(url);
+        this.hls.attachMedia(this.video);
+
+        var self = this;
+        this.hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            if (!self.dead) {
+                self.video.play().catch(function() {});
+                fb.classList.add('hidden');
+                document.getElementById('vov').classList.add('hidden');
+            }
+        });
+        this.hls.on(Hls.Events.ERROR, function (_, d) {
+            if (self.dead) return;
+            if (d.fatal) {
+                self.idx++;
+                if (self.hls) { self.hls.destroy(); self.hls = null; }
+                setTimeout(function() { self._tryUrl(); }, 800);
+            }
+        });
+    } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
+        this.video.src = url;
+        var self = this;
+        this.video.addEventListener('loadeddata', function () {
+            if (!self.dead) {
+                self.video.play().catch(function() {});
+                fb.classList.add('hidden');
+                document.getElementById('vov').classList.add('hidden');
+            }
+        }, { once: true });
+        this.video.addEventListener('error', function () {
+            if (!self.dead) { self.idx++; setTimeout(function () { self._tryUrl(); }, 800); }
+        }, { once: true });
+    } else {
+        this._showError('Tu navegador no soporta reproducción HLS');
+    }
+};
+
+StreamPlayer.prototype._showError = function (msg) {
+    document.getElementById('vov').classList.remove('hidden');
+    document.getElementById('vomsg').textContent = msg;
+    toast(msg, 'err');
+};
+
+StreamPlayer.prototype.destroy = function () {
+    this.dead = true;
+    if (this.hls) { this.hls.destroy(); this.hls = null; }
+    this.video.src = '';
+    this.video.load();
+    this.channel = null;
+};
+
+/* === RENDER de la grilla === */
+function getInitials(name) {
+    return name.split(/\s+/).slice(0, 2).map(function(w) { return w[0]; }).join('').toUpperCase().substring(0, 2);
+}
+
+function createCard(ch, idx) {
+    var f = S.fav.includes(nm(ch.name));
+    var p = S.cur && nm(S.cur.name) === nm(ch.name);
+    var cc = {
+        deportes: 'bg-emerald-500/15 text-emerald-400', peliculas: 'bg-amber-500/15 text-amber-400',
+        series: 'bg-violet-500/15 text-violet-400', noticias: 'bg-sky-500/15 text-sky-400',
+        musica: 'bg-pink-500/15 text-pink-400', infantil: 'bg-lime-500/15 text-lime-400',
+        documentales: 'bg-teal-500/15 text-teal-400', entretenimiento: 'bg-orange-500/15 text-orange-400', otros: 'bg-gray-500/15 text-gray-400'
+    }[ch.cat] || 'bg-gray-500/15 text-gray-400';
+
+    var d = document.createElement('div');
+    d.className = 'cf group relative bg-card border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:border-accent/40 hover:bg-card-h ' + (p ? 'border-accent ring-1 ring-accent/30' : 'border-bdr');
+    d.style.animationDelay = Math.min(idx * 20, 400) + 'ms';
+
+    d.innerHTML =
+        '<div class="aspect-video bg-bg/60 flex items-center justify-center relative overflow-hidden">' +
+            (ch.logo
+                ? '<img src="' + ch.logo + '" alt="" class="w-full h-full object-contain p-3" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="absolute inset-0 items-center justify-center text-2xl font-display font-bold text-muted/40" style="display:none">' + getInitials(ch.name) + '</div></div>'
+                : '<span class="text-2xl font-display font-bold text-muted/40">' + getInitials(ch.name) + '</span>') +
+            (p ? '<div class="absolute top-2 left-2 flex items-center gap-1 bg-err/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-white live-dot"></span>VIVO</div>' : '') +
+            (ch.arg ? '<div class="absolute top-2 left-2 bg-sky-500/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded" ' + (p ? 'style="left:auto;right:2px"' : '') + '>AR</div>' : '') +
+            '<div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity ' + (ch.arg && !p ? 'top-8' : '') + '">' +
+                '<button data-fav="' + nm(ch.name) + '" class="w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-xs ' + (f ? 'text-err' : 'text-white/60 hover:text-err') + '"><i class="fa-' + (f ? 'solid' : 'regular') + ' fa-heart"></i></button>' +
+            '</div>' +
+            '<div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">' +
+                '<span class="text-[10px] text-accent font-medium"><i class="fa-solid fa-play mr-1"></i>Reproducir</span>' +
+            '</div>' +
+        '</div>' +
+        '<div class="p-2.5">' +
+            '<p class="text-xs font-medium truncate leading-tight">' + ch.name + '</p>' +
+            '<div class="flex items-center gap-1.5 mt-1.5">' +
+                '<span class="text-[10px] px-1.5 py-0.5 rounded-full ' + cc + '">' + ch.cat + '</span>' +
+                (ch.urls.length > 1 ? '<span class="text-[9px] text-muted/40">' + ch.urls.length + ' enl.</span>' : '') +
+            '</div>' +
+        '</div>';
+
+    d.addEventListener('click', function (e) {
+        if (!e.target.closest('[data-fav]')) playChannel(ch);
+    });
+
+    var favBtn = d.querySelector('[data-fav="' + nm(ch.name) + '"');
+    if (favBtn) {
+        favBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            toggleFav(nm(ch.name));
+        });
+    }
+
     return d;
 }
-function rG(){const g=$('grid'),em=$('emptyst'),lm=$('lmwrap'),cn=$('gcount'),ti=$('gtitle');g.innerHTML='';if(!S.fl.length){em.classList.remove('hidden');lm.classList.add('hidden');cn.textContent='0 canales';return}em.classList.add('hidden');cn.textContent=S.fl.length+' canales';if(S.fov)ti.textContent='Mis favoritos';else if(S.q)ti.textContent=`"${S.q}"`;else if(S.cat==='all')ti.textContent='Todos los canales';else if(S.cat==='argentina')ti.textContent='Canales de Argentina';else ti.textContent=S.cat.charAt(0).toUpperCase()+S.cat.slice(1);const end=Math.min(S.d,S.fl.length),fr=document.createDocumentFragment();S.fl.slice(0,end).forEach((c,i)=>fr.appendChild(mC(c,i)));g.appendChild(fr);lm.classList.toggle('hidden',end>=S.fl.length)}
 
-/* === FILTROS === */
-function applyF(){let c=[...S.all];if(S.fov)c=c.filter(x=>S.fav.includes(nm(x.name)));if(S.cat==='argentina')c=c.filter(x=>x.arg);else if(S.cat!=='all')c=c.filter(x=>x.cat===S.cat);if(S.q){const q=nm(S.q);c=c.filter(x=>nm(x.name).includes(q)||nm(x.group).includes(q))}S.fl=c;S.d=S.pp;rG()}
-function tF(k){const i=S.fav.indexOf(k);if(i>=0){S.fav.splice(i,1);toast('Quitado','info')}else{S.fav.push(k);toast('Favorito','ok')}localStorage.setItem('svf',JSON.stringify(S.fav));rG();uFB();uPF()}
-function uFB(){const b=$('bfav');b.classList.toggle('bg-accent/20',S.fov);b.classList.toggle('text-accent',S.fov);b.classList.toggle('border-accent/40',S.fov);b.classList.toggle('text-muted',!S.fov)}
-function uPF(){const b=$('bfch');if(!S.cur)return;const f=S.fav.includes(nm(S.cur.name));b.innerHTML=`<i class="fa-${f?'solid':'regular'} fa-heart"></i>`;b.className=`text-sm transition ${f?'text-err':'text-muted hover:text-accent'}`}
+function renderGrid() {
+    var grid = document.getElementById('grid');
+    var em = document.getElementById('emptyst');
+    var lm = document.getElementById('lmwrap');
+    var cn = document.getElementById('gcount');
+    var ti = document.getElementById('gtitle');
+    grid.innerHTML = '';
 
-/* === ARCHIVOS === */
-function initFH(){const dz=$('dropz'),fi=$('finp'),finfo=$('finfo'),fnm=$('fnm'),fsz=$('fsz'),frem=$('frem'),fbtn=$('fl-go');dz.addEventListener('click',()=>fi.click());fi.addEventListener('change',e=>{if(e.target.files.length)hF(e.target.files[0])});dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('do')});dz.addEventListener('dragleave',()=>dz.classList.remove('do'));dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('do');if(e.dataTransfer.files.length)hF(e.dataTransfer.files[0])});function hF(file){const ext=file.name.toLowerCase();if(!ext.endsWith('.m3u')&&!ext.endsWith('.m3u8')&&!ext.endsWith('.txt')){toast('Solo .m3u, .m3u8, .txt','warn');return}const reader=new FileReader();reader.onload=()=>{lft=reader.result;lfn=file.name;fnm.textContent=file.name;fsz.textContent=fsz(file.size);finfo.classList.remove('hidden');fbtn.disabled=false};reader.onerror=()=>toast('Error al leer','err');reader.readAsText(file)}frem.addEventListener('click',()=>{lft=null;lfn='';finfo.classList.add('hidden');fbtn.disabled=true;fi.value=''});fbtn.addEventListener('click',()=>{if(!lft)return;cM('m-file');loadFT(lft,lfn);lft=null;lfn='';finfo.classList.add('hidden');fbtn.disabled=true;fi.value=''})}
+    if (!S.fl.length) {
+        em.classList.remove('hidden');
+        lm.classList.add('hidden');
+        cn.textContent = '0 canales';
+        return;
+    }
 
-/* === EVENTOS === */
-function initEv(){
-    let st;
-    $('sinput').addEventListener('input',e=>{clearTimeout(st);st=setTimeout(()=>{S.q=e.target.value.trim();applyF()},250)});
-    document.querySelectorAll('.cp').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.cp').forEach(x=>{x.className='cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt'});b.className='cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent';S.cat=b.dataset.c;S.fov=false;uFB();applyF()})});
-    $('bfav').addEventListener('click',()=>{S.fov=!S.fov;if(S.fov){S.cat='all';document.querySelectorAll('.cp').forEach(x=>{x.className='cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt'});document.querySelector('[data-c="all"]').className='cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent'}uFB();applyF()});
-    $('pcls').addEventListener('click',stopP);$('npc').addEventListener('click',stopP);
-    const vid=$('vid');
-    $('bplay').addEventListener('click',()=>{vid.paused?vid.play().catch(()=>{}):vid.pause()});
-    $('npp').addEventListener('click',()=>{vid.paused?vid.play().catch(()=>{}):vid.pause()});
-    vid.addEventListener('play',()=>{$('bplay').innerHTML='<i class="fa-solid fa-pause"></i>';$('npp').innerHTML='<i class="fa-solid fa-pause text-sm"></i>'});
-    vid.addEventListener('pause',()=>{$('bplay').innerHTML='<i class="fa-solid fa-play"></i>';$('npp').innerHTML='<i class="fa-solid fa-play text-sm"></i>'});
-    const vs=$('vslider');vs.addEventListener('input',()=>{vid.volume=vs.value/100});vid.volume=0.8;
-    $('bfs').addEventListener('click',()=>{const w=document.querySelector('.vw');document.fullscreenElement?document.exitFullscreen():w.requestFullscreen().catch(()=>{})});
-    $('bpip').addEventListener('click',async()=>{try{document.pictureInPictureElement?await document.exitPictureInPicture():await vid.requestPictureInPicture()}catch(e){toast('PiP no soportado','warn')}});
-    $('bfch').addEventListener('click',()=>{if(S.cur)tF(nm(S.cur.name))});
-    $('blm').addEventListener('click',()=>{S.d+=S.pp;rG()});
-    $('bb-editor').addEventListener('click',()=>{oM('m-editor');editingId=null;rEdList();$('ed-area').classList.add('hidden')});
-    $('bb-paste').addEventListener('click',()=>oM('m-paste'));
-    $('bb-url').addEventListener('click',()=>oM('m-url'));
-    $('bb-file').addEventListener('click',()=>oM('m-file'));
-    $('bb-explorer').addEventListener('click',()=>oM('m-explorer'));
-    $('ed-new').addEventListener('click',()=>openEditor(null));
-    $('ed-text').addEventListener('input',updEdCount);
-    $('ed-save').addEventListener('click',()=>{const name=$('ed-name').value.trim()||'Sin nombre',text=$('ed-text').value.trim();if(!text){toast('Escribí algo','warn');return}const list=gEd();if(editingId){const item=list.find(x=>x.id===editingId);if(item){item.name=name;item.text=text;item.date=Date.now()}}else{list.push({id:uid(),name,text,date:Date.now()})}sEd(list);editingId=null;rEdList();$('ed-area').classList.add('hidden');toast('Guardada','ok')});
-    $('ed-load').addEventListener('click',()=>{const text=$('ed-text').value.trim(),name=$('ed-name').value.trim()||'Lista';if(!text){toast('Sin contenido','warn');return}loadFT(text,name);cM('m-editor')});
-    $('ed-del').addEventListener('click',()=>{if(!editingId)return;let list=gEd();list=list.filter(x=>x.id!==editingId);sEd(list);editingId=null;rEdList();$('ed-area').classList.add('hidden');toast('Eliminada','info')});
-    $('ed-cancel').addEventListener('click',()=>{editingId=null;rEdList();$('ed-area').classList.add('hidden')});
-    const pt=$('pt-text'),pc=$('pt-count'),pb=$('pt-go');
-    pt.addEventListener('input',()=>{const t=pt.value.trim();if(!t){pc.textContent='Sin contenido';pb.disabled=true;return}const parsed=pM(t,'p'),hls=parsed.filter(c=>c.urls.some(isHLS)).length,rech=parsed.length-hls;pc.innerHTML=`${parsed.length} canales: <span class="text-ok">${hls} reproducibles</span>${rech>0?`, <span class="text-err">${rech} descartados</span>`:''}`;pb.disabled=hls===0});
-    pb.addEventListener('click',()=>{const t=pt.value.trim();if(!t)return;cM('m-paste');loadFT(t,$('pt-name').value.trim()||'Lista');pt.value='';$('pt-name').value='';pc.textContent='Sin contenido';pb.disabled=true});
-    $('ur-go').addEventListener('click',()=>{const u=$('ur-in').value.trim();if(!u){toast('Ingresa URL','warn');return}cM('m-url');loadCust(u,$('ur-nm').value.trim());$('ur-in').value='';$('ur-nm').value=''});
-    $('ex-go').addEventListener('click',()=>{const u=$('ex-in').value.trim();if(!u){toast('Ingresa URL','warn');return}explorePage(u)});
-    $('ex-in').addEventListener('keydown',e=>{if(e.key==='Enter'){const u=e.target.value.trim();if(u)explorePage(u)}});
-    $('sum-close').addEventListener('click',()=>$('load-summary').classList.add('hidden'));
-    document.querySelectorAll('.mx').forEach(b=>b.addEventListener('click',()=>b.closest('.mo').classList.remove('on')));
-    document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on')}));
-    $('bclrh').addEventListener('click',()=>{localStorage.removeItem('svh');rH();toast('Historial limpio','info')});
-    $('bout').addEventListener('click',lockApp);
-    document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.mo.on').forEach(m=>m.classList.remove('on'))});
-    initFH();
+    em.classList.add('hidden');
+    cn.textContent = S.fl.length + ' canales';
+
+    if (S.fov) ti.textContent = 'Mis favoritos';
+    else if (S.q) ti.textContent = '"' + S.q + '"';
+    else if (S.cat === 'all') ti.textContent = 'Todos los canales';
+    else if (S.cat === 'argentina') ti.textContent = 'Canales de Argentina';
+    else ti.textContent = S.cat.charAt(0).toUpperCase() + S.cat.slice(1);
+
+    var end = Math.min(S.d, S.fl.length);
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < end; i++) {
+        frag.appendChild(createCard(S.fl[i], i));
+    }
+    grid.appendChild(frag);
+    lm.classList.toggle('hidden', end >= S.fl.length);
 }
 
-async function initApp(){if(S.ini)return;S.ini=true;initEv();uFB();rH();$('load-scr').style.display='flex';try{await loadAll();$('lup').textContent=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});applyF()}catch(e){toast('Error al cargar','err')}const ls=$('load-scr');ls.style.transition='opacity 0.5s';ls.style.opacity='0';setTimeout(()=>{ls.style.display='none'},500);setInterval(async()=>{try{sessionStorage.removeItem('sv2');await loadAll(true);applyF();$('lup').textContent=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})}catch(e){}},30*60*1000)}
-document.addEventListener('DOMContentLoaded',initLock);
+/* === PLAY / STOP === */
+function playChannel(ch) {
+    var s = document.getElementById('psec');
+    var v = document.getElementById('vid');
+    s.classList.remove('hidden');
+    s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('vov').classList.remove('hidden');
+    document.getElementById('vomsg').textContent = 'Cargando...';
+    document.getElementById('pname').textContent = ch.name;
+    document.getElementById('pgrp').textContent = ch.arg ? 'Argentina' : ch.cat;
+    document.getElementById('pfb').classList.add('hidden');
+
+    S.cur = ch;
+    if (!pl) pl = new StreamPlayer(v);
+    pl.play(ch);
+
+    document.getElementById('npbar').classList.remove('hidden');
+    document.getElementById('npn').textContent = ch.name;
+    document.getElementById('npg').textContent = ch.group;
+    updatePlayerFavBtn();
+    renderGrid();
+}
+
+function stopPlay() {
+    if (pl) { pl.destroy(); pl = null; }
+    document.getElementById('psec').classList.add('hidden');
+    document.getElementById('npbar').classList.add('hidden');
+    S.cur = null;
+    renderGrid();
+}
+
+/* === EVENTOS === */
+function initEvents() {
+    var st;
+    document.getElementById('sinput').addEventListener('input', function (e) {
+        clearTimeout(st);
+        st = setTimeout(function () => { S.q = e.target.value.trim(); applyFilters(); }, 250);
+    });
+
+    // Categorías
+    var pills = document.querySelectorAll('.cp');
+    for (var i = 0; i < pills.length; i++) {
+        pills[i].addEventListener('click', function () {
+            for (var j = 0; j < pills.length; j++) {
+                pills[j].className = 'cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt';
+            }
+            pills[i].className = 'cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent';
+            S.cat = pills[i].dataset.c;
+            S.fov = false;
+            updateFavBtn();
+            applyFilters();
+        });
+    }
+
+    // Favoritos
+    document.getElementById('bfav').addEventListener('click', function () {
+        S.fov = !S.fov;
+        if (S.fov) {
+            S.cat = 'all';
+            for (var j = 0; j < pills.length; j++) {
+                pills[j].className = 'cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt';
+            }
+            document.querySelector('[data-c="all"]').className = 'cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent';
+        }
+        updateFavBtn();
+        applyFilters();
+    });
+
+    // Reproductor
+    document.getElementById('pcls').addEventListener('click', stopPlay);
+    document.getElementById('npc').addEventListener('click', stopPlay);
+
+    var vid = document.getElementById('vid');
+    document.getElementById('bplay').addEventListener('click', function () {
+        if (vid.paused) vid.play().catch(function () {}); else vid.pause();
+    });
+    document.getElementById('npp').addEventListener('click', function () {
+        if (vid.paused) vid.play().catch(function () {}); else vid.pause();
+    });
+    vid.addEventListener('play', function () {
+        document.getElementById('bplay').innerHTML = '<i class="fa-solid fa-pause"></i>';
+        document.getElementById('npp').innerHTML = '<i class="fa-solid fa-pause text-sm"></i>';
+    });
+    vid.addEventListener('pause', function () {
+        document.getElementById('bplay').innerHTML = '<i class="fa-solid fa-play"></i>';
+        document.getElementById('npp').innerHTML = '<i class="fa-solid fa-play text-sm"></i>';
+    });
+    var vs = document.getElementById('vslider');
+    vs.addEventListener('input', function () { vid.volume = vs.value / 100; });
+    vid.volume = 0.8;
+
+    document.getElementById('bfs').addEventListener('click', function () {
+        var w = document.querySelector('.vw');
+        if (document.fullscreenElement) document.exitFullscreen();
+        else w.requestFullscreen().catch(function () {});
+    });
+    document.getElementById('bpip').addEventListener('click', async function () {
+        try {
+            if (document.pictureInPictureElement) await document.exitPictureInPicture();
+            else toast('PiP no soportado', 'warn');
+        } catch (e) { toast('PiP no soportado', 'warn'); }
+    });
+    document.getElementById('bfch').addEventListener('click', function () {
+        if (S.cur) toggleFav(nm(S.cur.name));
+    });
+
+    // Banner
+    document.getElementById('bb-paste').addEventListener('click', function () { oM('m-paste'); });
+    document.getElementById('bb-url').addEventListener('click', function () { oM('m-url'); });
+    document.getElementById('bb-file').addEventListener('click', function () { oM('m-file'); });
+    document.getElementById('bb-web').addEventListener('click', function () { oM('m-web'); });
+
+    // Pegar texto
+    var pt = document.getElementById('pt-text');
+    var pc = document.getElementById('pt-count');
+    var pb = document.getElementById('pt-go');
+    pt.addEventListener('input', function () {
+        var t = pt.value.trim();
+        if (!t) { pc.textContent = 'Sin contenido'; pb.disabled = true; return; }
+        var parsed = pM(t, 'p');
+        var hls = parsed.filter(function (c) { return c.urls.some(isHLS); });
+        var rechazados = parsed.length - hls;
+        pc.innerHTML = parsed.length + ' canales: <span class="text-ok">' + hls + ' reproducibles</span>' + (rechazados > 0 ? ', <span class="text-err">' + rechazados + ' descartados</span>' : '');
+        pb.disabled = hls === 0;
+    });
+    pb.addEventListener('click', function () {
+        var t = pt.value.trim();
+        if (!t) return;
+        cM('m-paste');
+        loadFromText(t, document.getElementById('pt-name').value.trim() || 'Lista');
+        pt.value = '';
+        document.getElementById('pt-name').value = '';
+        pc.textContent = 'Sin contenido';
+        pb.disabled = true;
+    });
+
+    // URL
+    document.getElementById('ur-go').addEventListener('click', function () {
+        var u = document.getElementById('ur-in').value.trim();
+        if (!u) { toast('Ingresa URL', 'warn'); return; }
+        cM('m-url');
+        loadCust(u, document.getElementById('ur-nm').value.trim());
+        document.getElementById('ur-in').value = '';
+        document.getElementById('ur-nm').value = '';
+    });
+
+    // Archivo
+    var dz = document.getElementById('dropz');
+    var fi = document.getElementById('finp');
+    var finfo = document.getElementById('finfo');
+    var fnm = document.getElementById('fnm');
+    var fsz = document.getElementById('fsz');
+    var frem = document.getElementById('frem');
+    var fbtn = document.getElementById('fl-go');
+
+    dz.addEventListener('click', function () { fi.click(); });
+    fi.addEventListener('change', function (e) { if (e.target.files.length) hF(e.target.files[0]); });
+    dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('do'); });
+    dz.addEventListener('dragleave', function () { dz.classList.remove('do'); });
+    dz.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dz.classList.remove('do');
+        if (e.dataTransfer.files.length) hF(e.dataTransfer.files[0]);
+    });
+    function hF(file) {
+        var ext = file.name.toLowerCase();
+        if (!ext.endsWith('.m3u') && !ext.endsWith('.m3u8') && !ext.endsWith('.txt')) { toast('Solo .m3u, .m3u8, .txt', 'warn'); return; }
+        var reader = new FileReader();
+        reader.onload = function () {
+            lft = reader.result;
+            lfn = file.name;
+            fnm.textContent = file.name;
+            fsz.textContent = fsz(file.size);
+            finfo.classList.remove('hidden');
+            fbtn.disabled = false;
+        };
+        reader.onerror = function () { toast('Error al leer', 'err'); };
+        reader.readAsText(file);
+    }
+    frem.addEventListener('click', function () { lft = null; lfn = ''; finfo.classList.add('hidden'); fbtn.disabled = true; fi.value = ''; });
+    fbtn.addEventListener('click', function () {
+        if (!lft) return;
+        cM('m-file');
+        loadFromText(lft, lfn);
+        lft = null; lfn = '';
+        finfo.classList.add('hidden');
+        fbtn.disabled = true; fi.value = '';
+    });
+
+    // Buscador web
+    document.getElementById('webq').addEventListener('input', function (e) {
+        var q = e.target.value.trim();
+        if (q) searchWeb(q);
+    });
+    document.getElementById('web-go').addEventListener('click', function () {
+        var q = document.getElementById('webq').value.trim();
+        if (q) searchWeb(q);
+    });
+    document.getElementById('webq').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            var q = e.target.value.trim();
+            if (q) searchWeb(q);
+        }
+    });
+
+    // Botones de búsqueda rápida
+    var wqs = document.querySelectorAll('.wq');
+    for (var w = 0; w < wqs.length; w++) {
+        w.addEventListener('click', function () {
+            document.getElementById('webq').value = this.dataset.q;
+            searchWeb(this.dataset.q);
+        });
+    }
+
+    // Cerrar modales
+    var mx = document.querySelectorAll('.mx');
+    for (var m = 0; m < mx.length; m++) {
+        mx.addEventListener('click', function () { this.closest('.mo').classList.remove('on'); });
+    }
+    document.querySelectorAll('.mo').forEach(function (o) {
+        o.addEventListener('click', function (e) { if (e.target === o) o.classList.remove('on'); });
+    });
+
+    // Cerrar sesión
+    document.getElementById('bout').addEventListener('click', lockApp);
+
+    // Cerrar sesión
+    document.getElementById('bclrh').addEventListener('click', function () {
+        localStorage.removeItem('svh');
+        renderHistory();
+        toast('Historial limpio', 'info');
+    });
+
+    // Escape
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.mo.on').forEach(function (m) { m.classList.remove('on'); });
+        }
+    });
+
+    // Inicializar manejo de archivos
+    initFH();
+
+    // Auto-actualizar cada 30 min
+    setInterval(async function () {
+        try {
+            sessionStorage.removeItem('sv2');
+            await loadAll(true);
+            applyFilters();
+            document.getElementById('lup').textContent = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+        } catch (e) { /* silencio */
+    });
+}
+
+/* === INICIO === */
+async function initApp() {
+    if (S.ini) return;
+    S.ini = true;
+
+    initEvents();
+
+    document.getElementById('load-scr').style.display = 'flex';
+
+    try {
+        await loadAll();
+        document.getElementById('lup').textContent = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+        applyFilters();
+    } catch (e) {
+        toast('Error al cargar', 'err');
+    }
+
+    var ls = document.getElementById('load-scr');
+    ls.style.transition = 'opacity 0.5s';
+    ls.style.opacity = '0';
+    setTimeout(function () { ls.style.display = 'none'; }, 500);
+}
+
+document.addEventListener('DOMContentLoaded', initLock);
 </script>
 </body>
-                                                                                                                                                                                                                                                                                                                                                      </html>
+    </html>
