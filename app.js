@@ -1,6 +1,6 @@
 let canales = [];
 
-// 1. Carga y Filtrado Inicial
+// 1. Carga, Filtrado y Clasificación
 async function cargarLista(ruta) {
     const loader = document.getElementById('loader');
     if (loader) loader.classList.remove('hidden');
@@ -10,7 +10,7 @@ async function cargarLista(ruta) {
         const text = await response.text();
         const lines = text.split('\n');
         
-        // Define aquí qué países o idiomas quieres mantener
+        // Palabras clave para mantener canales en español/región
         const palabrasClave = ["argentina", "esp", "lat", "latino", "chile", "mexico", "colombia", "españa", "uruguay"];
         
         canales = [];
@@ -19,12 +19,20 @@ async function cargarLista(ruta) {
         lines.forEach(line => {
             if (line.startsWith('#EXTINF')) {
                 const name = line.split(',')[1] || "Sin nombre";
-                const group = (line.match(/group-title="([^"]+)"/) || [])[1] || "Otros";
+                let group = (line.match(/group-title="([^"]+)"/) || [])[1] || "Otros";
+                
+                // Clasificación automática para Cine/Series
+                const lowerName = name.toLowerCase();
+                if (lowerName.includes("cine") || lowerName.includes("pelis") || lowerName.includes("series") || lowerName.includes("movies")) {
+                    group = "🎬 Cine y Series";
+                } else if (group === "Otros") {
+                    group = "📺 TV en Vivo";
+                }
+
                 meta = { name, group };
             } else if (line.trim().startsWith('http') && meta) {
-                // Filtramos: solo agregamos si contiene alguna palabra clave en español/país
                 const textoCompleto = (meta.name + meta.group).toLowerCase();
-                const esDeInteres = palabrasClave.some(p => textoCompleto.includes(p));
+                const esDeInteres = palabrasClave.some(p => textoCompleto.includes(p)) || meta.group === "🎬 Cine y Series";
 
                 if (esDeInteres) {
                     canales.push({ ...meta, url: line.trim() });
@@ -66,6 +74,7 @@ function render(lista) {
             const card = document.createElement('div');
             card.className = 'bg-[#181822] p-2 rounded text-[10px] truncate border border-[#2a2a3a] hover:border-[#e8a020] cursor-pointer';
             card.innerText = c.name;
+            card.onclick = () => window.open(c.url, '_blank'); // Abre el enlace al hacer clic
             grid.appendChild(card);
         });
         section.appendChild(grid);
@@ -73,16 +82,15 @@ function render(lista) {
     });
 }
 
-// 4. Limpiador masivo de canales
+// 4. Limpiador masivo de enlaces
 async function limpiarCaidos() {
     const loader = document.getElementById('loader');
     if (loader) loader.classList.remove('hidden');
     
-    // Verificación rápida en paralelo
     const validaciones = await Promise.all(canales.map(async (canal) => {
         try {
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 3000); // Timeout de 3 segundos
+            const timeout = setTimeout(() => controller.abort(), 3000);
             await fetch(canal.url, { method: 'HEAD', mode: 'no-cors', signal: controller.signal });
             clearTimeout(timeout);
             return true;
