@@ -2,105 +2,20 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamVault AR - TV en Vivo</title>
+    <title>StreamVault Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script>
-    tailwind.config={theme:{extend:{fontFamily:{display:['Space Grotesk','sans-serif'],body:['DM Sans','sans-serif']},colors:{bg:'#0a0a0f',surface:'#111118',card:'#181822','card-h':'#20202e',bdr:'#2a2a3a',txt:'#eaeaf0',muted:'#7a7a95',accent:'#e8a020','accent-h':'#f0b840',ok:'#22c55e',err:'#ef4444',warn:'#f59e0b'}}}}
-    </script>
-    <style>
-        :root{--accent:#e8a020;--bg:#0a0a0f}
-        *{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#2a2a3a transparent}
-        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
-        body{font-family:'DM Sans',sans-serif;background:var(--bg);overflow-x:hidden;margin:0}
-        .bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 400px at 20% 10%,rgba(232,160,32,.06),transparent),radial-gradient(ellipse 500px 500px at 80% 80%,rgba(220,80,50,.04),transparent);animation:gl 20s ease-in-out infinite alternate}
-        @keyframes gl{to{opacity:.7;transform:scale(1.1)}}
-        @keyframes lp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}.live-dot{animation:lp 1.5s ease-in-out infinite}
-        @keyframes sd{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}.pe{animation:sd .4s cubic-bezier(.16,1,.3,1)}
-        @keyframes ci{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}.cf{animation:ci .35s ease-out both}
-        .cs{overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}.cs>*{scroll-snap-align:start}
-        @keyframes tI{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}.ti{animation:tI .35s ease-out}
-        @keyframes tO{to{opacity:0;transform:translateX(40px)}}.to{animation:tO .3s ease-in forwards}
-        .vw video{width:100%;display:block;background:#000;border-radius:8px}
-        .vs{-webkit-appearance:none;appearance:none;height:4px;background:#2a2a3a;border-radius:2px;outline:none}
-        .vs::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--accent);border-radius:50%;cursor:pointer}
-        .mo{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
-        .mo.on{opacity:1;pointer-events:auto}
-        .mb{background:#181822;border:1px solid #2a2a3a;border-radius:16px;padding:24px;max-width:620px;width:94%;max-height:88vh;overflow-y:auto;transform:scale(.95);transition:transform .25s}
-        .mo.on .mb{transform:scale(1)}
-        .nb{backdrop-filter:blur(16px);background:rgba(17,17,24,.92);border-top:1px solid #2a2a3a}
-        .ls{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .5s,transform .5s}
-        .ls.out{opacity:0;transform:scale(1.05);pointer-events:none}
-        @keyframes lb{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}.lk{animation:lb 2s ease-in-out infinite}
-        .pd{width:12px;height:12px;border-radius:50%;border:2px solid #2a2a3a;transition:all .2s}.pd.f{background:var(--accent);border-color:var(--accent)}.pd.e{background:#ef4444;border-color:#ef4444;animation:sh .4s}
-        @keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-        .kb{width:68px;height:68px;border-radius:50%;background:#181822;border:1px solid #2a2a3a;color:#eaeaf0;font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;user-select:none}
-        .kb:hover{background:#20202e;border-color:#e8a020;color:#e8a020}.kb:active{transform:scale(.92);background:#e8a020;color:#0a0a0f}
-        .dz{border:2px dashed #2a2a3a;border-radius:12px;transition:all .25s;cursor:pointer}.dz:hover,.dz.do{border-color:var(--accent);background:rgba(232,160,32,.05)}
-        .pa{background:#0a0a0f;border:2px dashed #2a2a3a;border-radius:12px;transition:all .25s;resize:vertical;min-height:180px;font-family:'DM Sans',monospace;font-size:12px;color:#eaeaf0;line-height:1.5}
-        .pa:focus{border-color:var(--accent);outline:none}.pa::placeholder{color:#4a4a5a}
-        .hi{transition:all .15s}.hi:hover{background:#20202e}
-        .link-found{transition:all .15s}.link-found:hover{background:#20202e;border-color:rgba(232,160,32,.3)}
-        @keyframes sp{to{transform:rotate(360deg)}}.spin{animation:sp 1s linear infinite}
-        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-        @media(max-width:380px){.kb{width:58px;height:58px;font-size:18px}}
-        .loading-spinner{width:40px;height:40px;border:4px solid #2a2a3a;border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite}
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="text-txt min-h-screen relative">
-
-<!-- ESTRUCTURA HTML (igual a la original, solo cambio el título) -->
-<div class="bg-glow"></div>
-<div id="toasts" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm"></div>
-
-<div id="lock-screen" class="ls">
-    <div class="bg-glow"></div>
-    <div class="relative z-10 text-center px-6 w-full max-w-sm">
-        <div class="lk text-5xl text-accent mb-6"><i class="fa-solid fa-lock"></i></div>
-        <h1 id="lkt" class="font-display text-2xl font-bold mb-1">StreamVault AR</h1>
-        <p id="lks" class="text-muted text-sm mb-8">Ingresá tu clave</p>
-        <div id="pind" class="flex justify-center gap-3 mb-8">
-            <div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div>
+<body class="bg-[#0a0a0f] text-white p-4">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-2xl font-bold text-[#e8a020] mb-4">StreamVault Pro</h1>
+        <div class="bg-[#111118] p-4 rounded-xl border border-[#2a2a3a] mb-6">
+            <button onclick="cargarLista('listas/mi-lista.m3u')" class="bg-[#e8a020] text-black px-4 py-2 rounded text-sm font-bold">Cargar Lista Principal</button>
+            <button onclick="limpiarCaidos()" class="bg-red-900/30 text-red-400 px-4 py-2 rounded text-sm ml-2">Limpiar Caídos</button>
+            <div id="loader" class="hidden spinner"></div>
         </div>
-        <div class="flex flex-col items-center gap-3" id="keypad">
-            <div class="flex gap-3"><button class="kb" data-k="1">1</button><button class="kb" data-k="2">2</button><button class="kb" data-k="3">3</button></div>
-            <div class="flex gap-3"><button class="kb" data-k="4">4</button><button class="kb" data-k="5">5</button><button class="kb" data-k="6">6</button></div>
-            <div class="flex gap-3"><button class="kb" data-k="7">7</button><button class="kb" data-k="8">8</button><button class="kb" data-k="9">9</button></div>
-            <div class="flex gap-3"><button class="kb" data-k="x" style="visibility:hidden"></button><button class="kb" data-k="0">0</button><button class="kb" data-k="d"><i class="fa-solid fa-delete-left text-lg"></i></button></div>
-        </div>
-        <p id="lke" class="text-err text-xs mt-5 opacity-0 transition-opacity">Clave incorrecta</p>
+        <div id="container"></div>
     </div>
-</div>
-
-<div id="load-scr" class="fixed inset-0 z-40 bg-bg flex flex-col items-center justify-center gap-6" style="display:none">
-    <div class="text-center">
-        <h1 class="font-display text-5xl font-bold text-accent tracking-tight">StreamVault AR</h1>
-        <p class="text-muted mt-2 text-sm">Cargando tu lista...</p>
-    </div>
-    <div class="loading-spinner"></div>
-    <p id="loadst" class="text-muted text-xs">Procesando M3U...</p>
-</div>
-
-<header id="hdr" class="relative z-10 border-b border-bdr bg-surface/80 backdrop-blur-md sticky top-0" style="display:none">
-    <!-- Header igual al original -->
-</header>
-
-<section id="psec" class="relative z-10 hidden max-w-7xl mx-auto px-4 mt-4">
-    <!-- Reproductor igual al original -->
-</section>
-
-<main id="mainc" class="relative z-10 max-w-7xl mx-auto px-4 py-6" style="display:none">
-    <!-- Contenido principal igual al original -->
-</main>
-
-<!-- MODALES (iguales al original) -->
-
-<script>
-// ============================================
-// LISTA M3U PERSONALIZADA (Tu lista de Argentina)
-// ============================================
-var USER_M3U_LIST = `#EXTM3U
-#EXTINF:-1 tvg-id="13Max
+    <script src="app.js"></script>
+</body>
+</html>
