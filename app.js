@@ -109,10 +109,149 @@ async function loadCust(url,ln){toast('Cargando lista...','info');try{const r=aw
 function loadFT(t,n){const p=pM(t,'f');if(!p.length){toast('Sin canales validos','warn');return}doM(p,n);aH(n,'embebida',p.length);toast(`+${p.length} canales de ${n}`,'ok')}
 function doM(p,n){const fm=new Map();for(const c of S.all)fm.set(nm(c.name),{...c});for(const c of p){const k=nm(c.name);if(fm.has(k)){const e=fm.get(k);if(!e.urls.includes(c.url))e.urls.push(c.url)}else fm.set(k,{name:c.name,logo:c.logo,group:c.group,cat:cl(c.name,c.group),urls:[c.url],sid:'c',arg:iA(c.name,c.group)})}S.all=Array.from(fm.values());applyF()}
 
-/* ===================================================================
-   EXPLORADOR WEB
+/* =====================================/* ===================================================================
+   EXPLORADOR WEB (Mejorado: API de GitHub directa + proxy generico)
    =================================================================== */
-async function explorePage(url){const st=$('ex-status'),res=$('ex-results'),emp=$('ex-empty');st.classList.remove('hidden');emp.classList.add('hidden');res.innerHTML='';$('ex-stmsg').textContent='Conectando...';try{const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);if(!r.ok)throw new Error('No se pudo acceder');$('ex-stmsg').textContent='Buscando M3U...';const html=await r.text(),found=new Set();let m;const hR=/href=["']([^"']*(?:\.m3u8?|\.M3U8?)[^"']*)["']/gi;while((m=hR.exec(html))!==null)found.add(m[1]);const uR=/https?:\/\/[^\s"'<>]+\.m3u8?[^\s"'<>]*/gi;while((m=uR.exec(html))!==null)found.add(m[0]);const rR=/https?:\/\/raw\.githubusercontent\.com\/[^\s"'<>]+/gi;while((m=rR.exec(html))!==null){if(m[0].match(/\.(m3u8?|M3U8?)(\?|$)/))found.add(m[0])}st.classList.add('hidden');let links=[...found].filter(u=>u.startsWith('http'));if(url.includes('github.com')){const gh=url.match(/github\.com\/([^\/]+)\/([^\/]+)/);if(gh){$('ex-stmsg').textContent='Buscando via API GitHub...';st.classList.remove('hidden');try{const ar=await fetch(`https://api.github.com/repos/${gh[1]}/${gh[2]}/contents/`);if(ar.ok){const files=await ar.json();for(const f of files)if(f.name.match(/\.(m3u8?|M3U8?)$/i)&&f.download_url)links.push(f.download_url)}}catch(e){}st.classList.add('hidden')}}const unique=[...new Set(links)];if(!unique.length){emp.classList.remove('hidden');return}res.innerHTML='';unique.forEach(link=>{const fn=link.split('/').pop().split('?')[0],el=document.createElement('div');el.className='link-found bg-card border border-bdr rounded-lg p-3';el.innerHTML=`<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-code text-accent text-sm"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${fn}</p><p class="text-[10px] text-muted/60 truncate mt-0.5">${link}</p></div><button class="ex-load-btn shrink-0 px-3 py-1.5 rounded-lg bg-accent/15 text-accent text-xs font-medium hover:bg-accent/25 transition">Cargar</button></div>`;el.querySelector('.ex-load-btn').addEventListener('click',async()=>{const btn=el.querySelector('.ex-load-btn');btn.innerHTML='<i class="fa-solid fa-spinner spin"></i>';btn.disabled=true;try{const r=await fetch(link);if(!r.ok)throw 0;const t=await r.text(),p=pM(t,'ex');if(!p.length)throw 0;doM(p,fn);aH(fn,link,p.length);toast(`+${p.length} canales`,'ok');btn.innerHTML='<i class="fa-solid fa-check"></i>';btn.classList.replace('text-accent','text-ok')}catch(e){toast('Error al cargar','err');btn.innerHTML='Cargar';btn.disabled=false}});res.appendChild(el)})}catch(e){st.classList.add('hidden');toast('Error: '+e.message,'err');res.innerHTML='<p class="text-err text-xs text-center py-4">No se pudo acceder. Usá "Mi Editor" o "Pegar texto".</p>'}}
+async function explorePage(url) {
+    const st = $('ex-status'), res = $('ex-results'), emp = $('ex-empty');
+    st.classList.remove('hidden'); emp.classList.add('hidden'); res.innerHTML = '';
+
+    /* ---- CASO 1: Es una URL de GitHub ---- */
+    const ghMatch = url.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);
+    if (ghMatch) {
+        const user = ghMatch[1], repo = ghMatch[2];
+        $('ex-stmsg').textContent = `Buscando en repositorio ${user}/${repo}...`;
+        
+        try {
+            /* Buscar en la raiz del repo */
+            const rootData = await fetchGithubFiles(user, repo, '');
+            let allFiles = [...rootData];
+
+            /* Buscar en subcarpetas comunes donde suelen estar las listas */
+            const subcarpetas = ['lists', 'm3u', 'iptv', 'channels', 'src', 'data', 'extras'];
+            for (const sub of subcarpetas) {
+                try {
+                    const subData = await fetchGithubFiles(user, repo, sub);
+                    if (subData.length) allFiles = allFiles.concat(subData);
+                } catch(e) { /* la subcarpeta no existe, no pasa nada */ }
+            }
+
+            /* Filtrar solo archivos M3U */
+            const m3uFiles = allFiles.filter(f => f.name.match(/\.(m3u8?|M3U8?)$/i));
+            
+            st.classList.add('hidden');
+
+            if (!m3uFiles.length) {
+                emp.classList.remove('hidden');
+                return;
+            }
+
+            res.innerHTML = '';
+            m3uFiles.forEach(file => {
+                const link = file.download_url || file.html_url;
+                const size = file.size ? fsz(file.size) : '';
+                const path = file.path || file.name;
+                const el = document.createElement('div');
+                el.className = 'link-found bg-card border border-bdr rounded-lg p-3';
+                el.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-file-code text-accent text-sm"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium truncate">${file.name}</p>
+                            <p class="text-[10px] text-muted/60 truncate mt-0.5">${path}</p>
+                            ${size ? `<p class="text-[9px] text-muted/40 mt-0.5">${size}</p>` : ''}
+                        </div>
+                        <button class="ex-load-btn shrink-0 px-3 py-1.5 rounded-lg bg-accent/15 text-accent text-xs font-medium hover:bg-accent/25 transition">Cargar</button>
+                    </div>`;
+                el.querySelector('.ex-load-btn').addEventListener('click', async () => {
+                    const btn = el.querySelector('.ex-load-btn');
+                    btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i>'; btn.disabled = true;
+                    try {
+                        const r = await fetch(link);
+                        if (!r.ok) throw 0;
+                        const t = await r.text(), p = pM(t, 'ex');
+                        if (!p.length) throw 0;
+                        doM(p, file.name); aH(file.name, link, p.length);
+                        toast(`+${p.length} canales de ${file.name}`, 'ok');
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i>'; btn.classList.replace('text-accent','text-ok');
+                    } catch(e) { toast('Error al cargar','err'); btn.innerHTML = 'Cargar'; btn.disabled = false; }
+                });
+                res.appendChild(el);
+            });
+
+        } catch(e) {
+            st.classList.add('hidden');
+            toast('Error al acceder al repositorio: ' + e.message, 'err');
+            res.innerHTML = '<p class="text-err text-xs text-center py-4">No se pudo leer el repositorio. Verificá que el nombre sea correcto.</p>';
+        }
+        return;
+    }
+
+    /* ---- CASO 2: Cualquier otra URL (usa proxy) ---- */
+    $('ex-stmsg').textContent = 'Conectando con la pagina...';
+    try {
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+        const resp = await fetch(proxyUrl);
+        if (!resp.ok) throw new Error('No se pudo acceder a la pagina');
+        $('ex-stmsg').textContent = 'Buscando archivos M3U...';
+        const html = await resp.text();
+        const found = new Set();
+        let m;
+        const hR = /href=["']([^"']*(?:\.m3u8?|\.M3U8?)[^"']*)["']/gi;
+        while ((m = hR.exec(html)) !== null) found.add(m[1]);
+        const uR = /https?:\/\/[^\s"'<>]+\.m3u8?[^\s"'<>]*/gi;
+        while ((m = uR.exec(html)) !== null) found.add(m[0]);
+        
+        st.classList.add('hidden');
+        const links = [...found].filter(u => u.startsWith('http'));
+        
+        if (!links.length) { emp.classList.remove('hidden'); return; }
+        
+        res.innerHTML = '';
+        const unique = [...new Set(links)];
+        unique.forEach(link => {
+            const fn = link.split('/').pop().split('?')[0];
+            const el = document.createElement('div');
+            el.className = 'link-found bg-card border border-bdr rounded-lg p-3';
+            el.innerHTML = `<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-code text-accent text-sm"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${fn}</p><p class="text-[10px] text-muted/60 truncate mt-0.5">${link}</p></div><button class="ex-load-btn shrink-0 px-3 py-1.5 rounded-lg bg-accent/15 text-accent text-xs font-medium hover:bg-accent/25 transition">Cargar</button></div>`;
+            el.querySelector('.ex-load-btn').addEventListener('click', async () => {
+                const btn = el.querySelector('.ex-load-btn');
+                btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i>'; btn.disabled = true;
+                try {
+                    const r = await fetch(link); if (!r.ok) throw 0;
+                    const t = await r.text(), p = pM(t, 'ex'); if (!p.length) throw 0;
+                    doM(p, fn); aH(fn, link, p.length);
+                    toast(`+${p.length} canales`, 'ok');
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i>'; btn.classList.replace('text-accent','text-ok');
+                } catch(e) { toast('Error al cargar','err'); btn.innerHTML = 'Cargar'; btn.disabled = false; }
+            });
+            res.appendChild(el);
+        });
+    } catch(e) {
+        st.classList.add('hidden');
+        toast('Error: ' + e.message, 'err');
+        res.innerHTML = '<p class="text-err text-xs text-center py-4">No se pudo acceder. Probá con un enlace de GitHub.</p>';
+    }
+}
+
+/* Helper: Obtener archivos de una carpeta en GitHub via API */
+async function fetchGithubFiles(user, repo, path) {
+    const url = path 
+        ? `https://api.github.com/repos/${user}/${repo}/contents/${path}`
+        : `https://api.github.com/repos/${user}/${repo}/contents/`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('Error de API GitHub');
+    const data = await r.json();
+    
+    /* Si es un archivo suelto (no un array), devolverlo como array */
+    if (!Array.isArray(data)) return [data];
+    
+    /* Si es una carpeta, devolver solo archivos (no subcarpetas) */
+    return data.filter(f => f.type === 'file');
+}
+$('ex-stmsg').textContent='Conectando...';try{const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);if(!r.ok)throw new Error('No se pudo acceder');$('ex-stmsg').textContent='Buscando M3U...';const html=await r.text(),found=new Set();let m;const hR=/href=["']([^"']*(?:\.m3u8?|\.M3U8?)[^"']*)["']/gi;while((m=hR.exec(html))!==null)found.add(m[1]);const uR=/https?:\/\/[^\s"'<>]+\.m3u8?[^\s"'<>]*/gi;while((m=uR.exec(html))!==null)found.add(m[0]);const rR=/https?:\/\/raw\.githubusercontent\.com\/[^\s"'<>]+/gi;while((m=rR.exec(html))!==null){if(m[0].match(/\.(m3u8?|M3U8?)(\?|$)/))found.add(m[0])}st.classList.add('hidden');let links=[...found].filter(u=>u.startsWith('http'));if(url.includes('github.com')){const gh=url.match(/github\.com\/([^\/]+)\/([^\/]+)/);if(gh){$('ex-stmsg').textContent='Buscando via API GitHub...';st.classList.remove('hidden');try{const ar=await fetch(`https://api.github.com/repos/${gh[1]}/${gh[2]}/contents/`);if(ar.ok){const files=await ar.json();for(const f of files)if(f.name.match(/\.(m3u8?|M3U8?)$/i)&&f.download_url)links.push(f.download_url)}}catch(e){}st.classList.add('hidden')}}const unique=[...new Set(links)];if(!unique.length){emp.classList.remove('hidden');return}res.innerHTML='';unique.forEach(link=>{const fn=link.split('/').pop().split('?')[0],el=document.createElement('div');el.className='link-found bg-card border border-bdr rounded-lg p-3';el.innerHTML=`<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-code text-accent text-sm"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${fn}</p><p class="text-[10px] text-muted/60 truncate mt-0.5">${link}</p></div><button class="ex-load-btn shrink-0 px-3 py-1.5 rounded-lg bg-accent/15 text-accent text-xs font-medium hover:bg-accent/25 transition">Cargar</button></div>`;el.querySelector('.ex-load-btn').addEventListener('click',async()=>{const btn=el.querySelector('.ex-load-btn');btn.innerHTML='<i class="fa-solid fa-spinner spin"></i>';btn.disabled=true;try{const r=await fetch(link);if(!r.ok)throw 0;const t=await r.text(),p=pM(t,'ex');if(!p.length)throw 0;doM(p,fn);aH(fn,link,p.length);toast(`+${p.length} canales`,'ok');btn.innerHTML='<i class="fa-solid fa-check"></i>';btn.classList.replace('text-accent','text-ok')}catch(e){toast('Error al cargar','err');btn.innerHTML='Cargar';btn.disabled=false}});res.appendChild(el)})}catch(e){st.classList.add('hidden');toast('Error: '+e.message,'err');res.innerHTML='<p class="text-err text-xs text-center py-4">No se pudo acceder. Usá "Mi Editor" o "Pegar texto".</p>'}}
 
 /* ===================================================================
    REPRODUCTOR HLS
