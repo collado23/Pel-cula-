@@ -95,7 +95,6 @@
 
 <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
 <main id="mainc" class="relative z-10 max-w-7xl mx-auto px-4 py-6" style="display:none">
-    <!-- Banner de carga de listas -->
     <div class="bg-gradient-to-r from-accent/10 via-card to-card border border-accent/20 rounded-xl p-5 mb-6">
         <div class="flex items-center gap-3 mb-4">
             <div class="w-11 h-11 rounded-xl bg-accent/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-folder-plus text-accent text-lg"></i></div>
@@ -109,13 +108,10 @@
             <button id="bb-explorer" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition col-span-2 sm:col-span-1"><i class="fa-solid fa-globe"></i>Explorar web</button>
         </div>
     </div>
-
-    <!-- Historial -->
     <div id="histsec" class="mb-6 hidden">
         <div class="flex items-center justify-between mb-2"><h3 class="text-xs font-medium text-muted"><i class="fa-solid fa-clock-rotate-left mr-1.5"></i>Cargadas recientemente</h3><button id="bclrh" class="text-[10px] text-muted/50 hover:text-err transition">Limpiar</button></div>
         <div id="histlist" class="flex gap-2 overflow-x-auto cs pb-1"></div>
     </div>
-
     <div class="flex items-center justify-between mb-4">
         <div><h2 id="gtitle" class="font-display text-xl font-bold">Todos los canales</h2><p id="gcount" class="text-xs text-muted mt-0.5">0 canales</p></div>
         <div class="text-xs text-muted"><i class="fa-solid fa-clock mr-1"></i><span id="lup">-</span></div>
@@ -125,7 +121,7 @@
     <div id="emptyst" class="hidden text-center py-20"><i class="fa-solid fa-satellite-dish text-5xl text-bdr mb-4 block"></i><p class="text-muted text-sm">No se encontraron canales</p></div>
 </main>
 
-<!-- ==================== NOW PLAYING (barra inferior) ==================== -->
+<!-- ==================== NOW PLAYING ==================== -->
 <div id="npbar" class="nb fixed bottom-0 left-0 right-0 z-30 hidden px-4 py-3">
     <div class="max-w-7xl mx-auto flex items-center gap-4">
         <div class="flex items-center gap-3 flex-1 min-w-0"><span class="live-dot w-2 h-2 rounded-full bg-err shrink-0"></span><span id="npn" class="text-sm font-medium truncate">-</span></div>
@@ -143,7 +139,7 @@
             <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-file-pen text-accent mr-2"></i>Mi Editor M3U</h3>
             <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <p class="text-muted text-xs mb-4">Guardá y editá tus listas M3U como en un Bloc de Notas. Todo se guarda en tu navegador.</p>
+        <p class="text-muted text-xs mb-4">Guardá y editá tus listas M3U. Todo se guarda en tu navegador.</p>
         <div class="flex items-center justify-between mb-2">
             <span class="text-xs font-medium text-muted">Mis listas guardadas</span>
             <button id="ed-new" class="text-xs text-accent hover:text-accent-h transition font-medium"><i class="fa-solid fa-plus mr-1"></i>Nueva</button>
@@ -262,8 +258,7 @@
             <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-clapperboard text-accent mr-2"></i>Buscar Peliculas</h3>
             <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
         </div>
-
-        <!-- Configuracion de API Key -->
+        <!-- Configuracion API Key -->
         <div id="tmdb-key-section" class="bg-bg border border-bdr rounded-lg p-3 mb-4">
             <div class="flex items-center gap-2 mb-2">
                 <i class="fa-solid fa-key text-accent text-xs"></i>
@@ -276,7 +271,6 @@
             </div>
             <p class="text-[10px] text-muted/40 mt-1.5">Obtene tu clave gratuita en themoviedb.org/settings/api</p>
         </div>
-
         <!-- Busqueda -->
         <div class="flex gap-2 mb-3">
             <div class="flex-1 relative">
@@ -289,24 +283,20 @@
                 <option value="multi">Todo</option>
             </select>
         </div>
-
         <!-- Tabs rapidos -->
-        <div class="flex gap-1.5 mb-4" id="tmdb-tabs">
+        <div class="flex gap-1.5 mb-4 flex-wrap" id="tmdb-tabs">
             <button data-tab="trending" class="tmdb-tab px-3 py-1.5 rounded-full text-[10px] font-medium border transition bg-card text-muted border-bdr hover:border-accent/40">Tendencias</button>
             <button data-tab="popular" class="tmdb-tab px-3 py-1.5 rounded-full text-[10px] font-medium border transition bg-card text-muted border-bdr hover:border-accent/40">Populares</button>
             <button data-tab="top_rated" class="tmdb-tab px-3 py-1.5 rounded-full text-[10px] font-medium border transition bg-card text-muted border-bdr hover:border-accent/40">Mejor valoradas</button>
             <button data-tab="now_playing" class="tmdb-tab px-3 py-1.5 rounded-full text-[10px] font-medium border transition bg-card text-muted border-bdr hover:border-accent/40">En cartel</button>
             <button data-tab="upcoming" class="tmdb-tab px-3 py-1.5 rounded-full text-[10px] font-medium border transition bg-card text-muted border-bdr hover:border-accent/40">Proximanente</button>
         </div>
-
-        <!-- Estado de carga -->
+        <!-- Carga -->
         <div id="tmdb-loading" class="hidden text-center py-8"><i class="fa-solid fa-spinner spin text-accent text-2xl mb-3 block"></i><p class="text-muted text-xs">Buscando...</p></div>
-
         <!-- Resultados -->
         <div id="tmdb-results" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[50vh] overflow-y-auto"></div>
-        <div id="tmdb-empty" class="hidden text-center py-8"><i class="fa-solid fa-film text-3xl text-bdr mb-3 block"></i><p class="text-muted text-xs" id="tmdb-empty-msg">Configurá tu API Key para empezar</p></div>
-
-        <!-- Detalle de pelicula -->
+        <div id="tmdb-empty" class="text-center py-8"><i class="fa-solid fa-film text-3xl text-bdr mb-3 block"></i><p class="text-muted text-xs" id="tmdb-empty-msg">Configurá tu API Key para empezar</p></div>
+        <!-- Detalle -->
         <div id="tmdb-detail" class="hidden">
             <button id="tmdb-detail-back" class="text-xs text-accent hover:text-accent-h transition mb-3 inline-flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i>Volver</button>
             <div class="flex gap-4">
@@ -317,8 +307,8 @@
                         <span id="td-year" class="text-[10px] text-muted bg-card px-2 py-0.5 rounded-full">-</span>
                         <span id="td-rating" class="text-[10px] text-accent bg-accent/15 px-2 py-0.5 rounded-full"><i class="fa-solid fa-star mr-0.5"></i>-</span>
                         <span id="td-runtime" class="text-[10px] text-muted bg-card px-2 py-0.5 rounded-full">-</span>
-                        <span id="td-genres" class="text-[10px] text-muted">-</span>
                     </div>
+                    <p id="td-genres" class="text-[10px] text-muted mb-2">-</p>
                     <p id="td-overview" class="text-xs text-muted leading-relaxed mb-3">-</p>
                     <div class="flex gap-2 flex-wrap">
                         <button id="td-search-stream" class="px-3 py-1.5 rounded-lg bg-accent text-bg text-[11px] font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-satellite-dish mr-1"></i>Buscar stream</button>
@@ -335,6 +325,8 @@
     <div class="max-w-7xl mx-auto px-4 py-6 text-center"><p class="text-muted text-xs">StreamVault &mdash; TV Argentina e IPTV</p></div>
 </footer>
 
+<!-- ========== SCRIPTS: archivos de listas primero, despues la app ========== -->
+<script src="canales.js"></script>
 <script src="app.js"></script>
 </body>
-                                                                                </html>
+                                        </html>
