@@ -2,25 +2,25 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StreamVault Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#0f0f1a] text-white">
-    <div class="p-4">
-        <h1 class="text-2xl font-bold text-[#e8a020] mb-4">StreamVault Pro</h1>
-        
-        <div class="flex gap-2 mb-4">
-            <button onclick="cargarLista('tv/canales.m3u')" class="bg-green-700 px-4 py-2 rounded">📺 Cargar TV</button>
-            <button onclick="cargarLista('peliculas/listado.m3u')" class="bg-blue-700 px-4 py-2 rounded">🎬 Mis Pelis</button>
-        </div>
-
-        <input type="text" id="buscador" oninput="buscarTMDB(this.value)" 
-               placeholder="🔍 Buscar estrenos nuevos (TMDB)..." 
-               class="w-full p-2 bg-[#181822] border border-[#2a2a3a] rounded mb-4">
-
-        <div id="loader" class="hidden text-[#e8a020]">Cargando...</div>
-        <div id="container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+<body class="bg-[#0f0f1a] text-white p-4">
+    <h1 class="text-2xl font-bold text-[#e8a020] mb-4">StreamVault Pro</h1>
+    
+    <div class="flex gap-2 mb-6">
+        <button onclick="cargarLista('canales.m3u')" class="bg-green-700 hover:bg-green-600 px-4 py-2 rounded font-bold text-sm">📺 TV en Vivo</button>
+        <button onclick="cargarLista('listado.m3u')" class="bg-blue-700 hover:bg-blue-600 px-4 py-2 rounded font-bold text-sm">🎬 Mis Pelis</button>
     </div>
+
+    <input type="text" oninput="buscarTMDB(this.value)" 
+           placeholder="🔍 Buscar estrenos..." 
+           class="w-full p-3 bg-[#181822] border border-[#2a2a3a] rounded mb-6 text-white">
+
+    <div id="loader" class="hidden text-[#e8a020] mb-4">Cargando contenido...</div>
+    <div id="container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+
     <script src="app.js"></script>
 </body>
 </html>
