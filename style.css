@@ -2,104 +2,58 @@
 *{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#2a2a3a transparent}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);overflow-x:hidden;margin:0}
-
-/* === Fondo atmosferico === */
 .bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 400px at 20% 10%,rgba(232,160,32,.06),transparent),radial-gradient(ellipse 500px 500px at 80% 80%,rgba(220,80,50,.04),transparent);animation:gl 20s ease-in-out infinite alternate}
 @keyframes gl{to{opacity:.7;transform:scale(1.1)}}
-
-/* === Animaciones === */
 @keyframes lp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
 .live-dot{animation:lp 1.5s ease-in-out infinite}
-
 @keyframes sd{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
 .pe{animation:sd .4s cubic-bezier(.16,1,.3,1)}
-
 @keyframes ci{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .cf{animation:ci .35s ease-out both}
-
-/* === Scroll horizontal con snap === */
 .cs{overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
 .cs>*{scroll-snap-align:start}
-
-/* === Toasts === */
 @keyframes tI{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
 .ti{animation:tI .35s ease-out}
 @keyframes tO{to{opacity:0;transform:translateX(40px)}}
 .to{animation:tO .3s ease-in forwards}
-
-/* === Reproductor de video === */
 .vw video{width:100%;display:block;background:#000;border-radius:8px}
 .vs{-webkit-appearance:none;appearance:none;height:4px;background:#2a2a3a;border-radius:2px;outline:none}
 .vs::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--accent);border-radius:50%;cursor:pointer}
-
-/* === Modales === */
 .mo{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
 .mo.on{opacity:1;pointer-events:auto}
 .mb{background:#181822;border:1px solid #2a2a3a;border-radius:16px;padding:24px;max-width:620px;width:94%;max-height:88vh;overflow-y:auto;transform:scale(.95);transition:transform .25s}
 .mo.on .mb{transform:scale(1)}
-
-/* === Barra now playing === */
 .nb{backdrop-filter:blur(16px);background:rgba(17,17,24,.92);border-top:1px solid #2a2a3a}
-
-/* === Pantalla de bloqueo === */
 .ls{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .5s,transform .5s}
 .ls.out{opacity:0;transform:scale(1.05);pointer-events:none}
 @keyframes lb{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .lk{animation:lb 2s ease-in-out infinite}
-
-/* === PIN dots === */
 .pd{width:12px;height:12px;border-radius:50%;border:2px solid #2a2a3a;transition:all .2s}
 .pd.f{background:var(--accent);border-color:var(--accent)}
 .pd.e{background:#ef4444;border-color:#ef4444;animation:sh .4s}
 @keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-
-/* === Teclado PIN === */
 .kb{width:68px;height:68px;border-radius:50%;background:#181822;border:1px solid #2a2a3a;color:#eaeaf0;font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;user-select:none}
 .kb:hover{background:#20202e;border-color:#e8a020;color:#e8a020}
 .kb:active{transform:scale(.92);background:#e8a020;color:#0a0a0f}
-
-/* === Spinner === */
 @keyframes sp{to{transform:rotate(360deg)}}
 .spin{animation:sp 1s linear infinite}
-
-/* === Dropzone === */
 .dz{border:2px dashed #2a2a3a;border-radius:12px;transition:all .25s;cursor:pointer}
 .dz:hover,.dz.do{border-color:var(--accent);background:rgba(232,160,32,.05)}
-
-/* === Tabs de categorias === */
-.tb{transition:all .2s}
-.tb.on{color:var(--accent);border-color:var(--accent);background:rgba(232,160,32,.1)}
-
-/* === Items hover === */
 .hi{transition:all .15s}
 .hi:hover{background:#20202e}
-
-/* === Textarea paste/editor === */
 .pa{background:#0a0a0f;border:2px dashed #2a2a3a;border-radius:12px;transition:all .25s;resize:vertical;min-height:200px;font-family:'DM Sans',monospace;font-size:12px;color:#eaeaf0;line-height:1.5}
 .pa:focus{border-color:var(--accent);outline:none}
 .pa::placeholder{color:#4a4a5a}
-
-/* === Editor: items de lista === */
 .ed-item{transition:all .15s;cursor:pointer}
 .ed-item:hover{background:#20202e}
 .ed-item.active{border-color:rgba(232,160,32,.4);background:rgba(232,160,32,.05)}
-
-/* === Explorador: links encontrados === */
 .link-found{transition:all .15s}
 .link-found:hover{background:#20202e;border-color:rgba(232,160,32,.3)}
-
-/* === TMDB: cards de peliculas === */
 .tmdb-card{transition:all .2s;cursor:pointer}
 .tmdb-card:hover{transform:translateY(-4px);border-color:rgba(232,160,32,.4)}
 .tmdb-card:hover .tmdb-card-overlay{opacity:1}
 .tmdb-card-overlay{opacity:0;transition:opacity .2s}
-
-/* === TMDB: tabs === */
 .tmdb-tab{transition:all .15s}
 .tmdb-tab.on{color:var(--accent);border-color:var(--accent);background:rgba(232,160,32,.1)}
-
-/* === Accesibilidad === */
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-
-/* === Responsive pequeno === */
 @media(max-width:380px){.kb{width:58px;height:58px;font-size:18px}}
