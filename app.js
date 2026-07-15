@@ -1,88 +1,48 @@
-let canales = [];
+const61f4c33ea3300d41b27b413ae33b4b64';
 
-// 1. Carga Inteligente (Optimizado para listas muy largas)
+// 1. Cargar tus listas M3U
 async function cargarLista(ruta) {
+    const container = document.getElementById('container');
     const loader = document.getElementById('loader');
-    if (loader) loader.classList.remove('hidden');
-
+    loader.classList.remove('hidden');
+    container.innerHTML = '';
+    
     try {
-        const response = await fetch(ruta);
-        const text = await response.text();
+        const res = await fetch(ruta);
+        const text = await res.text();
         const lines = text.split('\n');
         
-        canales = [];
-        let meta = null;
-
-        // Procesamos la lista rápidamente
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
+        lines.forEach(line => {
             if (line.startsWith('#EXTINF')) {
-                // Extrae el nombre después de la última coma
-                const name = line.includes(',') ? line.split(',').pop().trim() : "Sin nombre";
-                meta = { name };
-            } else if (line.trim().startsWith('http') && meta) {
-                canales.push({ ...meta, url: line.trim() });
-                meta = null;
+                const nombre = line.split(',').pop();
+                const card = document.createElement('div');
+                card.className = 'bg-[#181822] p-3 rounded border border-[#2a2a3a] text-[12px] text-center cursor-pointer hover:border-[#e8a020]';
+                card.innerText = nombre;
+                card.onclick = () => alert("Abriendo: " + nombre);
+                container.appendChild(card);
             }
-        }
-        
-        render(canales);
-        alert(`¡Lista cargada exitosamente! Total de canales: ${canales.length}`);
-    } catch (e) { 
-        alert("Error al cargar la lista: " + e.message); 
-    } finally {
-        if (loader) loader.classList.add('hidden');
-    }
+        });
+    } catch (e) { alert("Error al cargar el archivo: " + ruta); }
+    loader.classList.add('hidden');
 }
 
-// 2. Renderizado de alto rendimiento
-function render(lista) {
+// 2. Buscador inteligente TMDB
+async function buscarTMDB(query) {
+    if (query.length < 3) return;
     const container = document.getElementById('container');
-    if (!container) return;
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`;
     
-    // Limpiamos y agregamos contador
-    container.innerHTML = `<div class="p-4 text-[#e8a020] font-bold">Canales disponibles: ${lista.length}</div>`;
-    
-    const grid = document.createElement('div');
-    grid.className = 'grid grid-cols-2 md:grid-cols-4 gap-2 p-2';
-    
-    // Solo renderizamos los primeros 500 para no trabar el celular
-    // Si quieres ver todos, quita el .slice(0, 500)
-    lista.slice(0, 500).forEach(c => {
-        const card = document.createElement('div');
-        card.className = 'bg-[#181822] p-3 rounded text-[11px] truncate border border-[#2a2a3a] hover:border-[#e8a020] cursor-pointer text-white';
-        card.innerText = c.name;
-        card.onclick = () => window.open(c.url, '_blank');
-        grid.appendChild(card);
-    });
-    
-    container.appendChild(grid);
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        container.innerHTML = '';
+        data.results.forEach(p => {
+            if (!p.poster_path) return;
+            const card = document.createElement('div');
+            card.innerHTML = `<img src="https://image.tmdb.org/t/p/w200${p.poster_path}" class="rounded w-full mb-2">
+                              <h3 class="text-[10px] text-white">${p.title}</h3>`;
+            card.onclick = () => window.open(`https://www.google.com/search?q=${p.title}+pelicula+online`, '_blank');
+            container.appendChild(card);
+        });
+    } catch (e) { console.error(e); }
 }
-
-// 3. Limpiador por lotes (Evita colapso de memoria)
-async function limpiarCaidos() {
-    const loader = document.getElementById('loader');
-    if (loader) loader.classList.remove('hidden');
-    
-    let nuevosCanales = [];
-    const batchSize = 20; // Verificamos de a 20 para ser muy livianos
-
-    for (let i = 0; i < canales.length; i += batchSize) {
-        const batch = canales.slice(i, i + batchSize);
-        const resultados = await Promise.all(batch.map(async (c) => {
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 2000);
-                const res = await fetch(c.url, { method: 'HEAD', mode: 'no-cors', signal: controller.signal });
-                clearTimeout(timeout);
-                return res ? c : null;
-            } catch { return null; }
-        }));
-        nuevosCanales.push(...resultados.filter(c => c !== null));
-    }
-
-    canales = nuevosCanales;
-    render(canales);
-    if (loader) loader.classList.add('hidden');
-    alert(`Limpieza completada. Canales activos: ${canales.length}`);
-        }
