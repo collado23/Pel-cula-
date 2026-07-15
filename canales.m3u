@@ -5555,3 +5555,36 @@ http://Siguenos_KDmovis_KDWhatsApp.mp4
 
 #EXTINF:-1 tvg-logo="https://archive.org/download/31b-06776ceb-4b-9fc-1ea-84a-145b-235f-15/K%26D%20logo%2031.png" group-title="▶️ ENTRA AQUI ☆★K&D IPTV☆★ ✅",CONTINUA Y DISFRUTA DE TODO EL CONTENDO MULTIMEDIA k&D IPTV 
 https://raw.githubusercontent.com/david2803/Iptv/main/K%26D.m3u
+#EXTM3U
+#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_america-tv_m.png" group-title="Argentina",America TV
+https://stream-gtlc.telecentro.net.ar/hls/americatvHD/americatvHD.m3u8
+#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_telefe-hd_m.png" group-title="Argentina",Telefe HD
+https://stream-gtlc.telecentro.net.ar/hls/telefeHD/telefeHD.m3u8
+#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_el-trece-hd_m.png" group-title="Argentina",El Trece HD
+https://stream-gtlc.telecentro.net.ar/hls/el13HD/el13HD.m3u8
+#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_el-nueve_m.png" group-title="Argentina",El Nueve
+https://stream-gtlc.telecentro.net.ar/hls/elnueveHD/elnueveHD.m3u8
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Canal_7_Argentina_logo.svg/200px-Canal_7_Argentina_logo.svg.png" group-title="Argentina",Canal 7 Publica
+https://stream-gtlc.telecentro.net.ar/hls/canal7HD/canal7HD.m3u8
+#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_cronica-tv_m.png" group-title="Noticias",Cronica TV
+https://stream-gtlc.telecentro.net.ar/hls/cronicatvHD/cronicatvHD.m3u8
+#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_canal-26_m.png" group-title="Noticias",Canal 26
+https://stream-gtlc.telecentro.net.ar/hls/canal26HD/canal26HD.m3u8
+#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_a24_m.png" group-title="Noticias",A24
+https://stream-gtlc.telecentro.net.ar/hls/a24HD/a24HD.m3u8
+#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_tyc-sports_m.png" group-title="Deportes",TyC Sports
+https://stream-gtlc.telecentro.net.ar/hls/tycsportsHD/tycsportsHD.m3u8
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Logo_Telecentro.svg/200px-Logo_Telecentro.svg.png" group-title="Argentina",Telecentro
+https://stream-gtlc.telecentro.net.ar/hls/telecentroHD/telecentroHD.m3u8
+#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_net-tv_m.png" group-title="Argentina",Net TV
+https://stream-gtlc.telecentro.net.ar/hls/nettvHD/nettvHD.m3u8
+#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_magazine_m.png" group-title="Entretenimiento",Magazine
+https://stream-gtlc.telecentro.net.ar/hls/magazineHD/magazineHD.m3u8
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Cnn_en_espa%C3%B1ol_logo.svg/200px-Cnn_en_espa%C3%B1ol_logo.svg.png" group-title="Noticias",CNNE
+https://d1gymyavdvyjgt.cloudfront.net/v1/manifest/3722c60a815c199d9c1ef46cf4e8a03207b528c4/cnn-espanol/PROD/index.m3u8
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Deportv_logo.svg/200px-Deportv_logo.svg.png" group-title="Deportes",DeporTV
+https://d1gymyavdvyjgt.cloudfront.net/v1/manifest/3722c60a815c199d9c1ef46cf4e8a03207b528c4/deportv/PROD/index.m3u8
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Pakapaka_logo.svg/200px-Pakapaka_logo.svg.png" group-title="Infantil",Pakapaka
+https://d1gymyavdvyjgt.cloudfront.net/v1/manifest/3722c60a815c199d9c1ef46cf4e8a03207b528c4/pakapaka/PROD/index.m3u8
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Encuentro_logo.svg/200px-Encuentro_logo.svg.png" group-title="Documentales",Encuentro
+https://d1gymyavdvyjgt.cloudfront.net/v1/manifest/3722c60a815c199d9c1ef46cf4e8a03207b528c4/encuentro/PROD/index.m3u8
