@@ -1,300 +1,262 @@
 /* ===================================================================
-   StreamVault - App Principal
-   =================================================================== */
-function $(id){return document.getElementById(id)}
-function toast(m,t){const c=$('toasts'),cs={info:'border-accent bg-accent/10 text-accent',ok:'border-ok bg-ok/10 text-ok',err:'border-err bg-err/10 text-err',warn:'border-warn bg-warn/10 text-warn'},is={info:'fa-circle-info',ok:'fa-circle-check',err:'fa-circle-xmark',warn:'fa-triangle-exclamation'},e=document.createElement('div');e.className=`ti flex items-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-medium ${cs[t||'info']}`;e.innerHTML=`<i class="fa-solid ${is[t||'info']}"></i><span>${m}</span>`;c.appendChild(e);setTimeout(()=>{e.classList.replace('ti','to');setTimeout(()=>e.remove(),300)},3500)}
-function oM(id){$(id).classList.add('on')}
-function cM(id){$(id).classList.remove('on')}
-function nm(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
-function fsz(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
-
-/* ===================================================================
-   CLAVE PIN
-   =================================================================== */
-async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
-const PN={v:'',m:'login',l:true,a:0};
-function initLock(){const s=localStorage.getItem('svp'),t=$('lkt'),b=$('lks');if(s){PN.m='login';t.textContent='StreamVault';b.textContent='Ingresá tu clave'}else{PN.m='setup';t.textContent='Crear clave';b.textContent='Elegí un PIN de 4 digitos';document.querySelector('.lk').innerHTML='<i class="fa-solid fa-lock-open"></i>'}document.querySelectorAll('#keypad .kb').forEach(e=>e.addEventListener('click',()=>hK(e.dataset.k)));document.addEventListener('keydown',e=>{if(!PN.l)return;if(e.key>='0'&&e.key<='9')hK(e.key);else if(e.key==='Backspace')hK('d')})}
-async function hK(k){if(!PN.l)return;$('lke').style.opacity='0';if(k==='d'){PN.v=PN.v.slice(0,-1);uD();return}if(/^\d$/.test(k)&&PN.v.length<4){PN.v+=k;uD();if(PN.v.length===4)setTimeout(sP,200)}}
-function uD(){document.querySelectorAll('#pind .pd').forEach((d,i)=>{d.className='pd'+(i<PN.v.length?' f':'')})}
-async function sP(){const h=await sha(PN.v),er=$('lke'),ds=document.querySelectorAll('#pind .pd');if(PN.m==='setup'){localStorage.setItem('svp',h);unl()}else if(h===localStorage.getItem('svp')){PN.a=0;unl()}else{PN.a++;ds.forEach(d=>{d.className='pd e'});er.textContent=PN.a>=3?'Demasiados intentos.':'Clave incorrecta';er.style.opacity='1';setTimeout(()=>{PN.v='';uD()},600)}}
-function unl(){PN.l=false;$('lock-screen').classList.add('out');setTimeout(()=>{$('lock-screen').style.display='none';showApp()},500)}
-function lockApp(){if(pl){pl.x();pl=null}PN.l=true;PN.v='';PN.a=0;uD();$('lke').style.opacity='0';$('lock-screen').style.display='flex';setTimeout(()=>$('lock-screen').classList.remove('out'),50);if(localStorage.getItem('svp')){PN.m='login';$('lkt').textContent='StreamVault';$('lks').textContent='Ingresá tu clave';document.querySelector('.lk').innerHTML='<i class="fa-solid fa-lock"></i>'}['hdr','mainc','ftr'].forEach(i=>$(i).style.display='none');$('psec').classList.add('hidden');$('npbar').classList.add('hidden')}
-function showApp(){['hdr','mainc','ftr'].forEach(i=>$(i).style.display='');initApp()}
-
-/* ===================================================================
-   ESTADO
-   =================================================================== */
-const DL=[{i:'ar',n:'Argentina',u:'https://iptv-org.github.io/iptv/countries/ar.m3u'},{i:'sa',n:'Sudamerica',u:'https://iptv-org.github.io/iptv/regions/south-america.m3u'},{i:'la',n:'Latinoamerica',u:'https://iptv-org.github.io/iptv/regions/latin-america.m3u'},{i:'sp',n:'Espanol',u:'https://iptv-org.github.io/iptv/languages/spa.m3u'},{i:'ds',n:'Deportes',u:'https://iptv-org.github.io/iptv/categories/sports.m3u'},{i:'mv',n:'Peliculas',u:'https://iptv-org.github.io/iptv/categories/movies.m3u'},{i:'nw',n:'Noticias',u:'https://iptv-org.github.io/iptv/categories/news.m3u'},{i:'en',n:'Entretenimiento',u:'https://iptv-org.github.io/iptv/categories/entertainment.m3u'},{i:'mu',n:'Musica',u:'https://iptv-org.github.io/iptv/categories/music.m3u'},{i:'ki',n:'Infantil',u:'https://iptv-org.github.io/iptv/categories/kids.m3u'},{i:'dc',n:'Documentales',u:'https://iptv-org.github.io/iptv/categories/documentary.m3u'}];
-const AK=['argentina','america tv','telefe','canal 13','elnueve','canal 9','canal 7','publica','tyc sports','fox sports argentina','espn argentina','depotv','flow','telecentro','cronica','canal 26','a24','ln+','cablenoticias','cn23','misiones','formosa','cordoba','rosario','mendoza','tucuman','salta','net tv','magazine','panamericana'];
-const CK={deportes:['deporte','sports','futbol','football','soccer','nba','nfl','f1','formula','tenis','boxeo','wwe','ufc','motor','racing','bein','espn','fox sport','tyc sport','directv sport'],peliculas:['pelicula','movie','film','cinema','cine','amc','star cinema','golden','paramount'],series:['serie','series','show','sitcom','comedia','drama'],noticias:['noticia','news','24h','24 hor','cnne','telefe','milenio','adn40','cronica','canal 26','a24','ln+','cable','cn23'],musica:['musica','music','mtv','vh1','hit','radio','concert','banda','rock','pop','jazz'],infantil:['infantil','kids','children','nickelodeon','cartoon','disney channel','anime','boomerang','baby','nick','pj mask','paw patrol'],documentales:['documental','documentary','discovery','nat geo','national geographic','history','historia','animal','natura'],entretenimiento:['entretenimiento','entertainment','reality','variedad','programa','concurso','televisa','univision','magazine']};
-const S={all:[],fl:[],cat:'all',q:'',fov:false,fav:JSON.parse(localStorage.getItem('svf')||'[]'),d:0,pp:48,cur:null,ini:false};
-let lft=null,lfn='',editingId=null;
-
-/* ===================================================================
-   EDITOR PROPIO
-   =================================================================== */
-function gEd(){return JSON.parse(localStorage.getItem('sve')||'[]')}
-function sEd(list){localStorage.setItem('sve',JSON.stringify(list))}
-function rEdList(){const list=gEd(),el=$('ed-list');if(!list.length){el.innerHTML='<p class="text-muted/50 text-xs text-center py-4">No hay listas guardadas.</p>';return}el.innerHTML='';list.forEach(item=>{const ch=pM(item.text,'e').length,d=document.createElement('div');d.className='ed-item flex items-center gap-3 p-2.5 rounded-lg border border-bdr'+(editingId===item.id?' active':'');d.innerHTML=`<div class="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines text-accent text-xs"></i></div><div class="flex-1 min-w-0"><p class="text-xs font-medium truncate">${item.name}</p><p class="text-[10px] text-muted/50">${ch} canales</p></div><div class="flex gap-1 shrink-0"><button class="ed-load-btn w-7 h-7 rounded-md hover:bg-accent/20 flex items-center justify-center text-muted hover:text-accent transition text-xs"><i class="fa-solid fa-play"></i></button><button class="ed-edit-btn w-7 h-7 rounded-md hover:bg-card flex items-center justify-center text-muted hover:text-txt transition text-xs"><i class="fa-solid fa-pen"></i></button></div>`;d.querySelector('.ed-load-btn').addEventListener('click',e=>{e.stopPropagation();loadFT(item.text,item.name);cM('m-editor')});d.querySelector('.ed-edit-btn').addEventListener('click',e=>{e.stopPropagation();openEditor(item.id)});d.addEventListener('click',()=>openEditor(item.id));el.appendChild(d)})}
-function openEditor(id){const list=gEd();editingId=id;rEdList();const area=$('ed-area');area.classList.remove('hidden');if(id){const item=list.find(x=>x.id===id);if(item){$('ed-name').value=item.name;$('ed-text').value=item.text;updEdCount()}}else{$('ed-name').value='';$('ed-text').value='';$('ed-count').textContent='Sin contenido';$('ed-del').classList.add('hidden')}}
-function updEdCount(){const t=$('ed-text').value.trim();if(!t){$('ed-count').textContent='Sin contenido';return}const urls=t.split('\n').filter(l=>l.trim().startsWith('http')).length,exts=t.split('\n').filter(l=>l.trim().startsWith('#EXTINF')).length;$('ed-count').textContent=`${exts} canales / ${urls} enlaces`}
-
-/* ===================================================================
-   HISTORIAL
-   =================================================================== */
-function gH(){return JSON.parse(localStorage.getItem('svh')||'[]')}
-function aH(n,u,c){const h=gH();h.unshift({n,u,c,t:Date.now()});if(h.length>20)h.length=20;localStorage.setItem('svh',JSON.stringify(h));rH()}
-function rH(){const h=gH(),s=$('histsec'),l=$('histlist');if(!h.length){s.classList.add('hidden');return}s.classList.remove('hidden');l.innerHTML='';h.forEach(i=>{const e=document.createElement('button');e.className='hi shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-bdr text-left';e.innerHTML=`<div class="w-7 h-7 rounded-md bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-list text-accent text-[10px]"></i></div><div class="min-w-0"><p class="text-[11px] font-medium truncate max-w-[120px]">${i.n}</p><p class="text-[9px] text-muted/50">${i.c} canales</p></div>`;if(i.u!=='embebida'&&i.u!=='archivo-local')e.addEventListener('click',()=>loadCust(i.u,i.n));l.appendChild(e)})}
-
-/* ===================================================================
-   PARSER M3U
-   =================================================================== */
-function pM(t,sid){const ls=t.split('\n'),ch=[];let c=null;for(const r of ls){const l=r.trim();if(!l)continue;if(l.startsWith('#EXTINF:')){c={};const lm=l.match(/tvg-logo="([^"]*)"/),gm=l.match(/group-title="([^"]*)"/),ci=l.lastIndexOf(',');c.logo=lm?lm[1]:'';c.group=gm?gm[1]:'Otros';c.name=ci>=0?l.substring(ci+1).trim():'Sin nombre';if(!c.name)c.name='Sin nombre'}else if(!l.startsWith('#')&&c){if(l.startsWith('http')||l.startsWith('rtmp')||l.startsWith('rtsp')){c.url=l;c.sid=sid;ch.push(c)}c=null}}return ch}
-function iA(n,g){const t=nm(n+' '+g);return AK.some(k=>t.includes(nm(k)))}
-function cl(n,g){const t=nm(n+' '+g);for(const[c,ks]of Object.entries(CK))for(const k of ks)if(t.includes(nm(k)))return c;return'otros'}
-function mg(ls){const m=new Map();for(const l of ls)for(const c of l){const k=nm(c.name);if(m.has(k)){const e=m.get(k);if(!e.urls.includes(c.url))e.urls.push(c.url);if(!e.logo&&c.logo)e.logo=c.logo;if(c.sid==='ar'&&!e.arg)e.arg=iA(c.name,c.group)}else m.set(k,{name:c.name,logo:c.logo,group:c.group,cat:cl(c.name,c.group),urls:[c.url],sid:c.sid,arg:c.sid==='ar'||iA(c.name,c.group)})}return Array.from(m.values())}
-
-/* ===================================================================
-   CARGA - Detecta automaticamente LISTA_CANALES, LISTA_DEPORTES, etc
-   =================================================================== */
-async function loadAll(force){const ck='sv2',ct='sv3';if(!force){const c=sessionStorage.getItem(ck),ca=parseInt(sessionStorage.getItem(ct)||'0');if(c&&Date.now()-ca<30*60*1000){S.all=JSON.parse(c);return S.all}}
-const bar=$('loadbar'),st=$('loadst');
-let d=0,totalEst=0;
-
-/* Detectar listas locales desde archivos .js externos */
-const locales=[];
-if(typeof LISTA_CANALES!=='undefined'&&LISTA_CANALES.trim())locales.push({nombre:'Canales',texto:LISTA_CANALES,sid:'local'});
-if(typeof LISTA_DEPORTES!=='undefined'&&LISTA_DEPORTES.trim())locales.push({nombre:'Deportes',texto:LISTA_DEPORTES,sid:'local'});
-if(typeof LISTA_PELICULAS!=='undefined'&&LISTA_PELICULAS.trim())locales.push({nombre:'Peliculas',texto:LISTA_PELICULAS,sid:'local'});
-if(typeof LISTA_SERIES!=='undefined'&&LISTA_SERIES.trim())locales.push({nombre:'Series',texto:LISTA_SERIES,sid:'local'});
-if(typeof LISTA_MUSICA!=='undefined'&&LISTA_MUSICA.trim())locales.push({nombre:'Musica',texto:LISTA_MUSICA,sid:'local'});
-
-totalEst=locales.length+DL.length+2; /* +2 por las embebidas de respaldo */
-const embebidas=[];
-
-/* Cargar listas locales */
-for(const l of locales){const p=pM(l.texto,l.sid);embebidas.push(p);d++;bar.style.width=`${(d/totalEst)*100}%`;st.textContent=`${l.nombre}: ${p.length} canales`}
-
-/* Respaldo embebido (si no hay locales) */
-if(!locales.length){const a1=pM(M3U_ARG_EMBED,'ar'),a2=pM(M3U_REG_EMBED,'reg');embebidas.push(a1,a2);d+=2;bar.style.width=`${(d/totalEst)*100}%`;st.textContent=`Embebidas: ${a1.length+a2.length}`}
-
-/* Listas remotas */
-const res=await Promise.allSettled(DL.map(async l=>{try{const r=await fetch(l.u);if(!r.ok)throw 0;const t=await r.text(),p=pM(t,l.i);d++;bar.style.width=`${(d/totalEst)*100}%`;st.textContent=`${l.n}: ${p.length}`;return p}catch(e){d++;bar.style.width=`${(d/totalEst)*100}%`;st.textContent=`${l.n}: -`;return[]}}));
-const al=[...embebidas];for(const r of res)if(r.status==='fulfilled'&&r.value.length)al.push(r.value);
-S.all=mg(al);sessionStorage.setItem(ck,JSON.stringify(S.all));sessionStorage.setItem(ct,Date.now().toString());
-const totalLoc=locales.reduce((acc,l)=>acc+pM(l.texto,l.sid).length,0);
-if(totalLoc>0)toast(`${totalLoc} canales de archivo local`,'ok');
-return S.all}
-
-/* Listas embebidas de respaldo */
-const M3U_ARG_EMBED=`#EXTM3U
-#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_america-tv_m.png" group-title="Argentina",America TV
-https://stream-gtlc.telecentro.net.ar/hls/americatvHD/americatvHD.m3u8
-#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_telefe-hd_m.png" group-title="Argentina",Telefe HD
-https://stream-gtlc.telecentro.net.ar/hls/telefeHD/telefeHD.m3u8
-#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_el-trece-hd_m.png" group-title="Argentina",El Trece
-https://stream-gtlc.telecentro.net.ar/hls/el13HD/el13HD.m3u8
-#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_cronica-tv_m.png" group-title="Noticias",Cronica TV
-https://stream-gtlc.telecentro.net.ar/hls/cronicatvHD/cronicatvHD.m3u8
-#EXTINF:-1 tvg-logo="https://cdn.mitvstatic.com/channels/ar_tyc-sports_m.png" group-title="Deportes",TyC Sports
-https://stream-gtlc.telecentro.net.ar/hls/tycsportsHD/tycsportsHD.m3u8`;
-const M3U_REG_EMBED=`#EXTM3U
-#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Cnn_en_espa%C3%B1ol_logo.svg/200px-Cnn_en_espa%C3%B1ol_logo.svg.png" group-title="Noticias",CNNE
-https://d1gymyavdvyjgt.cloudfront.net/v1/manifest/3722c60a815c199d9c1ef46cf4e8a03207b528c4/cnn-espanol/PROD/index.m3u8
-#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Pakapaka_logo.svg/200px-Pakapaka_logo.svg.png" group-title="Infantil",Pakapaka
-https://d1gymyavdvyjgt.cloudfront.net/v1/manifest/3722c60a815c199d9c1ef46cf4e8a03207b528c4/pakapaka/PROD/index.m3u8`;
-
-async function loadCust(url,ln){toast('Cargando lista...','info');try{const r=await fetch(url);if(!r.ok)throw new Error(r.status);const t=await r.text(),p=pM(t,'c');if(!p.length)throw new Error('Lista vacia');doM(p,ln||url.split('/').pop()||'Lista');aH(ln||'Lista',url,p.length);toast(`+${p.length} canales`,'ok')}catch(e){toast('Error: '+e.message,'err')}}
-function loadFT(t,n){const p=pM(t,'f');if(!p.length){toast('Sin canales validos','warn');return}doM(p,n);aH(n,'embebida',p.length);toast(`+${p.length} canales de ${n}`,'ok')}
-function doM(p,n){const fm=new Map();for(const c of S.all)fm.set(nm(c.name),{...c});for(const c of p){const k=nm(c.name);if(fm.has(k)){const e=fm.get(k);if(!e.urls.includes(c.url))e.urls.push(c.url)}else fm.set(k,{name:c.name,logo:c.logo,group:c.group,cat:cl(c.name,c.group),urls:[c.url],sid:'c',arg:iA(c.name,c.group)})}S.all=Array.from(fm.values());applyF()}
-
-/* =====================================/* ===================================================================
-   EXPLORADOR WEB (Mejorado: API de GitHub directa + proxy generico)
+   EXPLORADOR WEB, REPRODUCTOR, GRILLA, FILTROS, TMDB E INICIO
    =================================================================== */
 async function explorePage(url) {
     const st = $('ex-status'), res = $('ex-results'), emp = $('ex-empty');
     st.classList.remove('hidden'); emp.classList.add('hidden'); res.innerHTML = '';
-
-    /* ---- CASO 1: Es una URL de GitHub ---- */
     const ghMatch = url.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);
     if (ghMatch) {
         const user = ghMatch[1], repo = ghMatch[2];
         $('ex-stmsg').textContent = `Buscando en repositorio ${user}/${repo}...`;
-        
         try {
-            /* Buscar en la raiz del repo */
             const rootData = await fetchGithubFiles(user, repo, '');
             let allFiles = [...rootData];
-
-            /* Buscar en subcarpetas comunes donde suelen estar las listas */
             const subcarpetas = ['lists', 'm3u', 'iptv', 'channels', 'src', 'data', 'extras'];
             for (const sub of subcarpetas) {
-                try {
-                    const subData = await fetchGithubFiles(user, repo, sub);
-                    if (subData.length) allFiles = allFiles.concat(subData);
-                } catch(e) { /* la subcarpeta no existe, no pasa nada */ }
+                try { const subData = await fetchGithubFiles(user, repo, sub); if (subData.length) allFiles = allFiles.concat(subData); } catch(e) {}
             }
-
-            /* Filtrar solo archivos M3U */
             const m3uFiles = allFiles.filter(f => f.name.match(/\.(m3u8?|M3U8?)$/i));
-            
             st.classList.add('hidden');
-
-            if (!m3uFiles.length) {
-                emp.classList.remove('hidden');
-                return;
-            }
-
-            res.innerHTML = '';
+            if (!m3uFiles.length) { emp.classList.remove('hidden'); return; }
             m3uFiles.forEach(file => {
                 const link = file.download_url || file.html_url;
                 const size = file.size ? fsz(file.size) : '';
-                const path = file.path || file.name;
                 const el = document.createElement('div');
-                el.className = 'link-found bg-card border border-bdr rounded-lg p-3';
-                el.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0 mt-0.5">
-                            <i class="fa-solid fa-file-code text-accent text-sm"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium truncate">${file.name}</p>
-                            <p class="text-[10px] text-muted/60 truncate mt-0.5">${path}</p>
-                            ${size ? `<p class="text-[9px] text-muted/40 mt-0.5">${size}</p>` : ''}
-                        </div>
-                        <button class="ex-load-btn shrink-0 px-3 py-1.5 rounded-lg bg-accent/15 text-accent text-xs font-medium hover:bg-accent/25 transition">Cargar</button>
-                    </div>`;
-                el.querySelector('.ex-load-btn').addEventListener('click', async () => {
-                    const btn = el.querySelector('.ex-load-btn');
-                    btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i>'; btn.disabled = true;
-                    try {
-                        const r = await fetch(link);
-                        if (!r.ok) throw 0;
-                        const t = await r.text(), p = pM(t, 'ex');
-                        if (!p.length) throw 0;
-                        doM(p, file.name); aH(file.name, link, p.length);
-                        toast(`+${p.length} canales de ${file.name}`, 'ok');
-                        btn.innerHTML = '<i class="fa-solid fa-check"></i>'; btn.classList.replace('text-accent','text-ok');
-                    } catch(e) { toast('Error al cargar','err'); btn.innerHTML = 'Cargar'; btn.disabled = false; }
-                });
+                el.className = 'link-found bg-card border border-bdr rounded-lg p-3 mb-2';
+                el.innerHTML = `<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center"><i class="fa-solid fa-file-code text-accent"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${file.name}</p>${size?`<p class="text-xs text-muted/50">${size}</p>`:''}</div><button class="ex-load-btn px-3 py-1.5 rounded-lg bg-accent text-white text-xs hover:bg-accent/90 transition">Cargar</button></div>`;
+                el.querySelector('.ex-load-btn').addEventListener('click', ()=>{loadCust(link,file.name);cM('m-explorer')});
                 res.appendChild(el);
             });
-
-        } catch(e) {
-            st.classList.add('hidden');
-            toast('Error al acceder al repositorio: ' + e.message, 'err');
-            res.innerHTML = '<p class="text-err text-xs text-center py-4">No se pudo leer el repositorio. Verificá que el nombre sea correcto.</p>';
-        }
-        return;
+            return;
+        } catch(e) { st.classList.add('hidden'); toast('Error al leer repositorio: '+e.message,'err'); return; }
     }
-
-    /* ---- CASO 2: Cualquier otra URL (usa proxy) ---- */
     $('ex-stmsg').textContent = 'Conectando con la pagina...';
     try {
         const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        const resp = await fetch(proxyUrl);
-        if (!resp.ok) throw new Error('No se pudo acceder a la pagina');
-        $('ex-stmsg').textContent = 'Buscando archivos M3U...';
-        const html = await resp.text();
-        const found = new Set();
-        let m;
-        const hR = /href=["']([^"']*(?:\.m3u8?|\.M3U8?)[^"']*)["']/gi;
-        while ((m = hR.exec(html)) !== null) found.add(m[1]);
-        const uR = /https?:\/\/[^\s"'<>]+\.m3u8?[^\s"'<>]*/gi;
-        while ((m = uR.exec(html)) !== null) found.add(m[0]);
-        
+        const resp = await fetch(proxyUrl); if (!resp.ok) throw new Error(resp.status);
+        const html = await resp.text(); const found = new Set(); let m;
+        const hR = /href=["']([^"']*\.(m3u8?|M3U8?)[^"']*)["']/gi;
+        while ((m = hR.exec(html)) !== null) found.add(new URL(m[1], url).href);
         st.classList.add('hidden');
-        const links = [...found].filter(u => u.startsWith('http'));
-        
-        if (!links.length) { emp.classList.remove('hidden'); return; }
-        
-        res.innerHTML = '';
-        const unique = [...new Set(links)];
-        unique.forEach(link => {
-            const fn = link.split('/').pop().split('?')[0];
+        if (!found.size) { emp.classList.remove('hidden'); return; }
+        [...found].forEach(link => {
+            const fn = link.split('/').pop().split('?')[0] || 'Lista.m3u';
             const el = document.createElement('div');
-            el.className = 'link-found bg-card border border-bdr rounded-lg p-3';
-            el.innerHTML = `<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-code text-accent text-sm"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${fn}</p><p class="text-[10px] text-muted/60 truncate mt-0.5">${link}</p></div><button class="ex-load-btn shrink-0 px-3 py-1.5 rounded-lg bg-accent/15 text-accent text-xs font-medium hover:bg-accent/25 transition">Cargar</button></div>`;
-            el.querySelector('.ex-load-btn').addEventListener('click', async () => {
-                const btn = el.querySelector('.ex-load-btn');
-                btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i>'; btn.disabled = true;
-                try {
-                    const r = await fetch(link); if (!r.ok) throw 0;
-                    const t = await r.text(), p = pM(t, 'ex'); if (!p.length) throw 0;
-                    doM(p, fn); aH(fn, link, p.length);
-                    toast(`+${p.length} canales`, 'ok');
-                    btn.innerHTML = '<i class="fa-solid fa-check"></i>'; btn.classList.replace('text-accent','text-ok');
-                } catch(e) { toast('Error al cargar','err'); btn.innerHTML = 'Cargar'; btn.disabled = false; }
-            });
+            el.className = 'link-found bg-card border border-bdr rounded-lg p-3 mb-2';
+            el.innerHTML = `<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center"><i class="fa-solid fa-link text-accent"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${fn}</p><p class="text-xs text-muted/50 truncate">${link}</p></div><button class="ex-load-btn px-3 py-1.5 rounded-lg bg-accent text-white text-xs hover:bg-accent/90 transition">Cargar</button></div>`;
+            el.querySelector('.ex-load-btn').addEventListener('click', ()=>{loadCust(link,fn);cM('m-explorer')});
             res.appendChild(el);
         });
-    } catch(e) {
-        st.classList.add('hidden');
-        toast('Error: ' + e.message, 'err');
-        res.innerHTML = '<p class="text-err text-xs text-center py-4">No se pudo acceder. Probá con un enlace de GitHub.</p>';
-    }
+    } catch(e) { st.classList.add('hidden'); toast('Error: '+e.message,'err'); }
 }
-
-/* Helper: Obtener archivos de una carpeta en GitHub via API */
 async function fetchGithubFiles(user, repo, path) {
-    const url = path 
-        ? `https://api.github.com/repos/${user}/${repo}/contents/${path}`
-        : `https://api.github.com/repos/${user}/${repo}/contents/`;
-    const r = await fetch(url);
-    if (!r.ok) throw new Error('Error de API GitHub');
-    const data = await r.json();
-    
-    /* Si es un archivo suelto (no un array), devolverlo como array */
-    if (!Array.isArray(data)) return [data];
-    
-    /* Si es una carpeta, devolver solo archivos (no subcarpetas) */
-    return data.filter(f => f.type === 'file');
+    const url = `https://api.github.com/repos/${user}/${repo}/contents/${path||''}`;
+    const r = await fetch(url); if (!r.ok) throw new Error('No disponible'); return await r.json();
 }
-$('ex-stmsg').textContent='Conectando...';try{const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);if(!r.ok)throw new Error('No se pudo acceder');$('ex-stmsg').textContent='Buscando M3U...';const html=await r.text(),found=new Set();let m;const hR=/href=["']([^"']*(?:\.m3u8?|\.M3U8?)[^"']*)["']/gi;while((m=hR.exec(html))!==null)found.add(m[1]);const uR=/https?:\/\/[^\s"'<>]+\.m3u8?[^\s"'<>]*/gi;while((m=uR.exec(html))!==null)found.add(m[0]);const rR=/https?:\/\/raw\.githubusercontent\.com\/[^\s"'<>]+/gi;while((m=rR.exec(html))!==null){if(m[0].match(/\.(m3u8?|M3U8?)(\?|$)/))found.add(m[0])}st.classList.add('hidden');let links=[...found].filter(u=>u.startsWith('http'));if(url.includes('github.com')){const gh=url.match(/github\.com\/([^\/]+)\/([^\/]+)/);if(gh){$('ex-stmsg').textContent='Buscando via API GitHub...';st.classList.remove('hidden');try{const ar=await fetch(`https://api.github.com/repos/${gh[1]}/${gh[2]}/contents/`);if(ar.ok){const files=await ar.json();for(const f of files)if(f.name.match(/\.(m3u8?|M3U8?)$/i)&&f.download_url)links.push(f.download_url)}}catch(e){}st.classList.add('hidden')}}const unique=[...new Set(links)];if(!unique.length){emp.classList.remove('hidden');return}res.innerHTML='';unique.forEach(link=>{const fn=link.split('/').pop().split('?')[0],el=document.createElement('div');el.className='link-found bg-card border border-bdr rounded-lg p-3';el.innerHTML=`<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-code text-accent text-sm"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${fn}</p><p class="text-[10px] text-muted/60 truncate mt-0.5">${link}</p></div><button class="ex-load-btn shrink-0 px-3 py-1.5 rounded-lg bg-accent/15 text-accent text-xs font-medium hover:bg-accent/25 transition">Cargar</button></div>`;el.querySelector('.ex-load-btn').addEventListener('click',async()=>{const btn=el.querySelector('.ex-load-btn');btn.innerHTML='<i class="fa-solid fa-spinner spin"></i>';btn.disabled=true;try{const r=await fetch(link);if(!r.ok)throw 0;const t=await r.text(),p=pM(t,'ex');if(!p.length)throw 0;doM(p,fn);aH(fn,link,p.length);toast(`+${p.length} canales`,'ok');btn.innerHTML='<i class="fa-solid fa-check"></i>';btn.classList.replace('text-accent','text-ok')}catch(e){toast('Error al cargar','err');btn.innerHTML='Cargar';btn.disabled=false}});res.appendChild(el)})}catch(e){st.classList.add('hidden');toast('Error: '+e.message,'err');res.innerHTML='<p class="text-err text-xs text-center py-4">No se pudo acceder. Usá "Mi Editor" o "Pegar texto".</p>'}}
 
-/* ===================================================================
-   REPRODUCTOR HLS
-   =================================================================== */
-class RP{constructor(v){this.v=v;this.h=null;this.c=null;this.i=0;this.d=false}play(c){this.x();this.d=false;this.c=c;this.i=0;this._t()}playUrl(u,n){this.x();this.d=false;this.c={name:n||'Stream',group:'Manual',urls:[u],logo:''};this.i=0;this._t()}_t(){if(this.d)return;if(this.i>=this.c.urls.length){this._e('Todos los enlaces fallaron.');$('pfb').classList.add('hidden');return}const u=this.c.urls[this.i],fb=$('pfb');if(this.i>0){fb.classList.remove('hidden');fb.innerHTML=`<i class="fa-solid fa-rotate mr-1"></i>${this.i+1}/${this.c.urls.length}`}if(Hls.isSupported()){this.h=new Hls({maxBufferLength:30,maxMaxBufferLength:60,startLevel:-1,fragLoadingTimeOut:15000,manifestLoadingTimeOut:15000,levelLoadingTimeOut:15000});this.h.loadSource(u);this.h.attachMedia(this.v);this.h.on(Hls.Events.MANIFEST_PARSED,()=>{if(!this.d){this.v.play().catch(()=>{});fb.classList.add('hidden');$('vov').classList.add('hidden')}});this.h.on(Hls.Events.ERROR,(_,d)=>{if(this.d)return;if(d.fatal){this.i++;if(this.h)this.h.destroy();this.h=null;setTimeout(()=>this._t(),800)}})}else if(this.v.canPlayType('application/vnd.apple.mpegurl')){this.v.src=u;this.v.addEventListener('loadeddata',()=>{if(!this.d){this.v.play().catch(()=>{});fb.classList.add('hidden');$('vov').classList.add('hidden')}},{once:true});this.v.addEventListener('error',()=>{if(!this.d){this.i++;setTimeout(()=>this._t(),800)}},{once:true})}else this._e('Sin soporte HLS')}_e(m){$('vov').classList.remove('hidden');$('vomsg').textContent=m;toast(m,'err')}x(){this.d=true;if(this.h){this.h.destroy();this.h=null}this.v.src='';this.v.load();this.c=null}}
-let pl=null;
-function playCh(ch){const s=$('psec'),v=$('vid');s.classList.remove('hidden');s.scrollIntoView({behavior:'smooth',block:'start'});$('vov').classList.remove('hidden');$('vomsg').textContent='Cargando...';$('pname').textContent=ch.name;$('pgrp').textContent=ch.arg?'Argentina':ch.cat;$('pfb').classList.add('hidden');S.cur=ch;if(!pl)pl=new RP(v);pl.play(ch);$('npbar').classList.remove('hidden');$('npn').textContent=ch.name;uPF();rG()}
+/* REPRODUCTOR HLS */
+class RP{constructor(v){this.v=v;this.h=null;this.c=null;this.i=0;this.d=false}
+play(c){this.x();this.d=false;this.c=c;this.i=0;this._t()}
+_t(){if(this.d)return;if(typeof Hls==='undefined'){$('pfb').classList.add('hidden');this._e('Falta cargar librería HLS.js');return}
+if(this.i>=this.c.urls.length){this._e('Todos los enlaces fallaron');$('pfb').classList.add('hidden');return}
+const u=this.c.urls[this.i],fb=$('pfb');if(this.i>0){fb.classList.remove('hidden');fb.innerHTML=`<i class="fa-solid fa-rotate-right mr-1"></i> Probando ${this.i+1}/${this.c.urls.length}`}
+if(Hls.isSupported()){this.h=new Hls({maxBufferLength:30,maxMaxBufferLength:60});this.h.loadSource(u);this.h.attachMedia(this.v);this.h.on(Hls.Events.MANIFEST_PARSED,()=>{fb.classList.add('hidden');$('vov').classList.add('hidden');this.v.play().catch(e=>console.log('Autoplay bloqueado'))});
+this.h.on(Hls.Events.ERROR, (_,d)=>{if(d.fatal){this.h.destroy();this.i++;setTimeout(()=>this._t(),800)}})}
+else if(this.v.canPlayType('application/vnd.apple.mpegurl')){this.v.src=u;this.v.addEventListener('loadedmetadata',()=>{fb.classList.add('hidden');$('vov').classList.add('hidden');this.v.play().catch(e=>{})}, {once:true});
+this.v.addEventListener('error',()=>{this.i++;setTimeout(()=>this._t(),800)}, {once:true})}
+else{this._e('Tu navegador no soporta reproducción');$('pfb').classList.add('hidden')}}
+_e(m){$('vov').classList.remove('hidden');$('vomsg').textContent=m;toast(m,'err')}
+x(){this.d=true;if(this.h)this.h.destroy();this.v.pause();this.v.src='';this.v.load();this.c=null}
+}
+function playCh(ch){const s=$('psec'),v=$('vid');s.classList.remove('hidden');s.scrollIntoView({behavior:'smooth',block:'start'});
+$('vov').classList.remove('hidden');$('vomsg').textContent='Cargando stream...';$('pname').textContent=ch.name;$('pgrp').textContent=ch.arg?'🇦🇷 Argentina':ch.cat.toUpperCase();$('pfb').classList.add('hidden');
+S.cur=ch;if(!pl)pl=new RP(v);pl.play(ch);$('npbar').classList.remove('hidden');$('npn').textContent=ch.name;uPF();rG()}
 function stopP(){if(pl){pl.x();pl=null}$('psec').classList.add('hidden');$('npbar').classList.add('hidden');S.cur=null;rG()}
 
-/* ===================================================================
-   RENDER GRILLA
-   =================================================================== */
+/* GRILLA Y FILTROS */
 function gI(n){return n.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase().substring(0,2)}
-function mC(ch,idx){const f=S.fav.includes(nm(ch.name)),p=S.cur&&nm(S.cur.name)===nm(ch.name),cc={deportes:'bg-emerald-500/15 text-emerald-400',peliculas:'bg-amber-500/15 text-amber-400',series:'bg-violet-500/15 text-violet-400',noticias:'bg-sky-500/15 text-sky-400',musica:'bg-pink-500/15 text-pink-400',infantil:'bg-lime-500/15 text-lime-400',documentales:'bg-teal-500/15 text-teal-400',entretenimiento:'bg-orange-500/15 text-orange-400',otros:'bg-gray-500/15 text-gray-400'}[ch.cat]||'bg-gray-500/15 text-gray-400',d=document.createElement('div');d.className=`cf group relative bg-card border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:border-accent/40 hover:bg-card-h ${p?'border-accent ring-1 ring-accent/30':'border-bdr'}`;d.style.animationDelay=`${Math.min(idx*20,400)}ms`;const logoHtml=ch.logo?`<img src="${ch.logo}" alt="" class="w-full h-full object-contain p-3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="absolute inset-0 items-center justify-center text-2xl font-display font-bold text-muted/40" style="display:none">${gI(ch.name)}</div>`:`<span class="text-2xl font-display font-bold text-muted/40">${gI(ch.name)}</span>`;const liveBadge=p?'<div class="absolute top-2 left-2 flex items-center gap-1 bg-err/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-white live-dot"></span>VIVO</div>':'';const arBadge=ch.arg?`<div class="absolute top-2 left-2 bg-sky-500/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded" ${p?'style="left:auto;right:2px"':''}>AR</div>`:'';const favTop=ch.arg&&!p?'top-8':'';d.innerHTML=`<div class="aspect-video bg-bg/60 flex items-center justify-center relative overflow-hidden">${logoHtml}${liveBadge}${arBadge}<div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity ${favTop}"><button data-fav="${nm(ch.name)}" class="w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-xs ${f?'text-err':'text-white/60 hover:text-err'}"><i class="fa-${f?'solid':'regular'} fa-heart"></i></button></div><div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1"><span class="text-[10px] text-accent font-medium"><i class="fa-solid fa-play mr-1"></i>Reproducir</span></div></div><div class="p-2.5"><p class="text-xs font-medium truncate leading-tight">${ch.name}</p><div class="flex items-center gap-1.5 mt-1.5"><span class="text-[10px] px-1.5 py-0.5 rounded-full ${cc}">${ch.cat}</span><span class="text-[10px] text-muted/50">${ch.urls.length>1?ch.urls.length+' enl.':''}</span></div></div>`;d.addEventListener('click',e=>{if(!e.target.closest('[data-fav]'))playCh(ch)});const fb=d.querySelector('[data-fav]');if(fb)fb.addEventListener('click',e=>{e.stopPropagation();tF(nm(ch.name))});return d}
-function rG(){const g=$('grid'),em=$('emptyst'),lm=$('lmwrap'),cn=$('gcount'),ti=$('gtitle');g.innerHTML='';if(!S.fl.length){em.classList.remove('hidden');lm.classList.add('hidden');cn.textContent='0 canales';return}em.classList.add('hidden');cn.textContent=S.fl.length+' canales';if(S.fov)ti.textContent='Mis favoritos';else if(S.q)ti.textContent=`"${S.q}"`;else if(S.cat==='all')ti.textContent='Todos los canales';else if(S.cat==='argentina')ti.textContent='Canales de Argentina';else ti.textContent=S.cat.charAt(0).toUpperCase()+S.cat.slice(1);const end=Math.min(S.d,S.fl.length),fr=document.createDocumentFragment();S.fl.slice(0,end).forEach((c,i)=>fr.appendChild(mC(c,i)));g.appendChild(fr);lm.classList.toggle('hidden',end>=S.fl.length)}
+function mC(ch,idx){const f=S.fav.includes(nm(ch.name)),p=S.cur&&nm(S.cur.name)===nm(ch.name);
+const cc={deportes:'bg-emerald-500/15 text-emerald-400',peliculas:'bg-amber-500/15 text-amber-400',series:'bg-violet-500/15 text-violet-400',noticias:'bg-sky-500/15 text-sky-400',musica:'bg-pink-500/15 text-pink-400',infantil:'bg-lime-500/15 text-lime-400',documentales:'bg-teal-500/15 text-teal-400',entretenimiento:'bg-orange-500/15 text-orange-400',otros:'bg-gray-500/15 text-gray-400'}[ch.cat]||'bg-gray-500/15 text-gray-400';
+const d=document.createElement('div');d.className=`cf group relative bg-card border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:border-accent/40 ${p?'border-accent ring-1 ring-accent/30':'border-bdr'}`;d.style.animationDelay=`${Math.min(idx*18,350)}ms`;
+const logoHtml=ch.logo?`<img src="${ch.logo}" alt="${ch.name}" class="w-full h-full object-contain p-2 bg-white" onerror="this.parentElement.innerHTML='<span class=\\'text-xl font-bold text-muted\\'>${gI(ch.name)}</span>'">`:`<span class="text-xl font-bold text-muted">${gI(ch.name)}</span>`;
+d.innerHTML=`<div class="aspect-video bg-bg/80 flex items-center justify-center relative overflow-hidden">${logoHtml}${p?`<div class="absolute top-2 left-2 flex items-center gap-1 bg-destructive/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>EN VIVO</div>`:''}${ch.arg?`<div class="absolute top-2 right-2 text-[10px] font-bold bg-sky-500/80 text-white px-1.5 py-0.5 rounded-full">🇦🇷</div>`:''}<div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"><div class="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center"><i class="fa-solid fa-play text-black ml-0.5"></i></div></div></div><div class="p-2"><p class="text-xs font-medium truncate leading-tight">${ch.name}</p><div class="flex items-center justify-between mt-1"><span class="text-[10px] px-1.5 py-0.5 rounded-full ${cc}">${ch.cat}</span>${ch.urls.length>1?`<span class="text-[9px] text-muted/50">x${ch.urls.length}</span>`:''}</div><button data-fav="${nm(ch.name)}" class="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-black/40 flex items-center justify-center text-white/70 hover:text-white hover:bg-black/60 transition-all ${f?'text-red-500':''}"><i class="fa-solid fa-heart text-xs ${f?'':'fa-regular'}"></i></button></div>`;
+d.addEventListener('click',e=>{if(!e.target.closest('button'))playCh(ch)});
+d.querySelector('[data-fav]').addEventListener('click',e=>{e.stopPropagation();tF(nm(ch.name))});
+return d;
+}
+function rG(){const g=$('grid'),em=$('emptystate'),lm=$('loadmore'),cn=$('gcount'),ti=$('gtitle');g.innerHTML='';
+if(!S.fl.length){em.classList.remove('hidden');lm.classList.add('hidden');cn.textContent='0 canales';return}
+em.classList.add('hidden');cn.textContent=S.fl.length+' canales';
+ti.textContent=S.fov?'Mis favoritos':S.q?`Búsqueda: "${S.q}"`:S.cat==='all'?'Todos los canales':S.cat==='argentina'?'🇦🇷 Argentina':S.cat.charAt(0).toUpperCase()+S.cat.slice(1);
+const end=Math.min(S.d,S.fl.length);const fr=document.createDocumentFragment();
+for(let i=0;i<end;i++)fr.appendChild(mC(S.fl[i],i));g.appendChild(fr);
+lm.classList.toggle('hidden',end>=S.fl.length)}
+function applyF(){let temp=[...S.all];if(S.fov)temp=temp.filter(x=>S.fav.includes(nm(x.name)));if(S.cat==='argentina')temp=temp.filter(x=>x.arg);else if(S.cat!=='all')temp=temp.filter(x=>x.cat===S.cat);if(S.q){const q=nm(S.q);temp=temp.filter(x=>nm(x.name).includes(q)||nm(x.group||'').includes(q))}
+S.fl=temp;S.d=S.pp;rG()}
+function tF(k){const i=S.fav.indexOf(k);if(i>=0){S.fav.splice(i,1);toast('Quitado de favoritos','info')}else{S.fav.push(k);toast('Agregado a favoritos ❤️','ok')}localStorage.setItem('svf',JSON.stringify(S.fav));rG();uPF()}
+function uFB(){const b=$('bfav');b.classList.toggle('bg-accent/20',S.fov);b.classList.toggle('text-accent',S.fov)}
+function uPF(){const b=$('bfch');if(!S.cur)return;const f=S.fav.includes(nm(S.cur.name));b.innerHTML=`<i class="fa-${f?'solid':'regular'} fa-heart"></i>`;b.classList.toggle('text-red-500',f)}
 
+/* ARCHIVOS LOCALES */
+function initFH(){const dz=$('dropzone'),fi=$('fileinput'),fnm=$('filename'),fszEl=$('filesize'),frem=$('remfile'),fbtn=$('loadfile');
+dz.addEventListener('click',()=>fi.click());
+fi.addEventListener('change',e=>{if(e.target.files[0])hF(e.target.files[0])});
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('border-accent')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('border-accent'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('border-accent');if(e.dataTransfer.files[0])hF(e.dataTransfer.files[0])});
+function hF(file){if(!file.name.match(/\.(m3u8?|txt)$/i)){toast('Solo archivos .m3u / .m3u8 / .txt','warn');return}
+const r=new FileReader();r.onload=()=>{lft=r.result;lfn=file.name;fnm.textContent=file.name;fszEl.textContent=fsz(file.size);$('fileinfo').classList.remove('hidden');fbtn.disabled=false};r.onerror=()=>toast('Error al leer archivo','err');r.readAsText(file)}
+frem.addEventListener('click',()=>{lft=null;lfn='';$('fileinfo').classList.add('hidden');fbtn.disabled=true;fi.value=''});
+fbtn.addEventListener('click',()=>{if(!lft)return;cM('m-file');loadFT(lft,lfn);lft=null;lfn='';$('fileinfo').classList.add('hidden');fbtn.disabled=true;fi.value=''})}
+
+/* TMDB */
+const TMDB={key:localStorage.getItem('tmdbk')||'',base:'https://api.themoviedb.org/3',imgW:'https://image.tmdb.org/t/p/w342',
+setKey(k){this.key=k;localStorage.setItem('tmdbk',k);this.updateUI()},
+updateUI(){const st=$('tmdbkeystat'),si=$('tmdbsearch'),sel=$('tmdbtype');if(this.key){st.textContent='✅ Configurada';st.className='text-xs text-ok'}else{st.textContent='❌ Falta clave';st.className='text-xs text-err';si.disabled=true;sel.disabled=true;return}si.disabled=false;sel.disabled=false},
+async search(q,type,page=1){if(!this.key)throw new Error('Ingresá tu API Key de TMDB');const t=type==='todo'?'multi':type;const r=await fetch(`${this.base}/search/${t}?api_key=${this.key}&query=${encodeURIComponent(q)}&language=es-ES&page=${page}`);if(!r.ok)throw new Error('Clave inválida o error de conexión');return await r.json()},
+renderResults(res){const c=$('tmdbres'),emp=$('tmdbemp');c.innerHTML='';if(!res?.results?.length){emp.classList.remove('hidden');return}emp.classList.add('hidden');res.results.forEach(it=>{if(!it.poster_path)return;const isM=it.media_type==='movie'||!it.media_type;const ti=isM?it.title:it.name;const ye=(isM?it.release_date:it.first_air_date)?.substring(0,4)||'???';const el=document.createElement('div');el.className='rounded-lg overflow-hidden border border-bdr hover:border-accent transition-all cursor-pointer bg-card';el.innerHTML=`<div class="aspect-[2/3] bg-muted"><img src="${this.imgW}${it.poster_path}" alt="${ti}" class="w-full h-full object-cover" loading="lazy"></div><div class="p-2"><p class="text-xs font-medium truncate">${ti}</p><p class="text-[10px] text-muted">${ye} · ${isM?'Película':'Serie'}</p></div>`;
+el.addEventListener('click',()=>{cM('m-tmdb');S.q=ti;$('sinput').value=ti;applyF();window.scrollTo({top:0,behavior:'smooth'})});
+c.appendChild(el)})}};
+function initTMDB(){TMDB.updateUI();$('savetmdbk').addEventListener('click',()=>{const k=$('tmdbkey').value.trim();if(!k){toast('Escribí tu API Key primero','warn');return}TMDB.setKey(k);toast('Clave guardada correctamente','ok')});
+let tm;$('tmdbsearch').addEventListener('input',e=>{clearTimeout(tm);const q=e.target.value.trim();if(q.length<3){$('tmdbres').innerHTML='';$('tmdbemp').classList.add('hidden');return}tm=setTimeout(async()=>{$('tmdbemp').classList.add('hidden');$('tmdbres').innerHTML='<p class="text-center text-xs text-muted py-4">Buscando...</p>';try{const d=await TMDB.search(q,$('tmdbtype').value);TMDB.renderResults(d)}catch(e){$('tmdbres').innerHTML='';$('tmdbemp').classList.remove('hidden');$('tmdbemp').textContent=e.message;toast(e.message,'err')}},650)})}
+
+/* INICIO GENERAL */
+async function initApp(){if(S.ini)return;S.ini=true;
+await loadAll();rG();rH();initFH();initTMDB();
+$('sinput').addEventListener('input',e=>{S.q=e.target.value.trim();applyF()});
+document.querySelectorAll('.catbtn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.catbtn').forEach(x=>x.classList.remove('bg-accent/20','text-accent'));b.classList.add('bg-accent/20','text-accent');S.cat=b.dataset.cat;applyF()})});
+$('bfav').addEventListener('click',()=>{S.fov=!S.fov;uFB();applyF()});
+$('loadmore').addEventListener('click',()=>{S.d+=S.pp;rG()});
+$('reloadall').addEventListener('click',async()=>{await loadAll(true);toast('Listas actualizadas','ok')});
+console.log('✅ StreamVault cargado completamente')}
 /* ===================================================================
-   FILTROS
+   EXPLORADOR WEB, REPRODUCTOR, GRILLA, FILTROS, TMDB E INICIO
    =================================================================== */
-function applyF(){let c=[...S.all];if(S.fov)c=c.filter(x=>S.fav.includes(nm(x.name)));if(S.cat==='argentina')c=c.filter(x=>x.arg);else if(S.cat!=='all')c=c.filter(x=>x.cat===S.cat);if(S.q){const q=nm(S.q);c=c.filter(x=>nm(x.name).includes(q)||nm(x.group).includes(q))}S.fl=c;S.d=S.pp;rG()}
-function tF(k){const i=S.fav.indexOf(k);if(i>=0){S.fav.splice(i,1);toast('Quitado','info')}else{S.fav.push(k);toast('Favorito','ok')}localStorage.setItem('svf',JSON.stringify(S.fav));rG();uFB();uPF()}
-function uFB(){const b=$('bfav');b.classList.toggle('bg-accent/20',S.fov);b.classList.toggle('text-accent',S.fov);b.classList.toggle('border-accent/40',S.fov);b.classList.toggle('text-muted',!S.fov)}
-function uPF(){const b=$('bfch');if(!S.cur)return;const f=S.fav.includes(nm(S.cur.name));b.innerHTML=`<i class="fa-${f?'solid':'regular'} fa-heart"></i>`;b.className=`text-sm transition ${f?'text-err':'text-muted hover:text-accent'}`}
+async function explorePage(url) {
+    const st = $('ex-status'), res = $('ex-results'), emp = $('ex-empty');
+    st.classList.remove('hidden'); emp.classList.add('hidden'); res.innerHTML = '';
+    const ghMatch = url.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);
+    if (ghMatch) {
+        const user = ghMatch[1], repo = ghMatch[2];
+        $('ex-stmsg').textContent = `Buscando en repositorio ${user}/${repo}...`;
+        try {
+            const rootData = await fetchGithubFiles(user, repo, '');
+            let allFiles = [...rootData];
+            const subcarpetas = ['lists', 'm3u', 'iptv', 'channels', 'src', 'data', 'extras'];
+            for (const sub of subcarpetas) {
+                try { const subData = await fetchGithubFiles(user, repo, sub); if (subData.length) allFiles = allFiles.concat(subData); } catch(e) {}
+            }
+            const m3uFiles = allFiles.filter(f => f.name.match(/\.(m3u8?|M3U8?)$/i));
+            st.classList.add('hidden');
+            if (!m3uFiles.length) { emp.classList.remove('hidden'); return; }
+            m3uFiles.forEach(file => {
+                const link = file.download_url || file.html_url;
+                const size = file.size ? fsz(file.size) : '';
+                const el = document.createElement('div');
+                el.className = 'link-found bg-card border border-bdr rounded-lg p-3 mb-2';
+                el.innerHTML = `<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center"><i class="fa-solid fa-file-code text-accent"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${file.name}</p>${size?`<p class="text-xs text-muted/50">${size}</p>`:''}</div><button class="ex-load-btn px-3 py-1.5 rounded-lg bg-accent text-white text-xs hover:bg-accent/90 transition">Cargar</button></div>`;
+                el.querySelector('.ex-load-btn').addEventListener('click', ()=>{loadCust(link,file.name);cM('m-explorer')});
+                res.appendChild(el);
+            });
+            return;
+        } catch(e) { st.classList.add('hidden'); toast('Error al leer repositorio: '+e.message,'err'); return; }
+    }
+    $('ex-stmsg').textContent = 'Conectando con la pagina...';
+    try {
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+        const resp = await fetch(proxyUrl); if (!resp.ok) throw new Error(resp.status);
+        const html = await resp.text(); const found = new Set(); let m;
+        const hR = /href=["']([^"']*\.(m3u8?|M3U8?)[^"']*)["']/gi;
+        while ((m = hR.exec(html)) !== null) found.add(new URL(m[1], url).href);
+        st.classList.add('hidden');
+        if (!found.size) { emp.classList.remove('hidden'); return; }
+        [...found].forEach(link => {
+            const fn = link.split('/').pop().split('?')[0] || 'Lista.m3u';
+            const el = document.createElement('div');
+            el.className = 'link-found bg-card border border-bdr rounded-lg p-3 mb-2';
+            el.innerHTML = `<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center"><i class="fa-solid fa-link text-accent"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${fn}</p><p class="text-xs text-muted/50 truncate">${link}</p></div><button class="ex-load-btn px-3 py-1.5 rounded-lg bg-accent text-white text-xs hover:bg-accent/90 transition">Cargar</button></div>`;
+            el.querySelector('.ex-load-btn').addEventListener('click', ()=>{loadCust(link,fn);cM('m-explorer')});
+            res.appendChild(el);
+        });
+    } catch(e) { st.classList.add('hidden'); toast('Error: '+e.message,'err'); }
+}
+async function fetchGithubFiles(user, repo, path) {
+    const url = `https://api.github.com/repos/${user}/${repo}/contents/${path||''}`;
+    const r = await fetch(url); if (!r.ok) throw new Error('No disponible'); return await r.json();
+}
 
-/* ===================================================================
-   ARCHIVOS LOCALES
-   =================================================================== */
-function initFH(){const dz=$('dropz'),fi=$('finp'),finfo=$('finfo'),fnm=$('fnm'),fszEl=$('fsz'),frem=$('frem'),fbtn=$('fl-go');dz.addEventListener('click',()=>fi.click());fi.addEventListener('change',e=>{if(e.target.files.length)hF(e.target.files[0])});dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('do')});dz.addEventListener('dragleave',()=>dz.classList.remove('do'));dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('do');if(e.dataTransfer.files.length)hF(e.dataTransfer.files[0])});function hF(file){if(!file.name.toLowerCase().match(/\.(m3u8?|txt)$/)){toast('Solo .m3u, .m3u8, .txt','warn');return}const reader=new FileReader();reader.onload=()=>{lft=reader.result;lfn=file.name;fnm.textContent=file.name;fszEl.textContent=fsz(file.size);finfo.classList.remove('hidden');fbtn.disabled=false};reader.onerror=()=>toast('Error al leer','err');reader.readAsText(file)}frem.addEventListener('click',()=>{lft=null;lfn='';finfo.classList.add('hidden');fbtn.disabled=true;fi.value=''});fbtn.addEventListener('click',()=>{if(!lft)return;cM('m-file');loadFT(lft,lfn);lft=null;lfn='';finfo.classList.add('hidden');fbtn.disabled=true;fi.value=''})}
+/* REPRODUCTOR HLS */
+class RP{constructor(v){this.v=v;this.h=null;this.c=null;this.i=0;this.d=false}
+play(c){this.x();this.d=false;this.c=c;this.i=0;this._t()}
+_t(){if(this.d)return;if(typeof Hls==='undefined'){$('pfb').classList.add('hidden');this._e('Falta cargar librería HLS.js');return}
+if(this.i>=this.c.urls.length){this._e('Todos los enlaces fallaron');$('pfb').classList.add('hidden');return}
+const u=this.c.urls[this.i],fb=$('pfb');if(this.i>0){fb.classList.remove('hidden');fb.innerHTML=`<i class="fa-solid fa-rotate-right mr-1"></i> Probando ${this.i+1}/${this.c.urls.length}`}
+if(Hls.isSupported()){this.h=new Hls({maxBufferLength:30,maxMaxBufferLength:60});this.h.loadSource(u);this.h.attachMedia(this.v);this.h.on(Hls.Events.MANIFEST_PARSED,()=>{fb.classList.add('hidden');$('vov').classList.add('hidden');this.v.play().catch(e=>console.log('Autoplay bloqueado'))});
+this.h.on(Hls.Events.ERROR, (_,d)=>{if(d.fatal){this.h.destroy();this.i++;setTimeout(()=>this._t(),800)}})}
+else if(this.v.canPlayType('application/vnd.apple.mpegurl')){this.v.src=u;this.v.addEventListener('loadedmetadata',()=>{fb.classList.add('hidden');$('vov').classList.add('hidden');this.v.play().catch(e=>{})}, {once:true});
+this.v.addEventListener('error',()=>{this.i++;setTimeout(()=>this._t(),800)}, {once:true})}
+else{this._e('Tu navegador no soporta reproducción');$('pfb').classList.add('hidden')}}
+_e(m){$('vov').classList.remove('hidden');$('vomsg').textContent=m;toast(m,'err')}
+x(){this.d=true;if(this.h)this.h.destroy();this.v.pause();this.v.src='';this.v.load();this.c=null}
+}
+function playCh(ch){const s=$('psec'),v=$('vid');s.classList.remove('hidden');s.scrollIntoView({behavior:'smooth',block:'start'});
+$('vov').classList.remove('hidden');$('vomsg').textContent='Cargando stream...';$('pname').textContent=ch.name;$('pgrp').textContent=ch.arg?'🇦🇷 Argentina':ch.cat.toUpperCase();$('pfb').classList.add('hidden');
+S.cur=ch;if(!pl)pl=new RP(v);pl.play(ch);$('npbar').classList.remove('hidden');$('npn').textContent=ch.name;uPF();rG()}
+function stopP(){if(pl){pl.x();pl=null}$('psec').classList.add('hidden');$('npbar').classList.add('hidden');S.cur=null;rG()}
 
-/* ===================================================================
-   TMDB - BUSCADOR DE PELICULAS
-   =================================================================== */
-const TMDB={key:localStorage.getItem('svtmdb')||'',base:'https://api.themoviedb.org/3',imgW:'https://image.tmdb.org/t/p/w342',setKey(k){this.key=k;localStorage.setItem('svtmdb',k);this.updateUI()},updateUI(){const st=$('tmdb-key-status'),si=$('tmdb-search'),sel=$('tmdb-type');if(this.key){st.textContent='Configurada';st.className='text-[10px] px-2 py-0.5 rounded-full bg-ok/15 text-ok';si.disabled=false;sel.disabled=false}else{st.textContent='Sin configurar';st.className='text-[10px] px-2 py-0.5 rounded-full bg-err/15 text-err';si.disabled=true;sel.disabled=true}},async search(q,type,page){if(!this.key)throw new Error('Sin API Key');const t=type==='tv'?'tv':'movie';const r=await fetch(`${this.base}/search/${t}?query=${encodeURIComponent(q)}&api_key=${this.key}&language=es-ES&page=${page||1}&include_adult=false`);if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.status_message||'Error TMDB')}return r.json()},async searchMulti(q,page){if(!this.key)throw new Error('Sin API Key');const r=await fetch(`${this.base}/search/multi?query=${encodeURIComponent(q)}&api_key=${this.key}&language=es-ES&page=${page||1}&include_adult=false`);if(!r.ok)throw new Error('Error TMDB');const d=await r.json();d.results=d.results.filter(i=>i.media_type==='movie'||i.media_type==='tv');return d},async getList(tab,page){if(!this.key)throw new Error('Sin API Key');const ep={trending:'trending/all/week',popular:'movie/popular',top_rated:'movie/top_rated',now_playing:'movie/now_playing',upcoming:'movie/upcoming'};const r=await fetch(`${this.base}/${ep[tab]}?api_key=${this.key}&language=es-ES&page=${page||1}`);if(!r.ok)throw new Error('Error TMDB');return r.json()},async getDetail(id,type){if(!this.key)throw new Error('Sin API Key');const r=await fetch(`${this.base}/${type||'movie'}/${id}?api_key=${this.key}&language=es-ES`);if(!r.ok)throw new Error('Error TMDB');return r.json()},renderResults(results){const c=$('tmdb-results'),emp=$('tmdb-empty');c.innerHTML='';if(!results||!results.length){emp.classList.remove('hidden');$('tmdb-empty-msg').textContent='No se encontraron resultados';return}emp.classList.add('hidden');results.forEach(item=>{const isM=item.media_type==='movie'||item.title,title=isM?item.title:item.name,date=isM?item.release_date:item.first_air_date,year=date?date.substring(0,4):'?',rating=item.vote_average?item.vote_average.toFixed(1):'-',poster=item.poster_path?this.imgW+item.poster_path:'',type=isM?'movie':'tv',card=document.createElement('div');card.className='tmdb-card bg-card border border-bdr rounded-xl overflow-hidden';card.innerHTML=`<div class="aspect-[2/3] bg-bg/60 relative overflow-hidden">${poster?`<img src="${poster}" alt="${title}" class="w-full h-full object-cover" loading="lazy">`:`<div class="w-full h-full flex items-center justify-center text-muted/30"><i class="fa-solid fa-film text-4xl"></i></div>`}<div class="tmdb-card-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-3"><p class="text-[10px] text-accent font-medium mb-0.5">${isM?'Pelicula':'Serie'}</p><p class="text-xs font-semibold leading-tight">${title}</p><div class="flex items-center gap-2 mt-1.5"><span class="text-[10px] text-muted">${year}</span><span class="text-[10px] text-accent"><i class="fa-solid fa-star mr-0.5"></i>${rating}</span></div></div>${rating!=='-'&&parseFloat(rating)>=7?'<div class="absolute top-2 right-2 bg-ok/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Top</div>':''}</div>`;card.addEventListener('click',()=>TMDB.showDetail(item.id,type));c.appendChild(card)})},async showDetail(id,type){$('tmdb-results').classList.add('hidden');$('tmdb-detail').classList.add('hidden');$('tmdb-loading').classList.remove('hidden');try{const data=await this.getDetail(id,type);$('tmdb-loading').classList.add('hidden');$('tmdb-detail').classList.remove('hidden');const isM=type==='movie',title=isM?data.title:data.name,year=(isM?data.release_date:data.first_air_date||'').substring(0,4),rating=data.vote_average?data.vote_average.toFixed(1):'-',runtime=isM&&data.runtime?data.runtime+' min':(data.episode_run_time&&data.episode_run_time.length?data.episode_run_time[0]+' min/ep':''),genres=(data.genres||[]).map(g=>g.name).join(', '),poster=data.poster_path?this.imgW+data.poster_path:'';$('td-poster').src=poster||'';$('td-poster').style.display=poster?'':'none';$('td-title').textContent=title;$('td-year').textContent=year||'?';$('td-rating').innerHTML=`<i class="fa-solid fa-star mr-0.5"></i>${rating}`;$('td-runtime').textContent=runtime;$('td-genres').textContent=genres;$('td-overview').textContent=data.overview||'Sin descripcion.';$('td-tmdb-link').href=`https://www.themoviedb.org/${type}/${id}`;$('td-search-stream').onclick=()=>{cM('m-tmdb');S.q=title;$('sinput').value=title;S.cat='all';S.fov=false;document.querySelectorAll('.cp').forEach(x=>{x.className='cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt'});document.querySelector('[data-c="all"]').className='cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent';uFB();applyF();window.scrollTo({top:$('mainc').offsetTop-70,behavior:'smooth'});toast(`Buscando "${title}" en canales`,'info')}}catch(e){$('tmdb-loading').classList.add('hidden');$('tmdb-results').classList.remove('hidden');toast('Error: '+e.message,'err')}},backToResults(){$('tmdb-detail').classList.add('hidden');$('tmdb-results').classList.remove('hidden')}};
+/* GRILLA Y FILTROS */
+function gI(n){return n.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase().substring(0,2)}
+function mC(ch,idx){const f=S.fav.includes(nm(ch.name)),p=S.cur&&nm(S.cur.name)===nm(ch.name);
+const cc={deportes:'bg-emerald-500/15 text-emerald-400',peliculas:'bg-amber-500/15 text-amber-400',series:'bg-violet-500/15 text-violet-400',noticias:'bg-sky-500/15 text-sky-400',musica:'bg-pink-500/15 text-pink-400',infantil:'bg-lime-500/15 text-lime-400',documentales:'bg-teal-500/15 text-teal-400',entretenimiento:'bg-orange-500/15 text-orange-400',otros:'bg-gray-500/15 text-gray-400'}[ch.cat]||'bg-gray-500/15 text-gray-400';
+const d=document.createElement('div');d.className=`cf group relative bg-card border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:border-accent/40 ${p?'border-accent ring-1 ring-accent/30':'border-bdr'}`;d.style.animationDelay=`${Math.min(idx*18,350)}ms`;
+const logoHtml=ch.logo?`<img src="${ch.logo}" alt="${ch.name}" class="w-full h-full object-contain p-2 bg-white" onerror="this.parentElement.innerHTML='<span class=\\'text-xl font-bold text-muted\\'>${gI(ch.name)}</span>'">`:`<span class="text-xl font-bold text-muted">${gI(ch.name)}</span>`;
+d.innerHTML=`<div class="aspect-video bg-bg/80 flex items-center justify-center relative overflow-hidden">${logoHtml}${p?`<div class="absolute top-2 left-2 flex items-center gap-1 bg-destructive/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>EN VIVO</div>`:''}${ch.arg?`<div class="absolute top-2 right-2 text-[10px] font-bold bg-sky-500/80 text-white px-1.5 py-0.5 rounded-full">🇦🇷</div>`:''}<div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"><div class="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center"><i class="fa-solid fa-play text-black ml-0.5"></i></div></div></div><div class="p-2"><p class="text-xs font-medium truncate leading-tight">${ch.name}</p><div class="flex items-center justify-between mt-1"><span class="text-[10px] px-1.5 py-0.5 rounded-full ${cc}">${ch.cat}</span>${ch.urls.length>1?`<span class="text-[9px] text-muted/50">x${ch.urls.length}</span>`:''}</div><button data-fav="${nm(ch.name)}" class="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-black/40 flex items-center justify-center text-white/70 hover:text-white hover:bg-black/60 transition-all ${f?'text-red-500':''}"><i class="fa-solid fa-heart text-xs ${f?'':'fa-regular'}"></i></button></div>`;
+d.addEventListener('click',e=>{if(!e.target.closest('button'))playCh(ch)});
+d.querySelector('[data-fav]').addEventListener('click',e=>{e.stopPropagation();tF(nm(ch.name))});
+return d;
+}
+function rG(){const g=$('grid'),em=$('emptystate'),lm=$('loadmore'),cn=$('gcount'),ti=$('gtitle');g.innerHTML='';
+if(!S.fl.length){em.classList.remove('hidden');lm.classList.add('hidden');cn.textContent='0 canales';return}
+em.classList.add('hidden');cn.textContent=S.fl.length+' canales';
+ti.textContent=S.fov?'Mis favoritos':S.q?`Búsqueda: "${S.q}"`:S.cat==='all'?'Todos los canales':S.cat==='argentina'?'🇦🇷 Argentina':S.cat.charAt(0).toUpperCase()+S.cat.slice(1);
+const end=Math.min(S.d,S.fl.length);const fr=document.createDocumentFragment();
+for(let i=0;i<end;i++)fr.appendChild(mC(S.fl[i],i));g.appendChild(fr);
+lm.classList.toggle('hidden',end>=S.fl.length)}
+function applyF(){let temp=[...S.all];if(S.fov)temp=temp.filter(x=>S.fav.includes(nm(x.name)));if(S.cat==='argentina')temp=temp.filter(x=>x.arg);else if(S.cat!=='all')temp=temp.filter(x=>x.cat===S.cat);if(S.q){const q=nm(S.q);temp=temp.filter(x=>nm(x.name).includes(q)||nm(x.group||'').includes(q))}
+S.fl=temp;S.d=S.pp;rG()}
+function tF(k){const i=S.fav.indexOf(k);if(i>=0){S.fav.splice(i,1);toast('Quitado de favoritos','info')}else{S.fav.push(k);toast('Agregado a favoritos ❤️','ok')}localStorage.setItem('svf',JSON.stringify(S.fav));rG();uPF()}
+function uFB(){const b=$('bfav');b.classList.toggle('bg-accent/20',S.fov);b.classList.toggle('text-accent',S.fov)}
+function uPF(){const b=$('bfch');if(!S.cur)return;const f=S.fav.includes(nm(S.cur.name));b.innerHTML=`<i class="fa-${f?'solid':'regular'} fa-heart"></i>`;b.classList.toggle('text-red-500',f)}
 
-function initTMDB(){TMDB.updateUI();$('tmdb-key-input').value=TMDB.key;$('tmdb-key-save').addEventListener('click',()=>{const k=$('tmdb-key-input').value.trim();if(!k){toast('Ingresá una API Key','warn');return}TMDB.setKey(k);toast('API Key guardada','ok')});let st;$('tmdb-search').addEventListener('input',e=>{clearTimeout(st);const q=e.target.value.trim();if(q.length<2){$('tmdb-results').innerHTML='';$('tmdb-empty').classList.remove('hidden');$('tmdb-empty-msg').textContent='Escribi al menos 2 caracteres';return}st=setTimeout(async()=>{$('tmdb-loading').classList.remove('hidden');$('tmdb-results').innerHTML='';$('tmdb-empty').classList.add('hidden');$('tmdb-detail').classList.add('hidden');document.querySelectorAll('.tmdb-tab').forEach(t=>t.classList.remove('on'));try{const type=$('tmdb-type').value,data=type==='multi'?await TMDB.searchMulti(q):await TMDB.search(q,type);$('tmdb-loading').classList.add('hidden');TMDB.renderResults(data.results)}catch(e){$('tmdb-loading').classList.add('hidden');toast('Error TMDB: '+e.message,'err');$('tmdb-empty').classList.remove('hidden');$('tmdb-empty-msg').textContent=e.message}},500)});$('tmdb-search').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.dispatchEvent(new Event('input'))});document.querySelectorAll('.tmdb-tab').forEach(tab=>{tab.addEventListener('click',async()=>{if(!TMDB.key){toast('Configurá tu API Key primero','warn');return}document.querySelectorAll('.tmdb-tab').forEach(t=>t.classList.remove('on'));tab.classList.add('on');$('tmdb-search').value='';$('tmdb-loading').classList.remove('hidden');$('tmdb-results').innerHTML='';$('tmdb-empty').classList.add('hidden');$('tmdb-detail').classList.add('hidden');try{const data=await TMDB.getList(tab.dataset.tab);$('tmdb-loading').classList.add('hidden');TMDB.renderResults(data.results)}catch(e){$('tmdb-loading').classList.add('hidden');toast('Error: '+e.message,'err');$('tmdb-empty').classList.remove('hidden');$('tmdb-empty-msg').textContent=e.message}})});$('tmdb-detail-back').addEventListener('click',()=>TMDB.backToResults())}
+/* ARCHIVOS LOCALES */
+function initFH(){const dz=$('dropzone'),fi=$('fileinput'),fnm=$('filename'),fszEl=$('filesize'),frem=$('remfile'),fbtn=$('loadfile');
+dz.addEventListener('click',()=>fi.click());
+fi.addEventListener('change',e=>{if(e.target.files[0])hF(e.target.files[0])});
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('border-accent')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('border-accent'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('border-accent');if(e.dataTransfer.files[0])hF(e.dataTransfer.files[0])});
+function hF(file){if(!file.name.match(/\.(m3u8?|txt)$/i)){toast('Solo archivos .m3u / .m3u8 / .txt','warn');return}
+const r=new FileReader();r.onload=()=>{lft=r.result;lfn=file.name;fnm.textContent=file.name;fszEl.textContent=fsz(file.size);$('fileinfo').classList.remove('hidden');fbtn.disabled=false};r.onerror=()=>toast('Error al leer archivo','err');r.readAsText(file)}
+frem.addEventListener('click',()=>{lft=null;lfn='';$('fileinfo').classList.add('hidden');fbtn.disabled=true;fi.value=''});
+fbtn.addEventListener('click',()=>{if(!lft)return;cM('m-file');loadFT(lft,lfn);lft=null;lfn='';$('fileinfo').classList.add('hidden');fbtn.disabled=true;fi.value=''})}
 
-/* ===================================================================
-   EVENTOS
-   =================================================================== */
-function initEv(){let st;$('sinput').addEventListener('input',e=>{clearTimeout(st);st=setTimeout(()=>{S.q=e.target.value.trim();applyF()},250)});document.querySelectorAll('.cp').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.cp').forEach(x=>{x.className='cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt'});b.className='cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent';S.cat=b.dataset.c;S.fov=false;uFB();applyF()})});$('bfav').addEventListener('click',()=>{S.fov=!S.fov;if(S.fov){S.cat='all';document.querySelectorAll('.cp').forEach(x=>{x.className='cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt'});document.querySelector('[data-c="all"]').className='cp shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent'}uFB();applyF()});$('pcls').addEventListener('click',stopP);$('npc').addEventListener('click',stopP);const vid=$('vid');$('bplay').addEventListener('click',()=>{vid.paused?vid.play().catch(()=>{}):vid.pause()});$('npp').addEventListener('click',()=>{vid.paused?vid.play().catch(()=>{}):vid.pause()});vid.addEventListener('play',()=>{$('bplay').innerHTML='<i class="fa-solid fa-pause"></i>';$('npp').innerHTML='<i class="fa-solid fa-pause text-sm"></i>'});vid.addEventListener('pause',()=>{$('bplay').innerHTML='<i class="fa-solid fa-play"></i>';$('npp').innerHTML='<i class="fa-solid fa-play text-sm"></i>'});const vs=$('vslider');vs.addEventListener('input',()=>{vid.volume=vs.value/100});vid.volume=0.8;$('bfs').addEventListener('click',()=>{const w=document.querySelector('.vw');document.fullscreenElement?document.exitFullscreen():w.requestFullscreen().catch(()=>{})});$('bpip').addEventListener('click',async()=>{try{document.pictureInPictureElement?await document.exitPictureInPicture():await vid.requestPictureInPicture()}catch(e){toast('PiP no soportado','warn')}});$('bfch').addEventListener('click',()=>{if(S.cur)tF(nm(S.cur.name))});$('blm').addEventListener('click',()=>{S.d+=S.pp;rG()});$('bb-editor').addEventListener('click',()=>{oM('m-editor');editingId=null;rEdList();$('ed-area').classList.add('hidden')});$('bb-paste').addEventListener('click',()=>oM('m-paste'));$('bb-url').addEventListener('click',()=>oM('m-url'));$('bb-file').addEventListener('click',()=>oM('m-file'));$('bb-explorer').addEventListener('click',()=>oM('m-explorer'));$('btmdb').addEventListener('click',()=>{oM('m-tmdb');TMDB.updateUI()});$('ed-new').addEventListener('click',()=>openEditor(null));$('ed-text').addEventListener('input',updEdCount);$('ed-save').addEventListener('click',()=>{const name=$('ed-name').value.trim()||'Sin nombre',text=$('ed-text').value.trim();if(!text){toast('Escribí algo','warn');return}const list=gEd();if(editingId){const item=list.find(x=>x.id===editingId);if(item){item.name=name;item.text=text;item.date=Date.now()}}else{list.push({id:uid(),name,text,date:Date.now()})}sEd(list);editingId=null;rEdList();$('ed-area').classList.add('hidden');toast('Lista guardada','ok')});$('ed-load').addEventListener('click',()=>{const text=$('ed-text').value.trim(),name=$('ed-name').value.trim()||'Lista';if(!text){toast('Sin contenido','warn');return}loadFT(text,name);cM('m-editor')});$('ed-del').addEventListener('click',()=>{if(!editingId)return;let list=gEd();list=list.filter(x=>x.id!==editingId);sEd(list);editingId=null;rEdList();$('ed-area').classList.add('hidden');toast('Eliminada','info')});$('ed-cancel').addEventListener('click',()=>{editingId=null;rEdList();$('ed-area').classList.add('hidden')});const pt=$('pt-text'),pc=$('pt-count'),pb=$('pt-go');pt.addEventListener('input',()=>{const t=pt.value.trim();if(!t){pc.textContent='Sin contenido';pb.disabled=true;return}const urls=t.split('\n').filter(l=>l.trim().startsWith('http')).length,exts=t.split('\n').filter(l=>l.trim().startsWith('#EXTINF')).length;pc.textContent=`${exts} canales / ${urls} enlaces`;pb.disabled=urls===0});pb.addEventListener('click',()=>{const t=pt.value.trim();if(!t)return;cM('m-paste');loadFT(t,$('pt-name').value.trim()||'Lista pegada');pt.value='';$('pt-name').value='';pc.textContent='Sin contenido';pb.disabled=true});$('ur-go').addEventListener('click',()=>{const u=$('ur-in').value.trim();if(!u){toast('Ingresa URL','warn');return}cM('m-url');loadCust(u,$('ur-nm').value.trim());$('ur-in').value='';$('ur-nm').value=''});$('ex-go').addEventListener('click',()=>{const u=$('ex-in').value.trim();if(!u){toast('Ingresa una URL','warn');return}explorePage(u)});$('ex-in').addEventListener('keydown',e=>{if(e.key==='Enter'){const u=e.target.value.trim();if(u)explorePage(u)}});document.querySelectorAll('.ex-q').forEach(b=>{b.addEventListener('click',()=>{$('ex-in').value=b.dataset.u;explorePage(b.dataset.u)})});$('dr-go').addEventListener('click',()=>{const u=$('dr-in').value.trim(),n=$('dr-nm').value.trim();if(!u){toast('Ingresa URL','warn');return}cM('m-dir');$('dr-in').value='';$('dr-nm').value='';const s=$('psec');s.classList.remove('hidden');s.scrollIntoView({behavior:'smooth',block:'start'});$('vov').classList.remove('hidden');$('vomsg').textContent='Cargando...';$('pname').textContent=n||'Stream';$('pgrp').textContent='Manual';$('npbar').classList.remove('hidden');$('npn').textContent=n||'Stream';if(!pl)pl=new RP(vid);pl.playUrl(u,n||'Stream')});document.querySelectorAll('.mx').forEach(b=>b.addEventListener('click',()=>b.closest('.mo').classList.remove('on')));document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on')}));$('bclrh').addEventListener('click',()=>{localStorage.removeItem('svh');rH();toast('Historial limpio','info')});$('bout').addEventListener('click',lockApp);document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.mo.on').forEach(m=>m.classList.remove('on'))});initFH();initTMDB()}
+/* TMDB */
+const TMDB={key:localStorage.getItem('tmdbk')||'',base:'https://api.themoviedb.org/3',imgW:'https://image.tmdb.org/t/p/w342',
+setKey(k){this.key=k;localStorage.setItem('tmdbk',k);this.updateUI()},
+updateUI(){const st=$('tmdbkeystat'),si=$('tmdbsearch'),sel=$('tmdbtype');if(this.key){st.textContent='✅ Configurada';st.className='text-xs text-ok'}else{st.textContent='❌ Falta clave';st.className='text-xs text-err';si.disabled=true;sel.disabled=true;return}si.disabled=false;sel.disabled=false},
+async search(q,type,page=1){if(!this.key)throw new Error('Ingresá tu API Key de TMDB');const t=type==='todo'?'multi':type;const r=await fetch(`${this.base}/search/${t}?api_key=${this.key}&query=${encodeURIComponent(q)}&language=es-ES&page=${page}`);if(!r.ok)throw new Error('Clave inválida o error de conexión');return await r.json()},
+renderResults(res){const c=$('tmdbres'),emp=$('tmdbemp');c.innerHTML='';if(!res?.results?.length){emp.classList.remove('hidden');return}emp.classList.add('hidden');res.results.forEach(it=>{if(!it.poster_path)return;const isM=it.media_type==='movie'||!it.media_type;const ti=isM?it.title:it.name;const ye=(isM?it.release_date:it.first_air_date)?.substring(0,4)||'???';const el=document.createElement('div');el.className='rounded-lg overflow-hidden border border-bdr hover:border-accent transition-all cursor-pointer bg-card';el.innerHTML=`<div class="aspect-[2/3] bg-muted"><img src="${this.imgW}${it.poster_path}" alt="${ti}" class="w-full h-full object-cover" loading="lazy"></div><div class="p-2"><p class="text-xs font-medium truncate">${ti}</p><p class="text-[10px] text-muted">${ye} · ${isM?'Película':'Serie'}</p></div>`;
+el.addEventListener('click',()=>{cM('m-tmdb');S.q=ti;$('sinput').value=ti;applyF();window.scrollTo({top:0,behavior:'smooth'})});
+c.appendChild(el)})}};
+function initTMDB(){TMDB.updateUI();$('savetmdbk').addEventListener('click',()=>{const k=$('tmdbkey').value.trim();if(!k){toast('Escribí tu API Key primero','warn');return}TMDB.setKey(k);toast('Clave guardada correctamente','ok')});
+let tm;$('tmdbsearch').addEventListener('input',e=>{clearTimeout(tm);const q=e.target.value.trim();if(q.length<3){$('tmdbres').innerHTML='';$('tmdbemp').classList.add('hidden');return}tm=setTimeout(async()=>{$('tmdbemp').classList.add('hidden');$('tmdbres').innerHTML='<p class="text-center text-xs text-muted py-4">Buscando...</p>';try{const d=await TMDB.search(q,$('tmdbtype').value);TMDB.renderResults(d)}catch(e){$('tmdbres').innerHTML='';$('tmdbemp').classList.remove('hidden');$('tmdbemp').textContent=e.message;toast(e.message,'err')}},650)})}
 
-/* ===================================================================
-   INICIO
-   =================================================================== */
-async function initApp(){if(S.ini)return;S.ini=true;initEv();uFB();rH();$('load-scr').style.display='flex';try{await loadAll();$('lup').textContent=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});applyF()}catch(e){toast('Error al cargar','err')}const ls=$('load-scr');ls.style.transition='opacity 0.5s';ls.style.opacity='0';setTimeout(()=>{ls.style.display='none'},500);setInterval(async()=>{try{sessionStorage.removeItem('sv2');await loadAll(true);applyF();$('lup').textContent=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})}catch(e){}},30*60*1000)}
-document.addEventListener('DOMContentLoaded',initLock);
+/* INICIO GENERAL */
+async function initApp(){if(S.ini)return;S.ini=true;
+await loadAll();rG();rH();initFH();initTMDB();
+$('sinput').addEventListener('input',e=>{S.q=e.target.value.trim();applyF()});
+document.querySelectorAll('.catbtn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.catbtn').forEach(x=>x.classList.remove('bg-accent/20','text-accent'));b.classList.add('bg-accent/20','text-accent');S.cat=b.dataset.cat;applyF()})});
+$('bfav').addEventListener('click',()=>{S.fov=!S.fov;uFB();applyF()});
+$('loadmore').addEventListener('click',()=>{S.d+=S.pp;rG()});
+$('reloadall').addEventListener('click',async()=>{await loadAll(true);toast('Listas actualizadas','ok')});
+console.log('✅ StreamVault cargado completamente')}
