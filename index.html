@@ -3,293 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamVault - TV en Vivo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>StreamVault Pro</title>
     <link rel="stylesheet" href="style.css">
-    <script>
-    tailwind.config={theme:{extend:{fontFamily:{display:['Space Grotesk','sans-serif'],body:['DM Sans','sans-serif']},colors:{bg:'#0a0a0f',surface:'#111118',card:'#181822','card-h':'#20202e',bdr:'#2a2a3a',txt:'#eaeaf0',muted:'#7a7a95',accent:'#e8a020','accent-h':'#f0b840',ok:'#22c55e',err:'#ef4444',warn:'#f59e0b'}}}}
-    </script>
 </head>
-<body class="text-txt min-h-screen relative">
+<body>
+    <header>
+        <h1>📺 StreamVault Pro</h1>
+        <button id="cargarLista">Cargar Lista</button>
+    </header>
 
-<div class="bg-glow"></div>
-<div id="toasts" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm"></div>
+    <div class="container">
+        <aside id="listaCanales">
+            <h3>Canales</h3>
+            <div id="contenedorCanales"></div>
+        </aside>
 
-<!-- PANTALLA DE CLAVE -->
-<div id="lock-screen" class="ls">
-    <div class="bg-glow"></div>
-    <div class="relative z-10 text-center px-6 w-full max-w-sm">
-        <div class="lk text-5xl text-accent mb-6"><i class="fa-solid fa-lock"></i></div>
-        <h1 id="lkt" class="font-display text-2xl font-bold mb-1">StreamVault</h1>
-        <p id="lks" class="text-muted text-sm mb-8">Ingresá tu clave</p>
-        <div id="pind" class="flex justify-center gap-3 mb-8"><div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
-        <div class="flex flex-col items-center gap-3" id="keypad">
-            <div class="flex gap-3"><button class="kb" data-k="1">1</button><button class="kb" data-k="2">2</button><button class="kb" data-k="3">3</button></div>
-            <div class="flex gap-3"><button class="kb" data-k="4">4</button><button class="kb" data-k="5">5</button><button class="kb" data-k="6">6</button></div>
-            <div class="flex gap-3"><button class="kb" data-k="7">7</button><button class="kb" data-k="8">8</button><button class="kb" data-k="9">9</button></div>
-            <div class="flex gap-3"><button class="kb" data-k="x" style="visibility:hidden"></button><button class="kb" data-k="0">0</button><button class="kb" data-k="d"><i class="fa-solid fa-delete-left text-lg"></i></button></div>
-        </div>
-        <p id="lke" class="text-err text-xs mt-5 opacity-0 transition-opacity">Clave incorrecta</p>
-    </div>
-</div>
-
-<!-- HEADER -->
-<header id="hdr" class="relative z-10 border-b border-bdr bg-surface/80 backdrop-blur-md sticky top-0" style="display:none">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-        <div class="flex items-center gap-2 shrink-0">
-            <div class="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center"><i class="fa-solid fa-tower-broadcast text-accent text-sm"></i></div>
-            <span class="font-display font-bold text-lg text-txt hidden sm:block">StreamVault</span>
-        </div>
-        <div class="flex-1 max-w-md relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm"></i>
-            <input id="sinput" type="text" placeholder="Buscar canales..." class="w-full bg-card border border-bdr rounded-lg pl-9 pr-4 py-2 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition">
-        </div>
-        <div class="flex items-center gap-1.5">
-            <button id="btmdb" title="Buscar Películas (TMDB)" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-accent hover:border-accent/40 transition text-sm"><i class="fa-solid fa-film"></i></button>
-            <button id="bfav" title="Favoritos" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-accent hover:border-accent/40 transition text-sm"><i class="fa-solid fa-heart"></i></button>
-            <button id="bout" title="Cerrar / Bloquear" class="w-9 h-9 rounded-lg bg-card border border-bdr flex items-center justify-center text-muted hover:text-err hover:border-err/40 transition text-sm"><i class="fa-solid fa-right-from-bracket"></i></button>
-        </div>
-    </div>
-    <div class="cs flex gap-2 px-4 pb-3 max-w-7xl mx-auto">
-        <button data-c="all" class="cp catbtn shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-accent text-bg border-accent">Todos</button>
-        <button data-c="argentina" class="cp catbtn shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-location-dot mr-1"></i>Argentina</button>
-        <button data-c="deportes" class="cp catbtn shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-futbol mr-1"></i>Deportes</button>
-        <button data-c="peliculas" class="cp catbtn shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-film mr-1"></i>Películas</button>
-        <button data-c="noticias" class="cp catbtn shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-newspaper mr-1"></i>Noticias</button>
-        <button data-c="series" class="cp catbtn shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-tv mr-1"></i>Series</button>
-        <button data-c="musica" class="cp catbtn shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-music mr-1"></i>Música</button>
-        <button data-c="infantil" class="cp catbtn shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-child mr-1"></i>Infantil</button>
-        <button data-c="documentales" class="cp catbtn shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-book-open mr-1"></i>Documentales</button>
-        <button data-c="otros" class="cp catbtn shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition bg-card text-muted border-bdr hover:border-accent/40 hover:text-txt"><i class="fa-solid fa-ellipsis mr-1"></i>Más</button>
-    </div>
-</header>
-
-<!-- REPRODUCTOR -->
-<section id="psec" class="relative z-10 hidden max-w-7xl mx-auto px-4 mt-4">
-    <div class="pe bg-surface border border-bdr rounded-xl overflow-hidden">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-bdr">
-            <div class="flex items-center gap-3 min-w-0"><span class="live-dot w-2.5 h-2.5 rounded-full bg-err shrink-0"></span><span id="pname" class="font-display font-semibold text-sm truncate">-</span><span id="pgrp" class="text-xs text-muted bg-card px-2 py-0.5 rounded-full shrink-0">-</span></div>
-            <div class="flex items-center gap-2 shrink-0"><span id="pfb" class="text-xs text-warn hidden"><i class="fa-solid fa-rotate mr-1"></i>Probando...</span><button id="pcls" class="w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition"><i class="fa-solid fa-xmark"></i></button></div>
-        </div>
-        <div class="vw relative bg-black"><video id="vid" controls playsinline></video><div id="vov" class="absolute inset-0 bg-black/60 flex items-center justify-center hidden"><div class="text-center"><i class="fa-solid fa-satellite-dish text-4xl text-accent mb-3 block animate-pulse"></i><p class="text-sm text-muted" id="vomsg">Cargando...</p></div></div></div>
-        <div class="flex items-center gap-4 px-4 py-2.5">
-            <button id="bplay" class="text-accent hover:text-accent-h transition"><i class="fa-solid fa-play"></i></button>
-            <div class="flex items-center gap-2 flex-1 max-w-xs"><i class="fa-solid fa-volume-high text-muted text-xs"></i><input id="vslider" type="range" min="0" max="100" value="80" class="vs flex-1"></div>
-            <button id="bpip" class="text-muted hover:text-accent transition text-sm"><i class="fa-solid fa-clone"></i></button>
-            <button id="bfs" class="text-muted hover:text-accent transition text-sm"><i class="fa-solid fa-expand"></i></button>
-            <button id="bfch" class="text-muted hover:text-accent transition text-sm"><i class="fa-regular fa-heart"></i></button>
-        </div>
-    </div>
-</section>
-
-<!-- CONTENIDO PRINCIPAL -->
-<main id="mainc" class="relative z-10 max-w-7xl mx-auto px-4 py-6" style="display:none">
-    <div class="bg-gradient-to-r from-accent/10 via-card to-card border border-accent/20 rounded-xl p-5 mb-6">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="w-11 h-11 rounded-xl bg-accent/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-folder-plus text-accent text-lg"></i></div>
-            <div><h3 class="font-display font-bold text-sm">Cargar listas M3U</h3><p class="text-muted text-xs mt-0.5">Editor propio, pegar texto, URL, archivo o explorar páginas web</p></div>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-            <button id="bb-editor" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-accent text-bg text-xs font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-file-pen"></i>Mi Editor</button>
-            <button id="bb-paste" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-paste"></i>Pegar texto</button>
-            <button id="bb-url" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-link"></i>Desde URL</button>
-            <button id="bb-file" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-file-arrow-up"></i>Archivo</button>
-            <button id="bb-explorer" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition col-span-2 sm:col-span-1"><i class="fa-solid fa-globe"></i>Explorar web</button>
-        </div>
-    </div>
-    <div id="histsec" class="mb-6 hidden">
-        <div class="flex items-center justify-between mb-2"><h3 class="text-xs font-medium text-muted"><i class="fa-solid fa-clock-rotate-left mr-1.5"></i>Cargadas recientemente</h3><button id="bclrh" class="text-[10px] text-muted/50 hover:text-err transition">Limpiar</button></div>
-        <div id="histlist" class="flex gap-2 overflow-x-auto cs pb-1"></div>
-    </div>
-    <div class="flex items-center justify-between mb-4">
-        <div><h2 id="gtitle" class="font-display text-xl font-bold">Todos los canales</h2><p id="gcount" class="text-xs text-muted mt-0.5">0 canales</p></div>
-        <button id="reloadall" class="text-xs text-muted hover:text-accent transition"><i class="fa-solid fa-rotate-right mr-1"></i>Actualizar</button>
-    </div>
-    <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"></div>
-    <div id="lmwrap" class="text-center mt-6 hidden"><button id="blm" class="px-6 py-2.5 rounded-lg bg-card border border-bdr text-sm text-muted hover:text-accent hover:border-accent/40 transition">Cargar más</button></div>
-    <div id="emptyst" class="hidden text-center py-20"><i class="fa-solid fa-satellite-dish text-5xl text-bdr mb-4 block"></i><p class="text-muted text-sm">No se encontraron canales</p></div>
-</main>
-
-<!-- BARRA REPRODUCCIÓN -->
-<div id="npbar" class="nb fixed bottom-0 left-0 right-0 z-30 hidden px-4 py-3">
-    <div class="max-w-7xl mx-auto flex items-center gap-4">
-        <div class="flex items-center gap-3 flex-1 min-w-0"><span class="live-dot w-2 h-2 rounded-full bg-err shrink-0"></span><span id="npn" class="text-sm font-medium truncate">-</span></div>
-        <div class="flex items-center gap-2">
-            <button id="npp" class="w-9 h-9 rounded-full bg-accent/20 text-accent flex items-center justify-center hover:bg-accent/30 transition"><i class="fa-solid fa-pause text-sm"></i></button>
-            <button id="npc" class="w-9 h-9 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-    </div>
-</div>
-
-<!-- MODALES -->
-<div id="m-editor" class="mo">
-    <div class="mb">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-file-pen text-accent mr-2"></i>Mi Editor M3U</h3>
-            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <p class="text-muted text-xs mb-4">Guardá y editá tus listas M3U. Todo se guarda en tu navegador.</p>
-        <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-muted">Mis listas guardadas</span>
-            <button id="ed-new" class="text-xs text-accent hover:text-accent-h transition font-medium"><i class="fa-solid fa-plus mr-1"></i>Nueva</button>
-        </div>
-        <div id="ed-list" class="space-y-1.5 mb-4 max-h-40 overflow-y-auto"></div>
-        <div id="ed-area" class="hidden">
-            <label class="text-xs text-muted mb-1.5 block">Nombre de la lista</label>
-            <input id="ed-name" type="text" placeholder="Mi lista de deportes" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-3">
-            <label class="text-xs text-muted mb-1.5 block">Contenido M3U</label>
-            <textarea id="ed-text" class="pa w-full rounded-xl p-4 mb-2" placeholder="#EXTINF:-1 group-title=&quot;Deportes&quot;,Canal HD&#10;https://ejemplo.com/canal.m3u8"></textarea>
-            <p id="ed-count" class="text-[10px] text-muted/50 mb-4">Sin contenido</p>
-            <div class="flex flex-wrap gap-2">
-                <button id="ed-save" class="px-4 py-2 rounded-lg bg-accent text-bg text-xs font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Guardar</button>
-                <button id="ed-load" class="px-4 py-2 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-play mr-1.5"></i>Cargar canales</button>
-                <button id="ed-del" class="px-4 py-2 rounded-lg bg-card border border-err/30 text-xs font-medium text-err/70 hover:text-err hover:border-err/50 transition"><i class="fa-solid fa-trash mr-1.5"></i>Eliminar</button>
-                <button id="ed-cancel" class="px-4 py-2 rounded-lg bg-card border border-bdr text-xs font-medium text-muted hover:text-txt transition ml-auto">Cancelar</button>
+        <main id="reproductor">
+            <div class="video-container">
+                <video id="player" controls autoplay></video>
+                <p>Selecciona un canal para reproducir</p>
             </div>
-        </div>
+        </main>
     </div>
-</div>
 
-<div id="m-paste" class="mo">
-    <div class="mb">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-paste text-accent mr-2"></i>Pegar texto M3U</h3>
-            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <textarea id="pt-text" class="pa w-full rounded-xl p-4 mb-2" placeholder="#EXTINF:-1 group-title=&quot;Deportes&quot;,Canal HD&#10;https://ejemplo.com/canal.m3u8"></textarea>
-        <p id="pt-count" class="text-[10px] text-muted/50 mb-1">Sin contenido</p>
-        <input id="pt-name" type="text" placeholder="Nombre (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4">
-        <div class="flex justify-end"><button id="pt-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition disabled:opacity-40" disabled><i class="fa-solid fa-plus mr-1.5"></i>Agregar canales</button></div>
-    </div>
-</div>
-
-<div id="m-url" class="mo">
-    <div class="mb">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-link text-accent mr-2"></i>Desde URL</h3>
-            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <p class="text-muted text-xs mb-3">Pegá la URL directa de un archivo .m3u o .m3u8</p>
-        <input id="ur-in" type="url" placeholder="https://ejemplo.com/lista.m3u" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-2">
-        <input id="ur-nm" type="text" placeholder="Nombre (opcional)" class="w-full bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition mb-4">
-        <div class="flex justify-end"><button id="ur-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-download mr-1.5"></i>Cargar lista</button></div>
-    </div>
-</div>
-
-<div id="m-file" class="mo">
-    <div class="mb">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-file-arrow-up text-accent mr-2"></i>Archivo local</h3>
-            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div id="dropz" class="dz p-8 text-center mb-4">
-            <input type="file" id="finp" accept=".m3u,.m3u8,.txt" class="hidden">
-            <i class="fa-solid fa-cloud-arrow-up text-3xl text-muted/40 mb-3 block"></i>
-            <p class="text-sm text-muted mb-1">Arrastrá tu archivo acá</p>
-            <p class="text-xs text-muted/50 mb-4">o hacé clic para seleccionar</p>
-            <span class="inline-block px-4 py-2 rounded-lg bg-card border border-bdr text-xs text-muted hover:text-accent hover:border-accent/40 transition"><i class="fa-solid fa-folder-open mr-1.5"></i>Seleccionar</span>
-            <p class="text-[10px] text-muted/40 mt-3">.m3u, .m3u8, .txt</p>
-        </div>
-        <div id="finfo" class="hidden bg-bg border border-bdr rounded-lg p-3 mb-4">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines text-accent text-sm"></i></div>
-                <div class="flex-1 min-w-0"><p id="fnm" class="text-sm font-medium truncate">-</p><p id="fsz" class="text-[10px] text-muted">-</p></div>
-                <button id="frem" class="w-7 h-7 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-err transition text-xs"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-        </div>
-        <div class="flex justify-end"><button id="fl-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition disabled:opacity-40" disabled><i class="fa-solid fa-plus mr-1.5"></i>Agregar</button></div>
-    </div>
-</div>
-
-<div id="m-explorer" class="mo">
-    <div class="mb">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-globe text-accent mr-2"></i>Explorador Web</h3>
-            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <p class="text-muted text-xs mb-3">Pegá la URL de cualquier página web y busco todos los archivos M3U que tenga.</p>
-        <div class="flex gap-2 mb-3">
-            <input id="ex-in" type="url" placeholder="https://github.com/usuario/repo" class="flex-1 bg-bg border border-bdr rounded-lg px-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition">
-            <button id="ex-go" class="px-5 py-2.5 rounded-lg bg-accent text-bg text-sm font-semibold hover:bg-accent-h transition shrink-0"><i class="fa-solid fa-magnifying-glass"></i></button>
-        </div>
-        <div class="flex flex-wrap gap-1.5 mb-4">
-            <span class="text-[10px] text-muted/50 self-center mr-1">Ejemplos:</span>
-            <button class="ex-q text-[10px] px-2.5 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-u="https://github.com/Free-TV/IPTV">Free-TV IPTV</button>
-            <button class="ex-q text-[10px] px-2.5 py-1 rounded-full bg-card border border-bdr text-muted hover:text-accent hover:border-accent/40 transition" data-u="https://github.com/iptv-org/iptv">iptv-org</button>
-        </div>
-        <div id="ex-status" class="hidden bg-bg border border-bdr rounded-lg p-3 mb-3">
-            <div class="flex items-center gap-2"><i class="fa-solid fa-spinner spin text-accent text-sm"></i><span class="text-xs text-muted" id="ex-stmsg">Analizando página...</span></div>
-        </div>
-        <div id="ex-results" class="space-y-2 max-h-72 overflow-y-auto"></div>
-        <div id="ex-empty" class="hidden text-center py-8"><i class="fa-solid fa-magnifying-glass text-3xl text-bdr mb-3 block"></i><p class="text-muted text-xs">No se encontraron archivos M3U en esa página</p></div>
-    </div>
-</div>
-
-<div id="m-tmdb" class="mo">
-    <div class="mb" style="max-width:720px">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg"><i class="fa-solid fa-clapperboard text-accent mr-2"></i>Buscar Películas</h3>
-            <button class="mx w-8 h-8 rounded-lg hover:bg-card flex items-center justify-center text-muted hover:text-txt transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div id="tmdb-key-section" class="bg-bg border border-bdr rounded-lg p-3 mb-4">
-            <div class="flex items-center gap-2 mb-2">
-                <i class="fa-solid fa-key text-accent text-xs"></i>
-                <span class="text-xs font-medium text-muted">API Key de TMDB</span>
-                <span id="tmdb-key-status" class="text-[10px] px-2 py-0.5 rounded-full bg-err/15 text-err">Sin configurar</span>
-            </div>
-            <div class="flex gap-2">
-                <input id="tmdb-key-input" type="text" placeholder="Pegá tu API Key v3 de themoviedb.org" class="flex-1 bg-surface border border-bdr rounded-lg px-3 py-2 text-xs text-txt placeholder:text-muted/50 focus:outline-none focus:border-accent/50 transition font-mono">
-                <button id="tmdb-key-save" class="px-3 py-2 rounded-lg bg-accent text-bg text-xs font-semibold hover:bg-accent-h transition shrink-0">Guardar</button>
-            </div>
-            <p class="text-[10px] text-muted/40 mt-1.5">Obtené tu clave gratuita en themoviedb.org/settings/api</p>
-        </div>
-        <div class="flex gap-2 mb-3">
-            <div class="flex-1 relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-muted/50 text-xs"></i>
-                <input id="tmdb-search" type="text" placeholder="Buscar películas..." class="w-full bg-bg border border-bdr rounded-lg pl-9 pr-4 py-2.5 text-sm text-txt placeholder:text-muted focus:outline-none focus:border-accent/50 transition" disabled>
-            </div>
-            <select id="tmdb-type" class="bg-bg border border-bdr rounded-lg px-3 py-2.5 text-xs text-muted focus:outline-none focus:border-accent/50 transition" disabled>
-                <option value="movie">Películas</option>
-                <option value="tv">Series</option>
-                <option value="multi">Todo</option>
-            </select>
-        </div>
-        <div id="tmdb-loading" class="hidden text-center py-8"><i class="fa-solid fa-spinner spin text-accent text-2xl mb-3 block"></i><p class="text-muted text-xs">Buscando...</p></div>
-        <div id="tmdb-results" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[50vh] overflow-y-auto"></div>
-        <div id="tmdb-empty" class="text-center py-8"><i class="fa-solid fa-film text-3xl text-bdr mb-3 block"></i><p class="text-muted text-xs" id="tmdb-empty-msg">Configurá tu API Key para empezar</p></div>
-        <div id="tmdb-detail" class="hidden">
-            <button id="tmdb-detail-back" class="text-xs text-accent hover:text-accent-h transition mb-3 inline-flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i>Volver</button>
-            <div class="flex gap-4">
-                <img id="td-poster" class="w-28 h-40 rounded-lg object-cover bg-card shrink-0" src="" alt="">
-                <div class="flex-1 min-w-0">
-                    <h4 id="td-title" class="font-display font-bold text-base mb-1">-</h4>
-                    <div class="flex items-center gap-2 mb-2 flex-wrap">
-                        <span id="td-year" class="text-[10px] text-muted bg-card px-2 py-0.5 rounded-full">-</span>
-                        <span id="td-rating" class="text-[10px] text-accent bg-accent/15 px-2 py-0.5 rounded-full"><i class="fa-solid fa-star mr-0.5"></i>-</span>
-                        <span id="td-runtime" class="text-[10px] text-muted bg-card px-2 py-0.5 rounded-full">-</span>
-                    </div>
-                    <p id="td-genres" class="text-[10px] text-muted mb-2">-</p>
-                    <p id="td-overview" class="text-xs text-muted leading-relaxed mb-3">-</p>
-                    <div class="flex gap-2 flex-wrap">
-                        <button id="td-search-stream" class="px-3 py-1.5 rounded-lg bg-accent text-bg text-[11px] font-semibold hover:bg-accent-h transition"><i class="fa-solid fa-satellite-dish mr-1"></i>Buscar stream</button>
-                        <a id="td-tmdb-link" href="#" target="_blank" class="px-3 py-1.5 rounded-lg bg-card border border-bdr text-[11px] text-muted hover:text-accent hover:border-accent/40 transition inline-flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square"></i>Ver en TMDB</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<footer id="ftr" class="relative z-10 border-t border-bdr mt-12 pb-20" style="display:none">
-    <div class="max-w-7xl mx-auto px-4 py-6 text-center"><p class="text-muted text-xs">StreamVault &mdash; TV Argentina e IPTV</p></div>
-</footer>
-
-<script src="canales.js"></script>
-<script src="app.js"></script>
+    <script src="Canales.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
 
