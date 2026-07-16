@@ -1,6 +1,8 @@
 :root{--accent:#e8a020;--bg:#0a0a0f}
 *{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#2a2a3a transparent}
-::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);overflow-x:hidden;margin:0}
 .bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 400px at 20% 10%,rgba(232,160,32,.06),transparent),radial-gradient(ellipse 500px 500px at 80% 80%,rgba(220,80,50,.04),transparent);animation:gl 20s ease-in-out infinite alternate}
 @keyframes gl{to{opacity:.7;transform:scale(1.1)}}
