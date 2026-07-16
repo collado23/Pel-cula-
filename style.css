@@ -88,3 +88,19 @@ video {
     height: 100%;
     border-radius: 8px;
 }
+#categorias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #333;
+}
+#categorias button {
+    padding: 4px 8px;
+    font-size: 12px;
+    background: #333;
+}
+#categorias button.cat-activa {
+    background: #2563eb;
+}
